@@ -11,6 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { User, Tenant } from '../entities';
 import { JwtService } from './jwt.service';
 import { EmailService } from './email.service';
+import { RefreshTokenService } from './refresh-token.service';
 import { RegisterDto } from '../dto/register.dto';
 import {
   LoginRequest,
@@ -29,7 +30,8 @@ export class AuthService {
     @InjectRepository(Tenant)
     private readonly tenantRepository: Repository<Tenant>,
     private readonly jwtService: JwtService,
-    private readonly emailService: EmailService
+    private readonly emailService: EmailService,
+    private readonly refreshTokenService: RefreshTokenService
   ) {}
 
   /**
@@ -180,19 +182,46 @@ export class AuthService {
     user.updateLastLogin(ipAddress);
     await this.userRepository.save(user);
 
-    // Generate tokens
-    const tokenPair = this.jwtService.generateTokenPair({
-      id: user.id,
+    // Create refresh token with device info
+    const refreshTokenEntity =
+      await this.refreshTokenService.createRefreshToken(user, {
+        ...(ipAddress && { ipAddress }),
+      });
+
+    // Generate access token
+    const accessToken = this.jwtService.generateAccessToken({
+      sub: user.id,
       email: user.email,
-      role: user.role,
-      status: user.status,
       tenantId: user.tenantId,
+      role: user.role,
     });
 
+    // Generate refresh token JWT using the entity's tokenId
+    const refreshToken = this.jwtService.generateRefreshToken(
+      user.id,
+      refreshTokenEntity.tokenId
+    );
+
+    // Update the refresh token entity with the hash of the JWT
+    const tokenHash = this.refreshTokenService.hashToken(refreshToken);
+    await this.refreshTokenService.updateTokenHash(
+      refreshTokenEntity.tokenId,
+      tokenHash
+    );
+
+    // Calculate expiration time
+    const expiresIn = this.jwtService.getTokenExpiration(accessToken)?.getTime()
+      ? Math.floor(
+          (this.jwtService.getTokenExpiration(accessToken)!.getTime() -
+            Date.now()) /
+            1000
+        )
+      : 0;
+
     return {
-      accessToken: tokenPair.accessToken,
-      refreshToken: tokenPair.refreshToken,
-      expiresIn: tokenPair.expiresIn,
+      accessToken,
+      refreshToken,
+      expiresIn,
       user: {
         id: user.id,
         email: user.email,
@@ -334,43 +363,114 @@ export class AuthService {
   }
 
   /**
-   * Refresh access token
+   * Refresh access token with rotation
    */
   async refreshToken(
-    refreshToken: string
-  ): Promise<{ accessToken: string; expiresIn: number }> {
+    refreshToken: string,
+    deviceInfo?: {
+      ipAddress?: string;
+      userAgent?: string;
+      deviceId?: string;
+      deviceName?: string;
+      deviceType?: string;
+      location?: string;
+    }
+  ): Promise<{ accessToken: string; refreshToken: string; expiresIn: number }> {
     try {
-      const payload = this.jwtService.verifyRefreshToken(refreshToken);
+      // Validate refresh token and get user
+      const user =
+        await this.refreshTokenService.validateRefreshToken(refreshToken);
 
-      const user = await this.userRepository.findOne({
-        where: { id: payload.sub },
-      });
-
-      if (!user || user.status !== UserStatus.ACTIVE) {
-        throw new UnauthorizedException('Invalid refresh token');
+      if (user.status !== UserStatus.ACTIVE) {
+        throw new UnauthorizedException('User account is not active');
       }
 
-      return this.jwtService.refreshAccessToken(refreshToken, {
-        id: user.id,
+      // Rotate refresh token (invalidate old, create new)
+      const { newToken: newRefreshTokenEntity } =
+        await this.refreshTokenService.rotateRefreshToken(
+          refreshToken,
+          user,
+          deviceInfo
+        );
+
+      // Generate new access token
+      const accessToken = this.jwtService.generateAccessToken({
+        sub: user.id,
         email: user.email,
-        role: user.role,
-        status: user.status,
         tenantId: user.tenantId,
+        role: user.role,
       });
+
+      // Generate new refresh token JWT
+      const newRefreshToken = this.jwtService.generateRefreshToken(
+        user.id,
+        newRefreshTokenEntity.tokenId
+      );
+
+      // Update the new refresh token entity with the hash of the JWT
+      const tokenHash = this.refreshTokenService.hashToken(newRefreshToken);
+      await this.refreshTokenService.updateTokenHash(
+        newRefreshTokenEntity.tokenId,
+        tokenHash
+      );
+
+      const expiresIn = this.jwtService
+        .getTokenExpiration(accessToken)
+        ?.getTime()
+        ? Math.floor(
+            (this.jwtService.getTokenExpiration(accessToken)!.getTime() -
+              Date.now()) /
+              1000
+          )
+        : 0;
+
+      return {
+        accessToken,
+        refreshToken: newRefreshToken,
+        expiresIn,
+      };
     } catch (error) {
       throw new UnauthorizedException('Invalid refresh token');
     }
   }
 
   /**
-   * Logout user (invalidate refresh token)
+   * Logout user (revoke refresh token)
    */
-  async logout(userId: string): Promise<{ message: string }> {
-    // In a real implementation, you would add the refresh token to a blacklist
-    // or use Redis to track invalidated tokens
+  async logout(
+    userId: string,
+    refreshToken?: string
+  ): Promise<{ message: string }> {
+    if (refreshToken) {
+      // Extract token ID and revoke specific token
+      const tokenId = this.extractTokenIdFromJwt(refreshToken);
+      if (tokenId) {
+        await this.refreshTokenService.revokeRefreshToken(tokenId);
+      }
+    } else {
+      // Revoke all tokens for the user
+      await this.refreshTokenService.revokeAllUserTokens(userId);
+    }
+
     return {
       message: 'Logged out successfully.',
     };
+  }
+
+  /**
+   * Extract token ID from JWT payload
+   */
+  private extractTokenIdFromJwt(token: string): string | null {
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3 || !parts[1]) {
+        return null;
+      }
+      const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
+      return payload.tokenId || null;
+    } catch {
+      return null;
+    }
   }
 
   /**

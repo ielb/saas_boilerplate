@@ -1,0 +1,18 @@
+{
+  "collection": "./collections/SaaS-Boilerplate-Tests.postman_collection.json",
+  "environment": "./environments/Development.postman_environment.json",
+  "reporters": ["cli", "json", "junit"],
+  "reporter": {
+    "json": {
+      "export": "./reports/newman-report.json"
+    },
+    "junit": {
+      "export": "./reports/newman-report.xml"
+    }
+  },
+  "iterationCount": 1,
+  "delayRequest": 100,
+  "timeout": 30000,
+  "bail": false,
+  "verbose": true
+}

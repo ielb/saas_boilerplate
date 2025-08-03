@@ -107,38 +107,38 @@ Based on PRD: `docs/prd.md`
   - [x] 2.2 Implement JWT token generation and validation
   - [x] 2.3 Create user registration with email verification
   - [x] 2.4 Implement login with password validation (Argon2)
-  - [ ] 2.5 Add refresh token mechanism with rotation
-  - [ ] 2.6 Implement multi-factor authentication (TOTP)
-  - [ ] 2.7 Create password reset functionality with secure tokens
-  - [ ] 2.8 Implement session management and device tracking
-  - [ ] 2.9 Set up role-based access control (RBAC)
-  - [ ] 2.10 Create resource-level permission system
-  - [ ] 2.11 Implement API rate limiting and brute force protection
-  - [ ] 2.12 Add security headers and CORS configuration
-  - [ ] 2.13 Create authentication guards and decorators
-  - [ ] 2.14 Implement account recovery with backup codes
-  - [ ] 2.15 Set up audit logging for authentication events
+  - [x] 2.5 Add refresh token mechanism with rotation (#29)
+  - [ ] 2.6 Implement multi-factor authentication (TOTP) (#4)
+  - [ ] 2.7 Create password reset functionality with secure tokens (#5)
+  - [ ] 2.8 Implement session management and device tracking (#6)
+  - [ ] 2.9 Set up role-based access control (RBAC) (#7)
+  - [ ] 2.10 Create resource-level permission system (#8)
+  - [ ] 2.11 Implement API rate limiting and brute force protection (#14)
+  - [ ] 2.12 Add security headers and CORS configuration (#15)
+  - [ ] 2.13 Create authentication guards and decorators (#16)
+  - [ ] 2.14 Implement account recovery with backup codes (#17)
+  - [ ] 2.15 Set up audit logging for authentication events (#18)
 
 - [ ] 3.0 Multi-Tenant Architecture & User Management
-  - [ ] 3.1 Design and implement tenant database schema
-  - [ ] 3.2 Create tenant isolation middleware and interceptors
-  - [ ] 3.3 Implement tenant-scoped database queries
-  - [ ] 3.4 Set up tenant onboarding workflow
-  - [ ] 3.5 Create tenant switching functionality
-  - [ ] 3.6 Implement tenant branding customization
-  - [ ] 3.7 Set up feature flags per tenant
-  - [ ] 3.8 Create user lifecycle management (registration, activation, suspension)
-  - [ ] 3.9 Implement user profile management with avatar upload
-  - [ ] 3.10 Create team collaboration with role hierarchy
-  - [ ] 3.11 Implement invitation system with email notifications
-  - [ ] 3.12 Add bulk user import/export with CSV support
-  - [ ] 3.13 Create team switching and multi-team membership
-  - [ ] 3.14 Implement access delegation and temporary permissions
-  - [ ] 3.15 Set up tenant usage analytics and reporting
+  - [ ] 3.1 Design and implement tenant database schema (#9)
+  - [ ] 3.2 Create tenant isolation middleware and interceptors (#10)
+  - [ ] 3.3 Implement tenant-scoped database queries (#19)
+  - [ ] 3.4 Set up tenant onboarding workflow (#20)
+  - [ ] 3.5 Create tenant switching functionality (#21)
+  - [ ] 3.6 Implement tenant branding customization (#30)
+  - [ ] 3.7 Set up feature flags per tenant (#31)
+  - [ ] 3.8 Create user lifecycle management (registration, activation, suspension) (#32)
+  - [ ] 3.9 Implement user profile management with avatar upload (#33)
+  - [ ] 3.10 Create team collaboration with role hierarchy (#34)
+  - [ ] 3.11 Implement invitation system with email notifications (#35)
+  - [ ] 3.12 Add bulk user import/export with CSV support (#36)
+  - [ ] 3.13 Create team switching and multi-team membership (#37)
+  - [ ] 3.14 Implement access delegation and temporary permissions (#38)
+  - [ ] 3.15 Set up tenant usage analytics and reporting (#39)
 
 - [ ] 4.0 Payment & Billing Infrastructure
-  - [ ] 4.1 Set up Stripe integration and webhook handling
-  - [ ] 4.2 Create subscription plan configuration system
+  - [ ] 4.1 Set up Stripe integration and webhook handling (#11)
+  - [ ] 4.2 Create subscription plan configuration system (#22)
   - [ ] 4.3 Implement subscription management (create, update, cancel)
   - [ ] 4.4 Add payment method management (cards, ACH, international)
   - [ ] 4.5 Create invoice generation with PDF templates
@@ -154,8 +154,8 @@ Based on PRD: `docs/prd.md`
   - [ ] 4.15 Implement billing data export and reporting
 
 - [ ] 5.0 Communication & Notification System
-  - [ ] 5.1 Set up email provider abstraction (SMTP, SES, SendGrid, Postmark)
-  - [ ] 5.2 Create email template engine with MJML and Handlebars
+  - [ ] 5.1 Set up email provider abstraction (SMTP, SES, SendGrid, Postmark) (#12)
+  - [ ] 5.2 Create email template engine with MJML and Handlebars (#23)
   - [ ] 5.3 Implement email queue with BullMQ background processing
   - [ ] 5.4 Add email delivery tracking and bounce handling
   - [ ] 5.5 Create notification preference management system
@@ -171,7 +171,7 @@ Based on PRD: `docs/prd.md`
   - [ ] 5.15 Implement notification unsubscribe and compliance
 
 - [ ] 6.0 File Management & Document Processing
-  - [ ] 6.1 Set up file storage abstraction (S3, GCS, local)
+  - [ ] 6.1 Set up file storage abstraction (S3, GCS, local) (#24)
   - [ ] 6.2 Implement secure file upload with pre-signed URLs
   - [ ] 6.3 Create file validation and virus scanning
   - [ ] 6.4 Implement folder structure and organization system
@@ -188,7 +188,7 @@ Based on PRD: `docs/prd.md`
   - [ ] 6.15 Create file preview and thumbnail generation
 
 - [ ] 7.0 Real-Time Features & WebSocket Infrastructure
-  - [ ] 7.1 Set up WebSocket gateway with NestJS
+  - [ ] 7.1 Set up WebSocket gateway with NestJS (#25)
   - [ ] 7.2 Implement connection management and scaling
   - [ ] 7.3 Create room-based messaging for tenant isolation
   - [ ] 7.4 Implement presence system (online status, activity indicators)
@@ -205,7 +205,7 @@ Based on PRD: `docs/prd.md`
   - [ ] 7.15 Create WebSocket load balancing and clustering
 
 - [ ] 8.0 Administrative Features & Analytics
-  - [ ] 8.1 Implement user impersonation with audit trails
+  - [ ] 8.1 Implement user impersonation with audit trails (#26)
   - [ ] 8.2 Create system monitoring and health checks
   - [ ] 8.3 Set up comprehensive audit logging
   - [ ] 8.4 Implement data backup and restore tools
@@ -222,10 +222,10 @@ Based on PRD: `docs/prd.md`
   - [ ] 8.15 Add admin user management and permissions
 
 - [ ] 9.0 Developer Experience & Documentation
-  - [ ] 9.1 Set up OpenAPI/Swagger documentation generation
+  - [ ] 9.1 Set up OpenAPI/Swagger documentation generation (#27)
   - [ ] 9.2 Create comprehensive API documentation
   - [ ] 9.3 Implement SDK generation for popular languages
-  - [ ] 9.4 Create Postman collections for all API endpoints
+  - [x] 9.4 Create Postman collections for all API endpoints
   - [ ] 9.5 Set up GraphQL layer (optional)
   - [ ] 9.6 Implement local development environment with hot reloading
   - [ ] 9.7 Create comprehensive testing framework setup
@@ -239,7 +239,7 @@ Based on PRD: `docs/prd.md`
   - [ ] 9.15 Add development environment performance profiling
 
 - [ ] 10.0 Testing, Security & Deployment
-  - [ ] 10.1 Set up comprehensive unit testing framework
+  - [ ] 10.1 Set up comprehensive unit testing framework (#28)
   - [ ] 10.2 Implement integration testing for all API endpoints
   - [ ] 10.3 Create end-to-end testing with Playwright/Cypress
   - [ ] 10.4 Add performance testing and load testing

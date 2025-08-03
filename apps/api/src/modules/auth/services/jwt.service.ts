@@ -27,10 +27,9 @@ export class JwtService {
   }
 
   /**
-   * Generate refresh token
+   * Generate refresh token with token ID
    */
-  generateRefreshToken(userId: string): string {
-    const tokenId = uuidv4();
+  generateRefreshToken(userId: string, tokenId: string): string {
     const payload: Omit<RefreshTokenPayload, 'iat' | 'exp'> = {
       sub: userId,
       tokenId,
@@ -128,7 +127,8 @@ export class JwtService {
       role: user.role,
     });
 
-    const refreshToken = this.generateRefreshToken(user.id);
+    const tokenId = uuidv4();
+    const refreshToken = this.generateRefreshToken(user.id, tokenId);
 
     // Calculate expiration time in seconds
     const expiresIn = this.getTokenExpirationInSeconds(accessToken);

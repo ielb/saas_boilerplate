@@ -19,6 +19,7 @@ import { Request } from 'express';
 import { AuthService } from '../services/auth.service';
 import { RegisterDto } from '../dto/register.dto';
 import { LoginDto } from '../dto/login.dto';
+import { RefreshTokenDto } from '../dto/refresh-token.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { LoginRequest, LoginResponse } from '@app/shared';
 
@@ -158,7 +159,7 @@ export class AuthController {
   }
 
   @Post('refresh')
-  @ApiOperation({ summary: 'Refresh access token' })
+  @ApiOperation({ summary: 'Refresh access token with rotation' })
   @ApiResponse({
     status: 200,
     description: 'Token refreshed successfully',
@@ -166,13 +167,20 @@ export class AuthController {
       type: 'object',
       properties: {
         accessToken: { type: 'string' },
+        refreshToken: { type: 'string' },
         expiresIn: { type: 'number' },
       },
     },
   })
   @ApiResponse({ status: 401, description: 'Invalid refresh token' })
-  async refreshToken(@Body('refreshToken') refreshToken: string) {
-    return this.authService.refreshToken(refreshToken);
+  async refreshToken(
+    @Body() refreshTokenDto: RefreshTokenDto,
+    @Req() req: Request
+  ) {
+    const ipAddress = req.ip || req.connection.remoteAddress;
+    return this.authService.refreshToken(refreshTokenDto.refreshToken, {
+      ...(ipAddress && { ipAddress }),
+    });
   }
 
   @Post('logout')

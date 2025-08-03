@@ -33,7 +33,7 @@ export class EmailService {
       provider: 'smtp',
       smtp: {
         host: process.env.SMTP_HOST || 'localhost',
-        port: parseInt(process.env.SMTP_PORT || '587'),
+        port: parseInt(process.env.SMTP_PORT || '1025'), // Changed to 1025 for Mailhog
         secure: process.env.SMTP_SECURE === 'true',
         user: process.env.SMTP_USER || '',
         pass: process.env.SMTP_PASS || '',
@@ -46,11 +46,17 @@ export class EmailService {
           host: config.smtp.host,
           port: config.smtp.port,
           secure: config.smtp.secure,
-          auth: {
-            user: config.smtp.user,
-            pass: config.smtp.pass,
-          },
-        });
+          auth:
+            config.smtp.user && config.smtp.pass
+              ? {
+                  user: config.smtp.user,
+                  pass: config.smtp.pass,
+                }
+              : undefined, // Use undefined instead of false for no auth
+          // Add these options for Mailhog
+          ignoreTLS: true,
+          requireTLS: false,
+        } as any); // Type assertion to avoid TypeScript issues
         break;
 
       case 'sendgrid':
@@ -74,11 +80,17 @@ export class EmailService {
           host: config.smtp.host,
           port: config.smtp.port,
           secure: config.smtp.secure,
-          auth: {
-            user: config.smtp.user,
-            pass: config.smtp.pass,
-          },
-        });
+          auth:
+            config.smtp.user && config.smtp.pass
+              ? {
+                  user: config.smtp.user,
+                  pass: config.smtp.pass,
+                }
+              : undefined, // Use undefined instead of false for no auth
+          // Add these options for Mailhog
+          ignoreTLS: true,
+          requireTLS: false,
+        } as any); // Type assertion to avoid TypeScript issues
     }
   }
 

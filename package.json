@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "dev": "yarn workspaces run dev",
-    "api:dev": "yarn workspace @app/api start:dev",
+    "start:api:dev": "yarn workspace @app/api start:dev",
     "build": "yarn workspaces run build",
     "test": "yarn workspaces run test",
     "test:unit": "yarn workspaces run test:unit",
