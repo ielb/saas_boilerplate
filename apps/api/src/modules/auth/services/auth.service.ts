@@ -424,25 +424,34 @@ export class AuthService {
   /**
    * Forgot password
    */
-  async forgotPassword(email: string): Promise<void> {
+  async forgotPassword(email: string): Promise<{ message: string }> {
     const user = await this.userRepository.findOne({
       where: { email },
     });
 
     if (!user) {
       // Don't reveal if user exists
-      return;
+      return {
+        message: 'Password reset email sent',
+      };
     }
 
     user.generatePasswordResetToken();
     await this.userRepository.save(user);
     await this.emailService.sendPasswordReset(user);
+
+    return {
+      message: 'Password reset email sent',
+    };
   }
 
   /**
    * Reset password
    */
-  async resetPassword(token: string, newPassword: string): Promise<void> {
+  async resetPassword(
+    token: string,
+    newPassword: string
+  ): Promise<{ message: string; status: string }> {
     const user = await this.userRepository.findOne({
       where: { passwordResetToken: token },
     });
@@ -460,5 +469,10 @@ export class AuthService {
     user.passwordResetTokenExpiresAt = null;
     await user.hashPassword();
     await this.userRepository.save(user);
+
+    return {
+      message: 'Password reset successfully',
+      status: 'success',
+    };
   }
 }

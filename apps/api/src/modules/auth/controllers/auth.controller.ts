@@ -134,6 +134,7 @@ export class AuthController {
       },
     },
   })
+  @HttpCode(HttpStatus.OK)
   @ApiResponse({ status: 400, description: 'Bad request' })
   async forgotPassword(@Body('email') email: string) {
     return this.authService.forgotPassword(email);
@@ -148,9 +149,13 @@ export class AuthController {
       type: 'object',
       properties: {
         message: { type: 'string' },
+        status: { type: 'string' },
+        userId: { type: 'string' },
+        tenantId: { type: 'string' },
       },
     },
   })
+  @HttpCode(HttpStatus.OK)
   @ApiResponse({ status: 400, description: 'Invalid or expired token' })
   async resetPassword(
     @Body('token') token: string,
