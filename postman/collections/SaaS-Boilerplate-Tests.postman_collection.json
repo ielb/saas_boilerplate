@@ -485,6 +485,415 @@
       ]
     },
     {
+      "name": "Multi-Factor Authentication Tests",
+      "item": [
+        {
+          "name": "1. Setup MFA - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has required MFA setup fields', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('secret');",
+                  "    pm.expect(response).to.have.property('qrCode');",
+                  "    pm.expect(response).to.have.property('backupCodes');",
+                  "    pm.expect(response.backupCodes).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Secret is a valid base32 string', function () {",
+                  "    const response = pm.response.json();",
+                  "    const base32Regex = /^[A-Z2-7]+=*$/;",
+                  "    pm.expect(response.secret).to.match(base32Regex);",
+                  "});",
+                  "",
+                  "pm.test('QR code is a valid data URL', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.qrCode).to.match(/^data:image\\/png;base64,/);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('mfaSecret', response.secret);",
+                  "    pm.environment.set('mfaBackupCodes', JSON.stringify(response.backupCodes));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/mfa/setup",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "mfa", "setup"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2. Setup MFA - Unauthorized",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 401', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Error message is present', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/mfa/setup",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "mfa", "setup"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3. Enable MFA - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Success message is present', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "    pm.expect(response.message).to.include('enabled successfully');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/mfa/enable",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "mfa", "enable"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4. Enable MFA - Invalid Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Error message is present', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"000000\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/mfa/enable",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "mfa", "enable"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5. Get MFA Status - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has MFA status fields', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('isEnabled');",
+                  "    pm.expect(response).to.have.property('isVerified');",
+                  "    pm.expect(response).to.have.property('backupCodesRemaining');",
+                  "    pm.expect(response.isEnabled).to.be.a('boolean');",
+                  "    pm.expect(response.isVerified).to.be.a('boolean');",
+                  "    pm.expect(response.backupCodesRemaining).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/mfa/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "mfa", "status"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "6. Verify MFA - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has verification result', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('isValid');",
+                  "    pm.expect(response).to.have.property('message');",
+                  "    pm.expect(response.isValid).to.be.a('boolean');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"123456\",\n  \"userId\": \"{{userId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/mfa/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "mfa", "verify"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "7. Verify MFA - Invalid Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Verification fails with invalid token', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.isValid).to.be.false;",
+                  "    pm.expect(response.message).to.include('Invalid');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"000000\",\n  \"userId\": \"{{userId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/mfa/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "mfa", "verify"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "8. Regenerate Backup Codes - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has new backup codes', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('backupCodes');",
+                  "    pm.expect(response.backupCodes).to.be.an('array');",
+                  "    pm.expect(response.backupCodes.length).to.be.greaterThan(0);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('mfaBackupCodes', JSON.stringify(response.backupCodes));",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/mfa/backup-codes/regenerate",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "mfa", "backup-codes", "regenerate"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "9. Disable MFA - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Success message is present', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "    pm.expect(response.message).to.include('disabled successfully');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/mfa/disable",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "mfa", "disable"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "Health Check Tests",
       "item": [
         {

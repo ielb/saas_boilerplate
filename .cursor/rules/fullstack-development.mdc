@@ -317,6 +317,7 @@ Create a common module (`@app/common`) for shared, reusable code:
 - Use test doubles to simulate dependencies
 - Achieve minimum 80% code coverage
 - **Test Structure**:
+
   ```typescript
   describe('ServiceName', () => {
     describe('methodName', () => {
@@ -351,6 +352,7 @@ Create a common module (`@app/common`) for shared, reusable code:
 - Use supertest for HTTP testing
 - Mock external dependencies
 - **Controller Test Structure**:
+
   ```typescript
   describe('ControllerName', () => {
     describe('POST /endpoint', () => {
@@ -460,6 +462,7 @@ if (pm.response.code === 200) {
 - Use MSW (Mock Service Worker) for API mocking
 - Write integration tests for complex component interactions
 - **Component Test Structure**:
+
   ```typescript
   describe('ComponentName', () => {
     it('should render correctly', () => {
@@ -542,6 +545,7 @@ src/
 - Test email queue processing performance
 - Use Artillery or k6 for load testing
 - **Performance Test Example**:
+
   ```typescript
   describe('Performance Tests', () => {
     it('should handle 100 concurrent requests', async () => {
@@ -565,6 +569,7 @@ src/
 - Test rate limiting and brute force protection
 - Test SQL injection and XSS prevention
 - **Security Test Example**:
+
   ```typescript
   describe('Security Tests', () => {
     it('should reject invalid JWT tokens', async () => {
@@ -609,6 +614,7 @@ src/
 - Run Postman collections in CI pipeline
 - Fail builds on test failures
 - **GitHub Actions Example**:
+
   ```yaml
   - name: Run Tests
     run: |
@@ -662,3 +668,8 @@ src/
 - Use Storybook for React component documentation
 - Maintain README files for each workspace
 - Document architectural decisions and patterns
+
+## Git
+
+- Use git commit messages that are descriptive and follow the conventional commits format
+- Do not commit changes until I have reviewed the changes and approved them

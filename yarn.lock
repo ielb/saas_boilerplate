@@ -117,8 +117,8 @@ __metadata:
     "@types/nodemailer": "npm:^6.4.9"
     "@types/passport-jwt": "npm:^3.0.9"
     "@types/passport-local": "npm:^1.0.35"
-    "@types/qrcode": "npm:^1.5.2"
-    "@types/speakeasy": "npm:^2.0.7"
+    "@types/qrcode": "npm:^1.5.5"
+    "@types/speakeasy": "npm:^2.0.10"
     "@types/supertest": "npm:^2.0.12"
     "@types/uuid": "npm:^9.0.2"
     argon2: "npm:^0.31.0"
@@ -146,7 +146,7 @@ __metadata:
     passport-jwt: "npm:^4.0.1"
     passport-local: "npm:^1.0.0"
     pg: "npm:^8.11.0"
-    qrcode: "npm:^1.5.3"
+    qrcode: "npm:^1.5.4"
     redis: "npm:^4.6.0"
     reflect-metadata: "npm:^0.1.13"
     rxjs: "npm:^7.8.1"
@@ -5302,7 +5302,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/qrcode@npm:^1.5.2":
+"@types/qrcode@npm:^1.5.5":
   version: 1.5.5
   resolution: "@types/qrcode@npm:1.5.5"
   dependencies:
@@ -5401,7 +5401,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/speakeasy@npm:^2.0.7":
+"@types/speakeasy@npm:^2.0.10":
   version: 2.0.10
   resolution: "@types/speakeasy@npm:2.0.10"
   dependencies:
@@ -17404,7 +17404,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"qrcode@npm:^1.5.3":
+"qrcode@npm:^1.5.4":
   version: 1.5.4
   resolution: "qrcode@npm:1.5.4"
   dependencies:
