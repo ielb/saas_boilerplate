@@ -1,0 +1,58 @@
+import {
+  Injectable,
+  ExecutionContext,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { Reflector } from '@nestjs/core';
+
+import { JwtService } from '../services/jwt.service';
+import { UserRole } from '@app/shared';
+
+@Injectable()
+export class JwtAuthGuard extends AuthGuard('jwt') {
+  constructor(
+    private readonly reflector: Reflector,
+    private readonly jwtService: JwtService
+  ) {
+    super();
+  }
+
+  override canActivate(context: ExecutionContext): boolean {
+    const request = context.switchToHttp().getRequest();
+    const token = this.extractTokenFromHeader(request);
+
+    if (!token) {
+      throw new UnauthorizedException('Access token is required');
+    }
+
+    if (!this.jwtService.validateTokenFormat(token)) {
+      throw new UnauthorizedException('Invalid token format');
+    }
+
+    const tokenType = this.jwtService.getTokenType(token);
+    if (tokenType !== 'access') {
+      throw new UnauthorizedException('Invalid token type');
+    }
+
+    if (this.jwtService.isTokenExpired(token)) {
+      throw new UnauthorizedException('Token has expired');
+    }
+
+    try {
+      const payload = this.jwtService.verifyAccessToken(token);
+      request.user = payload;
+      return true;
+    } catch (error) {
+      throw new UnauthorizedException('Invalid access token');
+    }
+  }
+
+  private extractTokenFromHeader(request: any): string | null {
+    const authHeader = request.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return null;
+    }
+    return authHeader.substring(7);
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
+    "exactOptionalPropertyTypes": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "baseUrl": ".",
+    "paths": {
+      "@app/*": ["apps/*/src/*"],
+      "@shared/*": ["packages/shared/src/*"],
+      "@shared": ["packages/shared/src"],
+      "@ui/*": ["packages/ui/src/*"],
+      "@config/*": ["packages/config/src/*"],
+      "@config": ["packages/config/src"]
+    }
+  },
+  "include": ["apps/*/src/**/*", "packages/*/src/**/*", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules", "dist", "build", ".next", "coverage"]
+}

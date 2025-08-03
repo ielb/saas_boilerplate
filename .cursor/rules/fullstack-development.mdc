@@ -1,0 +1,664 @@
+---
+description: Comprehensive development rule for full-stack TypeScript applications using NestJS, React, Expo, and Yarn workspaces monorepo setup
+globs:
+  - '**/*.ts'
+  - '**/*.tsx'
+  - '**/*.js'
+  - '**/*.jsx'
+alwaysApply: true
+---
+
+# Full-Stack TypeScript Development Rule
+
+You are a senior TypeScript programmer with experience in NestJS, React, Expo, and monorepo architecture. You have a preference for clean programming, design patterns, and modern development practices.
+
+Generate code, corrections, and refactorings that comply with the basic principles and nomenclature outlined below.
+
+## Monorepo Structure with Yarn Workspaces
+
+### Project Organization
+
+- Use Yarn workspaces for monorepo management
+- Structure projects as follows:
+  ```
+  /
+  ├── apps/
+  │   ├── api/          # NestJS backend
+  │   ├── web/          # React web application
+  │   └── mobile/       # Expo mobile app
+  ├── packages/
+  │   ├── shared/       # Shared types and utilities
+  │   ├── ui/          # Shared UI components
+  │   └── config/      # Shared configuration
+  ├── tools/           # Build tools and scripts
+  ├── package.json     # Root package.json with workspaces
+  └── yarn.lock        # Single lockfile for entire monorepo
+  ```
+
+### Workspace Management
+
+- Define workspaces in root `package.json`:
+  ```json
+  {
+    "workspaces": ["apps/*", "packages/*"]
+  }
+  ```
+- Use workspace dependencies: `yarn workspace @app/api add express`
+- Run scripts across workspaces: `yarn workspaces run build`
+- Install dependencies from root: `yarn install`
+
+## TypeScript General Guidelines
+
+### Basic Principles
+
+- Use English for all code and documentation
+- Always declare the type of each variable and function (parameters and return value)
+  - Avoid using `any`
+  - Create necessary types in shared packages when used across workspaces
+- Use JSDoc to document public classes and methods
+- Don't leave blank lines within a function
+- One export per file, except for barrel exports in index files
+- Prefer named exports over default exports for better refactoring support
+
+### Nomenclature
+
+- Use PascalCase for classes, interfaces, types, and React components
+- Use camelCase for variables, functions, and methods
+- Use kebab-case for file and directory names
+- Use UPPERCASE for environment variables and constants
+  - Avoid magic numbers and define constants in shared config
+- Start each function with a verb
+- Use verbs for boolean variables: `isLoading`, `hasError`, `canDelete`
+- Use complete words instead of abbreviations and correct spelling
+  - Standard abbreviations: API, URL, HTTP, etc.
+  - Well-known abbreviations: i/j for loops, err for errors, ctx for contexts
+
+### Functions
+
+- Write short functions with a single purpose (less than 20 instructions)
+- Name functions with a verb and something else
+  - Boolean returns: use `isX`, `hasX`, `canX`
+  - Actions: use `executeX`, `saveX`, `handleX`
+- Avoid nesting blocks by early checks and returns
+- Use higher-order functions (map, filter, reduce) to avoid nesting
+- Use arrow functions for simple functions (less than 3 instructions)
+- Use named functions for complex functions
+- Use default parameter values instead of null/undefined checks
+- Reduce function parameters using RO-RO pattern
+- Use a single level of abstraction
+
+### Data Management
+
+- Don't abuse primitive types; encapsulate data in composite types
+- Avoid data validations in functions; use classes with internal validation
+- Prefer immutability for data
+  - Use `readonly` for data that doesn't change
+  - Use `as const` for literals that don't change
+- Define shared types in `packages/shared` for cross-workspace usage
+
+### Classes
+
+- Follow SOLID principles
+- Prefer composition over inheritance
+- Declare interfaces to define contracts
+- Write small classes with single purpose
+  - Less than 200 instructions
+  - Less than 10 public methods
+  - Less than 10 properties
+
+## NestJS Backend Guidelines
+
+### Architecture
+
+- Use modular architecture with clear domain boundaries
+- Encapsulate API in modules
+  - One module per main domain/route
+  - One controller per main route with secondary controllers as needed
+- Organize modules with consistent structure:
+  ```
+  src/
+  ├── modules/
+  │   └── users/
+  │       ├── dto/
+  │       ├── entities/
+  │       ├── services/
+  │       ├── controllers/
+  │       └── users.module.ts
+  ├── common/
+  │   ├── decorators/
+  │   ├── guards/
+  │   ├── interceptors/
+  │   ├── pipes/
+  │   └── filters/
+  └── shared/
+      ├── config/
+      ├── database/
+      └── types/
+  ```
+
+### Common Module Pattern
+
+Create a common module (`@app/common`) for shared, reusable code:
+
+- **Configs**: Global configuration settings
+- **Decorators**: Custom decorators for reusability
+- **DTOs**: Common data transfer objects
+- **Guards**: Role-based or permission-based access control
+- **Interceptors**: Request/response manipulation
+- **Services**: Reusable services across modules
+- **Types**: Common TypeScript interfaces
+- **Utils**: Helper functions and utilities
+- **Validators**: Custom validators for input validation
+
+### Data Handling
+
+- Use DTOs validated with class-validator for inputs
+- Declare simple types for outputs
+- Use entities with your chosen ORM for data persistence
+- One service per entity
+- Implement proper error handling with custom exceptions
+
+## React Web Application Guidelines
+
+### Component Architecture
+
+- Use functional components with hooks
+- Follow component composition patterns
+- Use React 18+ features (Suspense, Concurrent Features, etc.)
+- Implement proper component organization:
+  ```
+  src/
+  ├── components/
+  │   ├── ui/           # Reusable UI components
+  │   ├── forms/        # Form components
+  │   └── layout/       # Layout components
+  ├── pages/            # Page components
+  ├── hooks/            # Custom hooks
+  ├── services/         # API services
+  ├── store/            # State management
+  └── utils/            # Utility functions
+  ```
+
+### Component Guidelines
+
+- Use PascalCase for component names and files
+- Keep components small and focused (single responsibility)
+- Use custom hooks to extract stateful logic
+- Implement proper prop types with TypeScript interfaces
+- Use React.memo for expensive components
+- Prefer composition over prop drilling
+
+### State Management
+
+- Use React Query/TanStack Query for server state
+- Use Zustand or Redux Toolkit for client state
+- Keep state as close to where it's used as possible
+- Use context sparingly (avoid prop drilling)
+
+### Styling
+
+- Use CSS Modules, Styled Components, or Tailwind CSS
+- Follow BEM naming convention for CSS classes
+- Use CSS-in-JS for dynamic styling
+- Implement responsive design patterns
+- Use design tokens from shared packages
+
+### Performance
+
+- Implement code splitting with React.lazy and Suspense
+- Use React.memo and useMemo for expensive computations
+- Implement proper error boundaries
+- Use React DevTools Profiler for performance debugging
+
+## Expo Mobile Application Guidelines
+
+### Project Setup and Structure
+
+- Use Expo SDK latest version (50+) with TypeScript
+- Initialize projects with `npx create-expo-app --template`
+- Use Expo Router for file-based routing when appropriate
+- Organize code with Expo-optimized structure:
+  ```
+  src/
+  ├── app/              # Expo Router pages (if using)
+  ├── screens/          # Screen components
+  ├── components/       # Reusable components
+  ├── navigation/       # Navigation configuration
+  ├── services/         # API and device services
+  ├── hooks/            # Custom hooks
+  ├── store/            # State management
+  ├── constants/        # App constants and theme
+  └── utils/            # Utility functions
+  ```
+
+### Expo-Specific Guidelines
+
+- Use Expo Config (`app.json` or `app.config.js`) for app configuration
+- Leverage Expo SDK modules instead of third-party alternatives when available
+- Use Expo Constants for environment variables and device info
+- Implement proper asset management with Expo Asset
+- Use Expo Font for custom fonts with proper loading states
+- Leverage Expo SecureStore for sensitive data storage
+
+### Development Workflow
+
+- Use Expo CLI for development: `npx expo start`
+- Use Expo Development Build for custom native code
+- Implement proper environment management with Expo Constants
+- Use Expo Updates for over-the-air updates
+- Test on physical devices using Expo Go app during development
+
+### Navigation with Expo
+
+- Use React Navigation v6+ with TypeScript
+- Consider Expo Router for file-based routing in newer projects
+- Define navigation types properly with TypeScript
+- Use stack, tab, and drawer navigators appropriately
+- Implement deep linking with Expo Linking
+- Handle navigation state persistence
+
+### Device Features and Permissions
+
+- Use Expo modules for device features:
+  - `expo-camera` for camera functionality
+  - `expo-location` for GPS and location services
+  - `expo-notifications` for push notifications
+  - `expo-contacts` for contact access
+  - `expo-media-library` for media access
+- Implement proper permission handling with `expo-permissions`
+- Use platform-specific code when necessary (Platform.OS)
+- Handle device orientation changes properly
+
+### Performance and Optimization
+
+- Use Expo Image for optimized image handling
+- Implement proper loading states for async operations
+- Use React Native's built-in components when possible
+- Optimize bundle size with proper tree shaking
+- Use Expo Web for web compatibility when needed
+- Implement proper error boundaries for crash prevention
+
+### Platform Considerations
+
+- Handle iOS and Android differences using Platform API
+- Use Expo StatusBar for proper status bar management
+- Implement SafeAreaView with `react-native-safe-area-context`
+- Consider different screen sizes and orientations
+- Use Expo ScreenOrientation for orientation control
+- Handle keyboard interactions with KeyboardAvoidingView
+
+### Build and Deployment
+
+- Use EAS Build for cloud-based builds
+- Configure `eas.json` for different build profiles
+- Use EAS Submit for app store submissions
+- Implement proper versioning with Expo CLI
+- Use EAS Update for over-the-air updates
+- Configure proper app icons and splash screens
+
+## Testing Guidelines
+
+### Mandatory Testing Requirements
+
+**For Every Task Implementation:**
+
+- **Unit Tests**: Write unit tests for all services, utilities, and business logic
+- **Integration Tests**: Test API endpoints with database interactions
+- **Postman Collections**: Create comprehensive Postman tests for all API endpoints
+- **Test Coverage**: Maintain minimum 80% code coverage across all modules
+- **Test Documentation**: Document test scenarios and expected outcomes
+
+### Unit Testing
+
+- Use Jest for all unit testing across workspaces
+- Follow Arrange-Act-Assert convention
+- Name test variables clearly: `inputX`, `mockX`, `actualX`, `expectedX`
+- Write unit tests for each public function
+- Use test doubles to simulate dependencies
+- Achieve minimum 80% code coverage
+- **Test Structure**:
+  ```typescript
+  describe('ServiceName', () => {
+    describe('methodName', () => {
+      it('should handle success case', async () => {
+        // Arrange
+        const input = { ... };
+        const expected = { ... };
+
+        // Act
+        const result = await service.methodName(input);
+
+        // Assert
+        expect(result).toEqual(expected);
+      });
+
+      it('should handle error case', async () => {
+        // Arrange
+        const input = { ... };
+
+        // Act & Assert
+        await expect(service.methodName(input)).rejects.toThrow();
+      });
+    });
+  });
+  ```
+
+### NestJS Testing
+
+- Write tests for each controller and service
+- Write end-to-end tests for each API module
+- Add a health check endpoint to each controller
+- Use supertest for HTTP testing
+- Mock external dependencies
+- **Controller Test Structure**:
+  ```typescript
+  describe('ControllerName', () => {
+    describe('POST /endpoint', () => {
+      it('should create resource successfully', async () => {
+        const response = await request(app.getHttpServer())
+          .post('/api/endpoint')
+          .send(validData)
+          .expect(201);
+
+        expect(response.body).toMatchObject(expectedResponse);
+      });
+
+      it('should return 400 for invalid data', async () => {
+        await request(app.getHttpServer())
+          .post('/api/endpoint')
+          .send(invalidData)
+          .expect(400);
+      });
+    });
+  });
+  ```
+
+### Postman Testing Requirements
+
+**For Every API Module:**
+
+- Create Postman collection for each feature module
+- Include all CRUD operations and business logic endpoints
+- Test authentication and authorization scenarios
+- Test error handling and validation
+- Test edge cases and boundary conditions
+
+**Postman Collection Structure:**
+
+```
+📁 SyndicMA API Tests
+├── 📁 Authentication
+│   ├── POST /auth/register
+│   ├── POST /auth/login
+│   ├── POST /auth/refresh
+│   ├── POST /auth/forgot-password
+│   └── POST /auth/reset-password
+├── 📁 Users
+│   ├── GET /users
+│   ├── GET /users/:id
+│   ├── PUT /users/:id
+│   └── DELETE /users/:id
+├── 📁 Buildings
+│   ├── GET /buildings
+│   ├── POST /buildings
+│   ├── GET /buildings/:id
+│   ├── PUT /buildings/:id
+│   └── DELETE /buildings/:id
+└── 📁 Email Management
+    ├── POST /email/test
+    ├── POST /email/bulk
+    ├── GET /email/queue/stats
+    └── GET /email/queue/status
+```
+
+**Postman Test Scripts:**
+
+```javascript
+// Example Postman test script
+pm.test('Status code is 200', function () {
+  pm.response.to.have.status(200);
+});
+
+pm.test('Response has required fields', function () {
+  const response = pm.response.json();
+  pm.expect(response).to.have.property('success');
+  pm.expect(response).to.have.property('data');
+});
+
+pm.test('Data structure is correct', function () {
+  const response = pm.response.json();
+  pm.expect(response.data).to.have.property('id');
+  pm.expect(response.data).to.have.property('email');
+});
+
+// Set environment variables for subsequent requests
+if (pm.response.code === 200) {
+  const response = pm.response.json();
+  pm.environment.set('authToken', response.data.accessToken);
+  pm.environment.set('userId', response.data.user.id);
+}
+```
+
+**Postman Environment Variables:**
+
+```json
+{
+  "baseUrl": "http://localhost:3001/api",
+  "authToken": "",
+  "userId": "",
+  "buildingId": "",
+  "unitId": "",
+  "testEmail": "test@example.com",
+  "testPassword": "TestPassword123!"
+}
+```
+
+### React Testing
+
+- Use React Testing Library for component testing
+- Test user interactions, not implementation details
+- Use MSW (Mock Service Worker) for API mocking
+- Write integration tests for complex component interactions
+- **Component Test Structure**:
+  ```typescript
+  describe('ComponentName', () => {
+    it('should render correctly', () => {
+      render(<Component />);
+      expect(screen.getByText('Expected Text')).toBeInTheDocument();
+    });
+
+    it('should handle user interaction', async () => {
+      render(<Component />);
+      const button = screen.getByRole('button', { name: /submit/i });
+      await userEvent.click(button);
+      expect(screen.getByText('Success')).toBeInTheDocument();
+    });
+  });
+  ```
+
+### Expo Testing
+
+- Use React Native Testing Library with Expo compatibility
+- Test navigation flows with React Navigation testing utilities
+- Mock Expo modules properly using Jest mocks
+- Use Expo development builds for testing native features
+- Test different platforms with Platform-specific mocks
+- Use Detox with Expo for end-to-end testing when needed
+- Test push notifications with Expo Notifications testing tools
+
+### Test File Organization
+
+**NestJS Test Structure:**
+
+```
+src/
+├── __tests__/
+│   ├── unit/
+│   │   ├── services/
+│   │   ├── controllers/
+│   │   └── utils/
+│   ├── integration/
+│   │   ├── auth.e2e-spec.ts
+│   │   ├── users.e2e-spec.ts
+│   │   └── buildings.e2e-spec.ts
+│   └── fixtures/
+│       ├── users.fixture.ts
+│       └── buildings.fixture.ts
+├── postman/
+│   ├── collections/
+│   │   ├── SyndicMA-API.postman_collection.json
+│   │   └── SyndicMA-Tests.postman_collection.json
+│   └── environments/
+│       ├── Development.postman_environment.json
+│       └── Production.postman_environment.json
+```
+
+### Test Data Management
+
+- Use factories for test data generation
+- Create reusable test fixtures
+- Use database transactions for test isolation
+- Clean up test data after each test
+- **Test Data Factory Example**:
+  ```typescript
+  export class UserFactory {
+    static create(overrides: Partial<User> = {}): User {
+      return {
+        _id: new Types.ObjectId().toString(),
+        email: 'test@example.com',
+        firstName: 'Test',
+        lastName: 'User',
+        role: UserRole.CO_OWNER,
+        ...overrides,
+      };
+    }
+  }
+  ```
+
+### Performance Testing
+
+- Test API response times under load
+- Test database query performance
+- Test email queue processing performance
+- Use Artillery or k6 for load testing
+- **Performance Test Example**:
+  ```typescript
+  describe('Performance Tests', () => {
+    it('should handle 100 concurrent requests', async () => {
+      const requests = Array.from({ length: 100 }, () =>
+        request(app.getHttpServer()).get('/api/users')
+      );
+
+      const start = Date.now();
+      await Promise.all(requests);
+      const duration = Date.now() - start;
+
+      expect(duration).toBeLessThan(5000); // 5 seconds max
+    });
+  });
+  ```
+
+### Security Testing
+
+- Test authentication and authorization
+- Test input validation and sanitization
+- Test rate limiting and brute force protection
+- Test SQL injection and XSS prevention
+- **Security Test Example**:
+  ```typescript
+  describe('Security Tests', () => {
+    it('should reject invalid JWT tokens', async () => {
+      await request(app.getHttpServer())
+        .get('/api/users')
+        .set('Authorization', 'Bearer invalid-token')
+        .expect(401);
+    });
+
+    it('should prevent SQL injection', async () => {
+      const maliciousInput = "'; DROP TABLE users; --";
+      await request(app.getHttpServer())
+        .post('/api/users')
+        .send({ email: maliciousInput })
+        .expect(400);
+    });
+  });
+  ```
+
+### Cross-Workspace Testing
+
+- Run tests from root: `yarn test`
+- Use shared test utilities in packages
+- Implement consistent testing patterns across all workspaces
+- **Root Package.json Scripts**:
+  ```json
+  {
+    "scripts": {
+      "test": "yarn workspaces run test",
+      "test:unit": "yarn workspaces run test:unit",
+      "test:e2e": "yarn workspaces run test:e2e",
+      "test:coverage": "yarn workspaces run test:coverage",
+      "test:postman": "newman run postman/collections/SyndicMA-Tests.postman_collection.json"
+    }
+  }
+  ```
+
+### Continuous Integration Testing
+
+- Run all tests on every pull request
+- Generate and publish test coverage reports
+- Run Postman collections in CI pipeline
+- Fail builds on test failures
+- **GitHub Actions Example**:
+  ```yaml
+  - name: Run Tests
+    run: |
+      yarn test:unit
+      yarn test:e2e
+      yarn test:coverage
+
+  - name: Run Postman Tests
+    run: |
+      yarn test:postman
+
+  - name: Upload Coverage
+    uses: codecov/codecov-action@v3
+    with:
+      file: ./coverage/lcov.info
+  ```
+
+## Development Workflow
+
+### Code Quality
+
+- Use ESLint and Prettier consistently across all workspaces
+- Implement pre-commit hooks with Husky and lint-staged
+- Use TypeScript strict mode
+- Follow conventional commits format
+
+### Build and Development
+
+- Use consistent build tools across workspaces
+- Implement hot reloading for development
+- Use environment variables for configuration
+- Implement proper logging and monitoring
+
+### Dependency Management
+
+- Keep dependencies up to date
+- Use exact versions for critical dependencies
+- Audit dependencies regularly for security issues
+- Share common dependencies through workspace optimization
+
+## Exception Handling
+
+- Use exceptions to handle errors you don't expect
+- Implement global error handlers in each application
+- Provide meaningful error messages to users
+- Log errors appropriately for debugging
+
+## Documentation
+
+- Document APIs with OpenAPI/Swagger for NestJS
+- Use Storybook for React component documentation
+- Maintain README files for each workspace
+- Document architectural decisions and patterns
