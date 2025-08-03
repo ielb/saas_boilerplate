@@ -66,61 +66,62 @@ services:
         condition: service_healthy
     networks:
       - saas-network
-    command: yarn workspace @app/api dev
+    command: yarn workspace @app/api start:dev
 
-  # Web Frontend (Next.js)
-  web:
-    build:
-      context: .
-      dockerfile: docker/web/Dockerfile
-      target: development
-    container_name: saas-web
-    ports:
-      - '3000:3000'
-    environment:
-      NODE_ENV: development
-      NEXT_PUBLIC_API_URL: http://localhost:3001/api
-    volumes:
-      - ./apps/web:/app/apps/web
-      - ./packages:/app/packages
-      - /app/apps/web/node_modules
-      - /app/packages/ui/node_modules
-      - /app/packages/shared/node_modules
-    depends_on:
-      - api
-    networks:
-      - saas-network
-    command: yarn workspace @app/web dev
+  # # Web Frontend (Next.js)
+  # web:
+  #   build:
+  #     context: .
+  #     dockerfile: docker/web/Dockerfile
+  #     target: development
+  #   container_name: saas-web
+  #   ports:
+  #     - '3000:3000'
+  #   environment:
+  #     NODE_ENV: development
+  #     NEXT_PUBLIC_API_URL: http://localhost:3001/api
+  #   volumes:
+  #     - ./apps/web:/app/apps/web
+  #     - ./packages:/app/packages
+  #     - /app/apps/web/node_modules
+  #     - /app/packages/ui/node_modules
+  #     - /app/packages/shared/node_modules
+  #   depends_on:
+  #     - api
+  #   networks:
+  #     - saas-network
+  #   command: yarn workspace @app/web dev
 
-  # Mobile Development (Expo)
-  mobile:
-    build:
-      context: .
-      dockerfile: docker/mobile/Dockerfile
-      target: development
-    container_name: saas-mobile
-    ports:
-      - '19000:19000'
-      - '19001:19001'
-      - '19002:19002'
-    environment:
-      NODE_ENV: development
-      EXPO_PUBLIC_API_URL: http://localhost:3001/api
-    volumes:
-      - ./apps/mobile:/app/apps/mobile
-      - ./packages:/app/packages
-      - /app/apps/mobile/node_modules
-      - /app/packages/shared/node_modules
-    depends_on:
-      - api
-    networks:
-      - saas-network
-    command: yarn workspace @app/mobile start
+  # # Mobile Development (Expo)
+  # mobile:
+  #   build:
+  #     context: .
+  #     dockerfile: docker/mobile/Dockerfile
+  #     target: development
+  #   container_name: saas-mobile
+  #   ports:
+  #     - '19000:19000'
+  #     - '19001:19001'
+  #     - '19002:19002'
+  #   environment:
+  #     NODE_ENV: development
+  #     EXPO_PUBLIC_API_URL: http://localhost:3001/api
+  #   volumes:
+  #     - ./apps/mobile:/app/apps/mobile
+  #     - ./packages:/app/packages
+  #     - /app/apps/mobile/node_modules
+  #     - /app/packages/shared/node_modules
+  #   depends_on:
+  #     - api
+  #   networks:
+  #     - saas-network
+  #   command: yarn workspace @app/mobile start
 
   # Mailhog for Email Testing
   mailhog:
     image: mailhog/mailhog:latest
     container_name: saas-mailhog
+    platform: linux/amd64
     ports:
       - '1025:1025' # SMTP
       - '8025:8025' # Web UI
