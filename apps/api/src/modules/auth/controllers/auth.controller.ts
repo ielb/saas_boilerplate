@@ -7,6 +7,7 @@ import {
   Req,
   UseGuards,
   Get,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -20,9 +21,12 @@ import { AuthService } from '../services/auth.service';
 import { RegisterDto } from '../dto/register.dto';
 import { LoginDto } from '../dto/login.dto';
 import { RefreshTokenDto } from '../dto/refresh-token.dto';
+import { ForgotPasswordDto } from '../dto/forgot-password.dto';
+import { ResetPasswordDto } from '../dto/reset-password.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { LoginRequest, LoginResponse } from '@app/shared';
 import { VerifyMfaDto } from '../dto/mfa.dto';
+import { ThrottlerGuard, Throttle } from '@nestjs/throttler';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -123,6 +127,8 @@ export class AuthController {
   }
 
   @Post('forgot-password')
+  @UseInterceptors(ThrottlerGuard)
+  @Throttle({ default: { ttl: 3600000, limit: 3 } }) // 3 requests per hour
   @ApiOperation({ summary: 'Request password reset' })
   @ApiResponse({
     status: 200,
@@ -136,11 +142,14 @@ export class AuthController {
   })
   @HttpCode(HttpStatus.OK)
   @ApiResponse({ status: 400, description: 'Bad request' })
-  async forgotPassword(@Body('email') email: string) {
-    return this.authService.forgotPassword(email);
+  @ApiResponse({ status: 429, description: 'Too many requests' })
+  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(forgotPasswordDto.email);
   }
 
   @Post('reset-password')
+  @UseInterceptors(ThrottlerGuard)
+  @Throttle({ default: { ttl: 300000, limit: 5 } }) // 5 requests per 5 minutes
   @ApiOperation({ summary: 'Reset password with token' })
   @ApiResponse({
     status: 200,
@@ -157,11 +166,12 @@ export class AuthController {
   })
   @HttpCode(HttpStatus.OK)
   @ApiResponse({ status: 400, description: 'Invalid or expired token' })
-  async resetPassword(
-    @Body('token') token: string,
-    @Body('newPassword') newPassword: string
-  ) {
-    return this.authService.resetPassword(token, newPassword);
+  @ApiResponse({ status: 429, description: 'Too many requests' })
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.authService.resetPassword(
+      resetPasswordDto.token,
+      resetPasswordDto.newPassword
+    );
   }
 
   @Post('refresh')

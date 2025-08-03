@@ -2,6 +2,7 @@ import {
   Injectable,
   UnauthorizedException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -13,10 +14,17 @@ import { RefreshTokenService } from './refresh-token.service';
 import { MfaService } from './mfa.service';
 import { EmailService } from './email.service';
 import { LoginDto, RegisterDto } from '../dto';
-import { LoginResponse, LoginRequest, AuthProvider } from '@app/shared';
+import {
+  LoginResponse,
+  LoginRequest,
+  AuthProvider,
+  UserStatus,
+} from '@app/shared';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -425,20 +433,48 @@ export class AuthService {
    * Forgot password
    */
   async forgotPassword(email: string): Promise<{ message: string }> {
+    this.logger.log(`Password reset requested for email: ${email}`);
+
     const user = await this.userRepository.findOne({
       where: { email },
     });
 
     if (!user) {
-      // Don't reveal if user exists
+      // Don't reveal if user exists for security
+      this.logger.warn(
+        `Password reset attempted for non-existent email: ${email}`
+      );
       return {
         message: 'Password reset email sent',
       };
     }
 
+    // Check if user is active
+    if (user.status !== UserStatus.ACTIVE) {
+      this.logger.warn(`Password reset attempted for inactive user: ${email}`);
+      return {
+        message: 'Password reset email sent',
+      };
+    }
+
+    // Generate new reset token
     user.generatePasswordResetToken();
     await this.userRepository.save(user);
-    await this.emailService.sendPasswordReset(user);
+
+    try {
+      await this.emailService.sendPasswordReset(user);
+      this.logger.log(`Password reset email sent successfully to: ${email}`);
+    } catch (error) {
+      this.logger.error(
+        `Failed to send password reset email to: ${email}`,
+        error instanceof Error ? error.stack : String(error)
+      );
+      // Clear the token if email fails
+      user.passwordResetToken = null;
+      user.passwordResetTokenExpiresAt = null;
+      await this.userRepository.save(user);
+      throw new BadRequestException('Failed to send password reset email');
+    }
 
     return {
       message: 'Password reset email sent',
@@ -452,23 +488,44 @@ export class AuthService {
     token: string,
     newPassword: string
   ): Promise<{ message: string; status: string }> {
+    this.logger.log(
+      `Password reset attempt with token: ${token.substring(0, 8)}...`
+    );
+
     const user = await this.userRepository.findOne({
       where: { passwordResetToken: token },
     });
 
     if (!user) {
+      this.logger.warn(
+        `Invalid password reset token attempted: ${token.substring(0, 8)}...`
+      );
       throw new BadRequestException('Invalid reset token');
     }
 
     if (!user.isPasswordResetTokenValid()) {
+      this.logger.warn(
+        `Expired password reset token attempted for user: ${user.email}`
+      );
       throw new BadRequestException('Reset token has expired');
     }
 
+    // Check if user is active
+    if (user.status !== UserStatus.ACTIVE) {
+      this.logger.warn(
+        `Password reset attempted for inactive user: ${user.email}`
+      );
+      throw new BadRequestException('Account is not active');
+    }
+
+    // Update password and clear reset token
     user.password = newPassword;
     user.passwordResetToken = null;
     user.passwordResetTokenExpiresAt = null;
     await user.hashPassword();
     await this.userRepository.save(user);
+
+    this.logger.log(`Password reset successful for user: ${user.email}`);
 
     return {
       message: 'Password reset successfully',
