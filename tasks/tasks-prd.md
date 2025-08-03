@@ -108,7 +108,7 @@ Based on PRD: `docs/prd.md`
   - [x] 2.3 Create user registration with email verification
   - [x] 2.4 Implement login with password validation (Argon2)
   - [x] 2.5 Add refresh token mechanism with rotation (#29)
-  - [ ] 2.6 Implement multi-factor authentication (TOTP) (#4)
+  - [x] 2.6 Implement multi-factor authentication (TOTP) (#4)
   - [ ] 2.7 Create password reset functionality with secure tokens (#5)
   - [ ] 2.8 Implement session management and device tracking (#6)
   - [ ] 2.9 Set up role-based access control (RBAC) (#7)

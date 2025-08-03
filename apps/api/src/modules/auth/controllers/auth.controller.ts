@@ -22,6 +22,7 @@ import { LoginDto } from '../dto/login.dto';
 import { RefreshTokenDto } from '../dto/refresh-token.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { LoginRequest, LoginResponse } from '@app/shared';
+import { VerifyMfaDto } from '../dto/mfa.dto';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -159,7 +160,7 @@ export class AuthController {
   }
 
   @Post('refresh')
-  @ApiOperation({ summary: 'Refresh access token with rotation' })
+  @ApiOperation({ summary: 'Refresh access token' })
   @ApiResponse({
     status: 200,
     description: 'Token refreshed successfully',
@@ -169,18 +170,67 @@ export class AuthController {
         accessToken: { type: 'string' },
         refreshToken: { type: 'string' },
         expiresIn: { type: 'number' },
+        user: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            email: { type: 'string' },
+            firstName: { type: 'string' },
+            lastName: { type: 'string' },
+            role: { type: 'string' },
+            status: { type: 'string' },
+            tenantId: { type: 'string' },
+            avatar: { type: 'string' },
+          },
+        },
       },
     },
   })
-  @ApiResponse({ status: 401, description: 'Invalid refresh token' })
   async refreshToken(
     @Body() refreshTokenDto: RefreshTokenDto,
     @Req() req: Request
-  ) {
+  ): Promise<LoginResponse> {
     const ipAddress = req.ip || req.connection.remoteAddress;
-    return this.authService.refreshToken(refreshTokenDto.refreshToken, {
-      ...(ipAddress && { ipAddress }),
-    });
+    return this.authService.refreshToken(
+      refreshTokenDto.refreshToken,
+      ipAddress
+    );
+  }
+
+  @Post('mfa/verify')
+  @ApiOperation({ summary: 'Verify MFA and complete login' })
+  @ApiResponse({
+    status: 200,
+    description: 'MFA verification successful',
+    schema: {
+      type: 'object',
+      properties: {
+        accessToken: { type: 'string' },
+        refreshToken: { type: 'string' },
+        expiresIn: { type: 'number' },
+        user: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            email: { type: 'string' },
+            firstName: { type: 'string' },
+            lastName: { type: 'string' },
+            role: { type: 'string' },
+            status: { type: 'string' },
+            tenantId: { type: 'string' },
+            avatar: { type: 'string' },
+          },
+        },
+      },
+    },
+  })
+  async verifyMfaAndCompleteLogin(
+    @Body() verifyMfaDto: VerifyMfaDto
+  ): Promise<LoginResponse> {
+    return this.authService.verifyMfaAndCompleteLogin(
+      verifyMfaDto.userId,
+      verifyMfaDto.token
+    );
   }
 
   @Post('logout')

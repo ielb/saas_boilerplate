@@ -39,7 +39,7 @@ export interface RefreshTokenPayload {
 export interface LoginResponse {
   accessToken: string;
   refreshToken: string;
-  expiresIn: number;
+  expiresIn?: number;
   user: {
     id: string;
     email: string;
@@ -49,8 +49,8 @@ export interface LoginResponse {
     status: UserStatus;
     tenantId: string;
     avatar?: string;
-    lastLoginAt?: Date;
   };
+  requiresMfa?: boolean;
 }
 
 export interface RegisterRequest {
@@ -94,8 +94,28 @@ export interface TwoFactorAuthSetup {
 }
 
 export interface TwoFactorAuthVerify {
-  code: string;
+  token: string;
   backupCode?: string;
+}
+
+export interface TwoFactorAuthStatus {
+  isEnabled: boolean;
+  isVerified: boolean;
+  backupCodesRemaining: number;
+}
+
+export interface BackupCode {
+  code: string;
+  isUsed: boolean;
+  usedAt?: Date;
+}
+
+export interface MFAConfig {
+  issuer: string;
+  algorithm: 'sha1' | 'sha256' | 'sha512';
+  digits: number;
+  period: number;
+  window: number;
 }
 
 export interface SocialLoginRequest {

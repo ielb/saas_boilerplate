@@ -100,17 +100,27 @@ export class User {
   @IsOptional()
   passwordResetTokenExpiresAt?: Date | null;
 
+  // MFA (Two-Factor Authentication) fields
+  @Column({ type: 'text', nullable: true })
+  twoFactorSecret?: string | null;
+
   @Column({ type: 'boolean', default: false })
-  @IsBoolean()
   twoFactorEnabled!: boolean;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  @Exclude()
-  twoFactorSecret?: string;
+  @Column({ type: 'boolean', default: false })
+  twoFactorVerified!: boolean;
 
   @Column({ type: 'json', nullable: true })
-  @Exclude()
-  twoFactorBackupCodes?: string[];
+  backupCodes?: string[] | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  twoFactorEnabledAt?: Date | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  lastTwoFactorAttempt?: Date | null;
+
+  @Column({ type: 'int', default: 0 })
+  twoFactorAttempts!: number;
 
   @Column({ type: 'timestamp', nullable: true })
   @IsOptional()
@@ -277,7 +287,7 @@ export class User {
     delete obj.emailVerificationToken;
     delete obj.passwordResetToken;
     delete obj.twoFactorSecret;
-    delete obj.twoFactorBackupCodes;
+    delete obj.backupCodes;
     return obj;
   }
 }
