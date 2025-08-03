@@ -6,14 +6,15 @@ import { AuthController } from './controllers/auth.controller';
 import { AuthService } from './services/auth.service';
 import { JwtService } from './services/jwt.service';
 import { EmailService } from './services/email.service';
+import { RefreshTokenService } from './services/refresh-token.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { User, Tenant } from './entities';
+import { User, Tenant, RefreshToken } from './entities';
 import { env } from '@app/config';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Tenant]),
+    TypeOrmModule.forFeature([User, Tenant, RefreshToken]),
     JwtModule.register({
       secret: env.JWT_SECRET,
       signOptions: {
@@ -24,7 +25,20 @@ import { env } from '@app/config';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtService, EmailService, JwtAuthGuard, JwtStrategy],
-  exports: [AuthService, JwtService, EmailService, JwtAuthGuard],
+  providers: [
+    AuthService,
+    JwtService,
+    EmailService,
+    RefreshTokenService,
+    JwtAuthGuard,
+    JwtStrategy,
+  ],
+  exports: [
+    AuthService,
+    JwtService,
+    EmailService,
+    RefreshTokenService,
+    JwtAuthGuard,
+  ],
 })
 export class AuthModule {}
