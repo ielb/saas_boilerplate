@@ -41,6 +41,11 @@ Based on PRD: `docs/prd.md`
 - `apps/api/src/modules/auth/controllers/account-recovery.controller.ts` - Account recovery controller
 - `apps/api/src/modules/auth/controllers/account-recovery.controller.spec.ts` - Account recovery controller tests
 - `apps/api/src/database/migrations/1700000000004-CreateAccountRecovery.ts` - Account recovery database migration
+- `apps/api/src/modules/auth/entities/audit-log.entity.ts` - Audit log entity for tracking authentication events
+- `apps/api/src/modules/auth/services/audit.service.ts` - Audit service for logging authentication events
+- `apps/api/src/modules/auth/services/audit.service.spec.ts` - Audit service unit tests
+- `apps/api/src/modules/auth/interceptors/audit.interceptor.ts` - Audit interceptor for automatic event capture
+- `apps/api/src/database/migrations/1700000000005-CreateAuditLogs.ts` - Audit logs database migration
 - `apps/api/src/shared/` - Shared types and configurations
 - `apps/api/src/config/` - Environment and application configuration
 - `apps/api/src/database/` - Database connection and migrations
@@ -141,7 +146,7 @@ Based on PRD: `docs/prd.md`
   - [x] 2.12 Add security headers and CORS configuration (#15)
   - [x] 2.13 Create authentication guards and decorators (#16)
   - [x] 2.14 Implement account recovery with backup codes (#17) - **COMPLETED**
-  - [ ] 2.15 Set up audit logging for authentication events (#18)
+  - [x] 2.15 Set up audit logging for authentication events (#18) - **COMPLETED**
 
 - [ ] 3.0 Multi-Tenant Architecture & User Management
   - [ ] 3.1 Design and implement tenant database schema (#9)

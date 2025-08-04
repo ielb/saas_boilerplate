@@ -17,6 +17,8 @@ import { SessionService } from './services/session.service';
 import { RoleService } from './services/role.service';
 import { PermissionService } from './services/permission.service';
 import { AccountRecoveryService } from './services/account-recovery.service';
+import { AuditService } from './services/audit.service';
+import { AuditInterceptor } from './interceptors/audit.interceptor';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { PermissionsGuard } from './guards/permissions.guard';
 import { AuthGuard } from './guards/auth.guard';
@@ -30,6 +32,7 @@ import {
   Permission,
   Role,
   AccountRecovery,
+  AuditLog,
 } from './entities';
 import { env } from '@app/config';
 
@@ -43,6 +46,7 @@ import { env } from '@app/config';
       Permission,
       Role,
       AccountRecovery,
+      AuditLog,
     ]),
     JwtModule.register({
       secret: env.JWT_SECRET,
@@ -71,6 +75,8 @@ import { env } from '@app/config';
     RoleService,
     PermissionService,
     AccountRecoveryService,
+    AuditService,
+    AuditInterceptor,
     JwtAuthGuard,
     PermissionsGuard,
     AuthGuard,
@@ -87,6 +93,8 @@ import { env } from '@app/config';
     RoleService,
     PermissionService,
     AccountRecoveryService,
+    AuditService,
+    AuditInterceptor,
     JwtAuthGuard,
     PermissionsGuard,
     AuthGuard,
