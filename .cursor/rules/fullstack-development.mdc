@@ -671,5 +671,6 @@ src/
 
 ## Git
 
-- Use git commit messages that are descriptive and follow the conventional commits format
 - Do not commit changes until I have reviewed the changes and approved them
+- Use git commit messages that are descriptive and follow the conventional commits format
+- Commit changes to new branch and create pull request to main branch

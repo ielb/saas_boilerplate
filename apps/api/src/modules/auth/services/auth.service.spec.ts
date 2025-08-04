@@ -11,6 +11,8 @@ import { RefreshTokenService } from './refresh-token.service';
 import { MfaService } from './mfa.service';
 import { EmailService } from './email.service';
 import { SessionService } from './session.service';
+import { RoleService } from './role.service';
+import { PermissionService } from './permission.service';
 import { UserStatus } from '@app/shared';
 
 describe('AuthService - Password Reset', () => {
@@ -98,6 +100,21 @@ describe('AuthService - Password Reset', () => {
             createSession: jest.fn(),
             getUserSessions: jest.fn(),
             revokeSession: jest.fn(),
+          },
+        },
+        {
+          provide: RoleService,
+          useValue: {
+            getDefaultRole: jest.fn(),
+            assignRoleToUser: jest.fn(),
+            getRoleByName: jest.fn(),
+            createDefaultRoles: jest.fn(),
+          },
+        },
+        {
+          provide: PermissionService,
+          useValue: {
+            createDefaultPermissions: jest.fn(),
           },
         },
       ],

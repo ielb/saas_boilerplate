@@ -28,6 +28,7 @@ describe('PermissionService', () => {
     findOneBy: jest.fn(),
     update: jest.fn(),
     delete: jest.fn(),
+    remove: jest.fn(),
     createQueryBuilder: jest.fn(),
   };
 
@@ -148,7 +149,7 @@ describe('PermissionService', () => {
       expect(result).toEqual(mockPermission);
       expect(mockPermissionRepository.create).toHaveBeenCalledWith({
         ...createPermissionDto,
-        isSystem: true,
+        isSystem: false,
         isActive: true,
       });
     });
@@ -167,6 +168,10 @@ describe('PermissionService', () => {
           scope: PermissionScope.TENANT,
           isSystem: false,
           isActive: true,
+          conditions: undefined,
+          createdAt: undefined,
+          updatedAt: undefined,
+          fullName: 'users:read',
           getFullName: jest.fn().mockReturnValue('users:read'),
         },
         {
@@ -178,11 +183,17 @@ describe('PermissionService', () => {
           scope: PermissionScope.TENANT,
           isSystem: false,
           isActive: true,
+          conditions: undefined,
+          createdAt: undefined,
+          updatedAt: undefined,
+          fullName: 'users:write',
           getFullName: jest.fn().mockReturnValue('users:write'),
         },
       ];
 
       const mockQueryBuilder = {
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
         skip: jest.fn().mockReturnThis(),
         take: jest.fn().mockReturnThis(),
         getManyAndCount: jest.fn().mockResolvedValue([mockPermissions, 2]),
@@ -196,7 +207,12 @@ describe('PermissionService', () => {
       const result = await service.getAllPermissions(1, 10);
 
       // Assert
-      expect(result.permissions).toEqual(mockPermissions);
+      expect(result.permissions).toEqual(
+        mockPermissions.map(permission => ({
+          ...permission,
+          getFullName: undefined, // This gets removed by mapToResponseDto
+        }))
+      );
       expect(result.total).toBe(2);
       expect(result.page).toBe(1);
       expect(result.limit).toBe(10);
@@ -205,7 +221,8 @@ describe('PermissionService', () => {
     it('should filter permissions by resource', async () => {
       // Arrange
       const mockQueryBuilder = {
-        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
         skip: jest.fn().mockReturnThis(),
         take: jest.fn().mockReturnThis(),
         getManyAndCount: jest.fn().mockResolvedValue([[], 0]),
@@ -224,7 +241,7 @@ describe('PermissionService', () => {
       );
 
       // Assert
-      expect(mockQueryBuilder.where).toHaveBeenCalledWith(
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
         'permission.resource = :resource',
         { resource: PermissionResource.USERS }
       );
@@ -257,6 +274,7 @@ describe('PermissionService', () => {
       expect(result).toEqual(mockPermissions);
       expect(mockPermissionRepository.find).toHaveBeenCalledWith({
         where: { isSystem: true },
+        order: { name: 'ASC' },
       });
     });
   });
@@ -285,6 +303,7 @@ describe('PermissionService', () => {
       expect(result).toEqual(mockPermission);
       expect(mockPermissionRepository.findOne).toHaveBeenCalledWith({
         where: { id: 'permission-123' },
+        relations: ['roles'],
       });
     });
 
@@ -387,8 +406,8 @@ describe('PermissionService', () => {
       await service.deletePermission('permission-123');
 
       // Assert
-      expect(mockPermissionRepository.delete).toHaveBeenCalledWith(
-        'permission-123'
+      expect(mockPermissionRepository.remove).toHaveBeenCalledWith(
+        mockPermission
       );
     });
 
@@ -462,7 +481,9 @@ describe('PermissionService', () => {
         },
       ];
 
-      mockPermissionRepository.find.mockResolvedValue(existingPermissions);
+      mockPermissionRepository.findOne.mockResolvedValue(
+        existingPermissions[0]
+      );
 
       // Act
       await service.createDefaultPermissions();

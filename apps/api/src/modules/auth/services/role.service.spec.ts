@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { RoleService } from './role.service';
 import { Role } from '../entities/role.entity';
 import { Permission } from '../entities/permission.entity';
@@ -32,6 +32,8 @@ describe('RoleService', () => {
     findOneBy: jest.fn(),
     update: jest.fn(),
     delete: jest.fn(),
+    count: jest.fn(),
+    remove: jest.fn(),
     createQueryBuilder: jest.fn(),
   };
 
@@ -43,6 +45,7 @@ describe('RoleService', () => {
 
   const mockUserRepository = {
     findOne: jest.fn(),
+    count: jest.fn(),
     createQueryBuilder: jest.fn(),
   };
 
@@ -108,7 +111,10 @@ describe('RoleService', () => {
 
       mockRoleRepository.create.mockReturnValue(mockRole);
       mockRoleRepository.save.mockResolvedValue(mockRole);
-      mockPermissionRepository.findByIds.mockResolvedValue(mockPermissions);
+      mockRoleRepository.findOne
+        .mockResolvedValueOnce(null) // No existing role with same name
+        .mockResolvedValueOnce(mockRole); // Role found for permission assignment
+      mockPermissionRepository.find.mockResolvedValue(mockPermissions);
 
       // Act
       const result = await service.createRole(createRoleDto, 'tenant-123');
@@ -119,13 +125,11 @@ describe('RoleService', () => {
         ...createRoleDto,
         tenantId: 'tenant-123',
         isSystem: false,
-        isActive: true,
       });
       expect(mockRoleRepository.save).toHaveBeenCalledWith(mockRole);
-      expect(mockPermissionRepository.findByIds).toHaveBeenCalledWith([
-        'permission-1',
-        'permission-2',
-      ]);
+      expect(mockPermissionRepository.find).toHaveBeenCalledWith({
+        where: { id: In(['permission-1', 'permission-2']) },
+      });
     });
 
     it('should create a role without permissions', async () => {
@@ -158,7 +162,7 @@ describe('RoleService', () => {
 
       // Assert
       expect(result).toEqual(mockRole);
-      expect(mockPermissionRepository.findByIds).not.toHaveBeenCalled();
+      expect(mockPermissionRepository.find).not.toHaveBeenCalled();
     });
   });
 
@@ -177,6 +181,11 @@ describe('RoleService', () => {
           isActive: true,
           permissions: [],
           getAllPermissions: jest.fn().mockReturnValue([]),
+          parentRoleId: undefined,
+          metadata: undefined,
+          createdAt: undefined,
+          updatedAt: undefined,
+          totalPermissions: 0,
         },
         {
           id: 'role-2',
@@ -189,15 +198,24 @@ describe('RoleService', () => {
           isActive: true,
           permissions: [],
           getAllPermissions: jest.fn().mockReturnValue([]),
+          parentRoleId: undefined,
+          metadata: undefined,
+          createdAt: undefined,
+          updatedAt: undefined,
+          totalPermissions: 0,
         },
       ];
 
       const mockQueryBuilder = {
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
         where: jest.fn().mockReturnThis(),
         andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        addOrderBy: jest.fn().mockReturnThis(),
         skip: jest.fn().mockReturnThis(),
         take: jest.fn().mockReturnThis(),
         getManyAndCount: jest.fn().mockResolvedValue([mockRoles, 2]),
+        getMany: jest.fn().mockResolvedValue(mockRoles),
       };
 
       mockRoleRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder);
@@ -206,11 +224,18 @@ describe('RoleService', () => {
       const result = await service.getAllRoles('tenant-123', 1, 10);
 
       // Assert
-      expect(result.roles).toEqual(mockRoles);
+      expect(result.roles).toEqual(
+        mockRoles.map(role => ({
+          ...role,
+          getAllPermissions: undefined, // This gets removed by mapToResponseDto
+          permissions: [],
+          totalPermissions: 0,
+        }))
+      );
       expect(result.total).toBe(2);
       expect(result.page).toBe(1);
       expect(result.limit).toBe(10);
-      expect(mockQueryBuilder.where).toHaveBeenCalledWith(
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
         'role.tenantId = :tenantId',
         { tenantId: 'tenant-123' }
       );
@@ -219,11 +244,15 @@ describe('RoleService', () => {
     it('should filter roles by level', async () => {
       // Arrange
       const mockQueryBuilder = {
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
         where: jest.fn().mockReturnThis(),
         andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        addOrderBy: jest.fn().mockReturnThis(),
         skip: jest.fn().mockReturnThis(),
         take: jest.fn().mockReturnThis(),
         getManyAndCount: jest.fn().mockResolvedValue([[], 0]),
+        getMany: jest.fn().mockResolvedValue([]),
       };
 
       mockRoleRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder);
@@ -266,6 +295,7 @@ describe('RoleService', () => {
       expect(mockRoleRepository.find).toHaveBeenCalledWith({
         where: { isSystem: true },
         relations: ['permissions'],
+        order: { level: 'ASC' },
       });
     });
   });
@@ -288,17 +318,29 @@ describe('RoleService', () => {
         },
       ];
 
-      mockRoleRepository.find.mockResolvedValue(mockRoles);
+      const mockQueryBuilder = {
+        leftJoinAndSelect: jest.fn().mockReturnThis(),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue(mockRoles),
+      };
+
+      mockRoleRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder);
 
       // Act
       const result = await service.getCustomRoles('tenant-123');
 
       // Assert
       expect(result).toEqual(mockRoles);
-      expect(mockRoleRepository.find).toHaveBeenCalledWith({
-        where: { tenantId: 'tenant-123', isSystem: false },
-        relations: ['permissions'],
-      });
+      expect(mockQueryBuilder.where).toHaveBeenCalledWith(
+        'role.isSystem = :isSystem',
+        { isSystem: false }
+      );
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
+        'role.tenantId = :tenantId',
+        { tenantId: 'tenant-123' }
+      );
     });
   });
 
@@ -327,7 +369,7 @@ describe('RoleService', () => {
       expect(result).toEqual(mockRole);
       expect(mockRoleRepository.findOne).toHaveBeenCalledWith({
         where: { id: 'role-123' },
-        relations: ['permissions'],
+        relations: ['permissions', 'parentRole', 'childRoles', 'users'],
       });
     });
 
@@ -407,7 +449,7 @@ describe('RoleService', () => {
       await service.deleteRole('role-123');
 
       // Assert
-      expect(mockRoleRepository.delete).toHaveBeenCalledWith('role-123');
+      expect(mockRoleRepository.remove).toHaveBeenCalledWith(mockRole);
     });
 
     it('should throw BadRequestException when trying to delete system role', async () => {
@@ -457,7 +499,7 @@ describe('RoleService', () => {
       ];
 
       mockRoleRepository.findOne.mockResolvedValue(mockRole);
-      mockPermissionRepository.findByIds.mockResolvedValue(mockPermissions);
+      mockPermissionRepository.find.mockResolvedValue(mockPermissions);
       mockRoleRepository.save.mockResolvedValue({
         ...mockRole,
         permissions: mockPermissions,
@@ -471,10 +513,9 @@ describe('RoleService', () => {
 
       // Assert
       expect(result.permissions).toEqual(mockPermissions);
-      expect(mockPermissionRepository.findByIds).toHaveBeenCalledWith([
-        'permission-1',
-        'permission-2',
-      ]);
+      expect(mockPermissionRepository.find).toHaveBeenCalledWith({
+        where: { id: In(['permission-1', 'permission-2']) },
+      });
       expect(mockRoleRepository.save).toHaveBeenCalledWith({
         ...mockRole,
         permissions: mockPermissions,
@@ -577,7 +618,7 @@ describe('RoleService', () => {
         },
       ];
 
-      mockRoleRepository.find.mockResolvedValue(existingRoles);
+      mockRoleRepository.findOne.mockResolvedValue(existingRoles[0]);
 
       // Act
       await service.createDefaultRoles('tenant-123');

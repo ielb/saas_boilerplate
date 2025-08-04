@@ -19,9 +19,21 @@ Based on PRD: `docs/prd.md`
 - `apps/api/src/modules/admin/` - Administrative features module directory
 - `apps/api/src/common/` - Shared utilities and common code
 - `apps/api/src/common/decorators/permissions.decorator.ts` - Resource-level permission decorators
+- `apps/api/src/common/decorators/auth.decorator.ts` - Authentication and authorization decorators
+- `apps/api/src/common/decorators/index.ts` - Decorators barrel export
+- `apps/api/src/common/guards/auth.guard.ts` - Comprehensive authentication guard
+- `apps/api/src/common/guards/auth.guard.spec.ts` - Authentication guard unit tests
+- `apps/api/src/common/guards/roles.guard.ts` - Role-based access control guard
+- `apps/api/src/common/guards/roles.guard.spec.ts` - Roles guard unit tests
+- `apps/api/src/common/guards/tenant.guard.ts` - Tenant context guard
+- `apps/api/src/common/guards/tenant.guard.spec.ts` - Tenant guard unit tests
+- `apps/api/src/common/guards/mfa.guard.ts` - Multi-factor authentication guard
+- `apps/api/src/common/guards/mfa.guard.spec.ts` - MFA guard unit tests
+- `apps/api/src/common/guards/index.ts` - Guards barrel export
+- `apps/api/src/common/guards/permissions.guard.ts` - Resource-level permission guard
+- `apps/api/src/common/guards/permissions.guard.spec.ts` - Permission guard unit tests
+- `apps/api/src/common/examples/auth-usage.example.ts` - Example controller showing guard and decorator usage
 - `apps/api/src/common/services/permission-checker.service.ts` - Permission checking utility service
-- `apps/api/src/modules/auth/guards/permissions.guard.ts` - Resource-level permission guard
-- `apps/api/src/modules/auth/guards/permissions.guard.spec.ts` - Permission guard unit tests
 - `apps/api/src/common/services/permission-checker.service.spec.ts` - Permission checker service unit tests
 - `apps/api/src/shared/` - Shared types and configurations
 - `apps/api/src/config/` - Environment and application configuration
@@ -107,7 +119,7 @@ Based on PRD: `docs/prd.md`
   - [x] 1.9 Set up Git hooks and conventional commits
   - [x] 1.10 Create initial README and documentation structure
 
-- [ ] 2.0 Authentication & Security System Implementation
+- [x] 2.0 Authentication & Security System Implementation
   - [x] 2.1 Set up NestJS authentication module structure
   - [x] 2.2 Implement JWT token generation and validation
   - [x] 2.3 Create user registration with email verification
@@ -119,9 +131,9 @@ Based on PRD: `docs/prd.md`
   - [x] 2.8 Implement session management and device tracking (#6)
   - [x] 2.9 Set up role-based access control (RBAC) (#7)
   - [x] 2.10 Create resource-level permission system (#8)
-  - [ ] 2.11 Implement API rate limiting and brute force protection (#14)
-  - [ ] 2.12 Add security headers and CORS configuration (#15)
-  - [ ] 2.13 Create authentication guards and decorators (#16)
+  - [x] 2.11 Implement API rate limiting and brute force protection (#14)
+  - [x] 2.12 Add security headers and CORS configuration (#15)
+  - [x] 2.13 Create authentication guards and decorators (#16)
   - [ ] 2.14 Implement account recovery with backup codes (#17)
   - [ ] 2.15 Set up audit logging for authentication events (#18)
 

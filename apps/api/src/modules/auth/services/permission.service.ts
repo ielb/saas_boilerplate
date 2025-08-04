@@ -53,6 +53,7 @@ export class PermissionService {
       ...createPermissionDto,
       scope,
       isSystem: false,
+      isActive: true,
     });
 
     const savedPermission = await this.permissionRepository.save(permission);
@@ -186,6 +187,7 @@ export class PermissionService {
         const permission = this.permissionRepository.create({
           ...permissionData,
           isSystem: true,
+          isActive: true,
         });
 
         await this.permissionRepository.save(permission);
