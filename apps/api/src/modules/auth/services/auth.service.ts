@@ -16,7 +16,6 @@ import { EmailService } from './email.service';
 import { SessionService } from './session.service';
 import { RoleService } from './role.service';
 import { PermissionService } from './permission.service';
-import { BruteForceProtectionService } from '../../../common/services/brute-force-protection.service';
 import { LoginDto, RegisterDto } from '../dto';
 import {
   LoginResponse,
@@ -40,8 +39,7 @@ export class AuthService {
     private readonly emailService: EmailService,
     private readonly sessionService: SessionService,
     private readonly roleService: RoleService,
-    private readonly permissionService: PermissionService,
-    private readonly bruteForceService: BruteForceProtectionService
+    private readonly permissionService: PermissionService
   ) {}
 
   /**
@@ -158,53 +156,25 @@ export class AuthService {
     ipAddress?: string,
     userAgent?: string
   ): Promise<LoginResponse> {
-    const identifier = `${ipAddress}:${userAgent}`;
-
-    // Check if this IP/user agent combination is blocked
-    const isBlocked = await this.bruteForceService.isBlocked(
-      identifier,
-      'login'
-    );
-    if (isBlocked) {
-      const remainingTime =
-        await this.bruteForceService.getRemainingLockoutTime(
-          identifier,
-          'login'
-        );
-      throw new UnauthorizedException({
-        message: 'Too many failed login attempts. Please try again later.',
-        retryAfter: remainingTime,
-      });
-    }
-
     const user = await this.userRepository.findOne({
       where: { email: loginDto.email },
       relations: ['tenant'],
     });
 
     if (!user) {
-      // Record failed attempt
-      await this.bruteForceService.recordFailedAttempt(identifier, 'login');
       throw new UnauthorizedException('Invalid credentials');
     }
 
     // Verify password
     const isPasswordValid = await user.verifyPassword(loginDto.password);
     if (!isPasswordValid) {
-      // Record failed attempt
-      await this.bruteForceService.recordFailedAttempt(identifier, 'login');
       throw new UnauthorizedException('Invalid credentials');
     }
 
     // Check if user is active
     if (!user.isActive) {
-      // Record failed attempt
-      await this.bruteForceService.recordFailedAttempt(identifier, 'login');
       throw new UnauthorizedException('Account is not active');
     }
-
-    // Record successful attempt and reset counters
-    await this.bruteForceService.recordSuccessfulAttempt(identifier, 'login');
 
     // Update last login
     user.updateLastLogin(ipAddress);
@@ -288,7 +258,6 @@ export class AuthService {
         status: user.status,
         tenantId: user.tenantId,
         ...(user.avatar && { avatar: user.avatar }),
-        ...(user.lastLoginAt && { lastLoginAt: user.lastLoginAt }),
       },
     };
   }

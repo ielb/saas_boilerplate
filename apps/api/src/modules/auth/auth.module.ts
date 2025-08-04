@@ -19,9 +19,6 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { PermissionsGuard } from './guards/permissions.guard';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PermissionCheckerService } from '../../common/services/permission-checker.service';
-import { BruteForceProtectionService } from '../../common/services/brute-force-protection.service';
-import { RateLimitGuard } from '../../common/guards/rate-limit.guard';
-import { EnhancedRateLimitGuard } from '../../common/guards/enhanced-rate-limit.guard';
 import {
   User,
   Tenant,
@@ -71,9 +68,6 @@ import { env } from '@app/config';
     PermissionsGuard,
     JwtStrategy,
     PermissionCheckerService,
-    BruteForceProtectionService,
-    RateLimitGuard,
-    EnhancedRateLimitGuard,
   ],
   exports: [
     AuthService,
@@ -87,9 +81,6 @@ import { env } from '@app/config';
     JwtAuthGuard,
     PermissionsGuard,
     PermissionCheckerService,
-    BruteForceProtectionService,
-    RateLimitGuard,
-    EnhancedRateLimitGuard,
   ],
 })
 export class AuthModule {}
