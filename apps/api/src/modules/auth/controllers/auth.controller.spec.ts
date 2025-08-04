@@ -529,7 +529,10 @@ describe('AuthController', () => {
       jest.spyOn(authService, 'logout').mockResolvedValue(undefined);
 
       // Act
-      const result = await controller.logout(mockRequest);
+      const result = await controller.logout(
+        mockRequest,
+        'valid-refresh-token'
+      );
 
       // Assert
       expect(result).toBeUndefined();

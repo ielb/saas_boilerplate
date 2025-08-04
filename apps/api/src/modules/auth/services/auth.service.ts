@@ -13,6 +13,7 @@ import { JwtService } from './jwt.service';
 import { RefreshTokenService } from './refresh-token.service';
 import { MfaService } from './mfa.service';
 import { EmailService } from './email.service';
+import { SessionService } from './session.service';
 import { LoginDto, RegisterDto } from '../dto';
 import {
   LoginResponse,
@@ -33,7 +34,8 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly refreshTokenService: RefreshTokenService,
     private readonly mfaService: MfaService,
-    private readonly emailService: EmailService
+    private readonly emailService: EmailService,
+    private readonly sessionService: SessionService
   ) {}
 
   /**
@@ -127,7 +129,11 @@ export class AuthService {
   /**
    * Login user
    */
-  async login(loginDto: LoginDto, ipAddress?: string): Promise<LoginResponse> {
+  async login(
+    loginDto: LoginDto,
+    ipAddress?: string,
+    userAgent?: string
+  ): Promise<LoginResponse> {
     const user = await this.userRepository.findOne({
       where: { email: loginDto.email },
       relations: ['tenant'],
@@ -174,6 +180,39 @@ export class AuthService {
       refreshTokenEntity.tokenId,
       tokenHash
     );
+
+    // Create session for this login
+    const deviceFingerprint = this.sessionService.generateDeviceFingerprint(
+      userAgent || '',
+      ipAddress || ''
+    );
+
+    const browserInfo = userAgent
+      ? this.sessionService.parseBrowserInfo(userAgent)
+      : { browser: 'Unknown', browserVersion: 'Unknown' };
+
+    const osInfo = userAgent
+      ? this.sessionService.parseOperatingSystem(userAgent)
+      : { operatingSystem: 'Unknown', osVersion: 'Unknown' };
+
+    const deviceType = userAgent
+      ? this.sessionService.detectDeviceType(userAgent)
+      : ('unknown' as any);
+
+    const session = await this.sessionService.createSession({
+      userId: user.id,
+      refreshTokenHash: tokenHash,
+      deviceFingerprint,
+      deviceName: `${browserInfo.browser} on ${osInfo.operatingSystem}`,
+      deviceType,
+      browser: browserInfo.browser,
+      browserVersion: browserInfo.browserVersion,
+      operatingSystem: osInfo.operatingSystem,
+      osVersion: osInfo.osVersion,
+      ipAddress: ipAddress || 'unknown',
+      userAgent: userAgent || '',
+      isRememberMe: loginDto.rememberMe || false,
+    });
 
     // Calculate expiration time
     const expiresIn = this.jwtService.getTokenExpiration(accessToken)?.getTime()
@@ -365,10 +404,27 @@ export class AuthService {
   /**
    * Logout user
    */
-  async logout(refreshToken: string): Promise<void> {
+  async logout(refreshToken: string, userId?: string): Promise<void> {
     const payload = this.jwtService.decodeToken(refreshToken);
     if (payload) {
       await this.refreshTokenService.revokeRefreshToken(payload.tokenId);
+    }
+
+    // If userId is provided, revoke the current session
+    if (userId) {
+      // Find and revoke the session associated with this refresh token
+      const sessions = await this.sessionService.getUserSessions(userId);
+      const currentSession = sessions.find(
+        session =>
+          session.refreshTokenHash ===
+          this.refreshTokenService.hashToken(refreshToken)
+      );
+
+      if (currentSession) {
+        await this.sessionService.revokeSession(currentSession.id, {
+          reason: 'User logout',
+        });
+      }
     }
   }
 
