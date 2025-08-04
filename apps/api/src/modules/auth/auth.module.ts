@@ -7,6 +7,7 @@ import { MfaController } from './controllers/mfa.controller';
 import { SessionController } from './controllers/session.controller';
 import { RoleController } from './controllers/role.controller';
 import { PermissionController } from './controllers/permission.controller';
+import { AccountRecoveryController } from './controllers/account-recovery.controller';
 import { AuthService } from './services/auth.service';
 import { JwtService } from './services/jwt.service';
 import { RefreshTokenService } from './services/refresh-token.service';
@@ -15,8 +16,10 @@ import { EmailService } from './services/email.service';
 import { SessionService } from './services/session.service';
 import { RoleService } from './services/role.service';
 import { PermissionService } from './services/permission.service';
+import { AccountRecoveryService } from './services/account-recovery.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { PermissionsGuard } from './guards/permissions.guard';
+import { AuthGuard } from './guards/auth.guard';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PermissionCheckerService } from '../../common/services/permission-checker.service';
 import {
@@ -26,6 +29,7 @@ import {
   Session,
   Permission,
   Role,
+  AccountRecovery,
 } from './entities';
 import { env } from '@app/config';
 
@@ -38,6 +42,7 @@ import { env } from '@app/config';
       Session,
       Permission,
       Role,
+      AccountRecovery,
     ]),
     JwtModule.register({
       secret: env.JWT_SECRET,
@@ -54,6 +59,7 @@ import { env } from '@app/config';
     SessionController,
     RoleController,
     PermissionController,
+    AccountRecoveryController,
   ],
   providers: [
     AuthService,
@@ -64,8 +70,10 @@ import { env } from '@app/config';
     SessionService,
     RoleService,
     PermissionService,
+    AccountRecoveryService,
     JwtAuthGuard,
     PermissionsGuard,
+    AuthGuard,
     JwtStrategy,
     PermissionCheckerService,
   ],
@@ -78,8 +86,10 @@ import { env } from '@app/config';
     SessionService,
     RoleService,
     PermissionService,
+    AccountRecoveryService,
     JwtAuthGuard,
     PermissionsGuard,
+    AuthGuard,
     PermissionCheckerService,
   ],
 })

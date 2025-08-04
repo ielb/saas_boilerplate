@@ -7,6 +7,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { env } from '@app/config';
 
 // Import modules (will be created in subsequent tasks)
+import { CommonModule } from './common/common.module';
 import { AuthModule } from './modules/auth/auth.module';
 // import { UsersModule } from './modules/users/users.module';
 // import { TenantsModule } from './modules/tenants/tenants.module';
@@ -73,6 +74,7 @@ import { AuthModule } from './modules/auth/auth.module';
     ]),
 
     // Feature modules (will be uncommented as they are created)
+    CommonModule,
     AuthModule,
     // UsersModule,
     // TenantsModule,

@@ -34,7 +34,8 @@ import {
   RequireDelete,
   RequireManage,
 } from '../decorators/permissions.decorator';
-import { AuthGuard, RolesGuard, TenantGuard, MfaGuard } from '../guards';
+import { RolesGuard, TenantGuard, MfaGuard } from '../guards';
+import { AuthGuard } from '../../modules/auth/guards/auth.guard';
 import { UserRole } from '@app/shared';
 import {
   PermissionResource,
