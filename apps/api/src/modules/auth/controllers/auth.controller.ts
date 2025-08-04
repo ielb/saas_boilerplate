@@ -26,7 +26,10 @@ import { ResetPasswordDto } from '../dto/reset-password.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { LoginRequest, LoginResponse } from '@app/shared';
 import { VerifyMfaDto } from '../dto/mfa.dto';
-import { ThrottlerGuard, Throttle } from '@nestjs/throttler';
+import {
+  RateLimit,
+  RateLimitConfigs,
+} from '../../../common/decorators/rate-limit.decorator';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -34,6 +37,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
+  @RateLimit(RateLimitConfigs.REGISTER)
   @ApiOperation({ summary: 'Register a new user and tenant' })
   @ApiResponse({
     status: 201,
@@ -49,12 +53,14 @@ export class AuthController {
   })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 409, description: 'User or tenant already exists' })
+  @ApiResponse({ status: 429, description: 'Too many requests' })
   async register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
   }
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @RateLimit(RateLimitConfigs.LOGIN)
   @ApiOperation({ summary: 'Login with email and password' })
   @ApiResponse({
     status: 200,
@@ -84,6 +90,7 @@ export class AuthController {
   })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
   @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 429, description: 'Too many requests' })
   async login(
     @Body() loginDto: LoginDto,
     @Req() req: Request
@@ -94,6 +101,7 @@ export class AuthController {
   }
 
   @Post('verify-email')
+  @RateLimit(RateLimitConfigs.API_NORMAL)
   @ApiOperation({ summary: 'Verify email address with token' })
   @ApiResponse({
     status: 200,
@@ -106,15 +114,17 @@ export class AuthController {
     },
   })
   @ApiResponse({ status: 400, description: 'Invalid or expired token' })
+  @ApiResponse({ status: 429, description: 'Too many requests' })
   async verifyEmail(@Body('token') token: string) {
     return this.authService.verifyEmail(token);
   }
 
-  @Post('resend-verification')
+  @Post('resend-email-verification')
+  @RateLimit(RateLimitConfigs.API_STRICT)
   @ApiOperation({ summary: 'Resend email verification' })
   @ApiResponse({
     status: 200,
-    description: 'Verification email sent',
+    description: 'Email verification resent',
     schema: {
       type: 'object',
       properties: {
@@ -123,13 +133,13 @@ export class AuthController {
     },
   })
   @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 429, description: 'Too many requests' })
   async resendEmailVerification(@Body('email') email: string) {
     return this.authService.resendEmailVerification(email);
   }
 
   @Post('forgot-password')
-  @UseInterceptors(ThrottlerGuard)
-  @Throttle({ default: { ttl: 3600000, limit: 3 } }) // 3 requests per hour
+  @RateLimit(RateLimitConfigs.FORGOT_PASSWORD)
   @ApiOperation({ summary: 'Request password reset' })
   @ApiResponse({
     status: 200,
@@ -149,8 +159,7 @@ export class AuthController {
   }
 
   @Post('reset-password')
-  @UseInterceptors(ThrottlerGuard)
-  @Throttle({ default: { ttl: 300000, limit: 5 } }) // 5 requests per 5 minutes
+  @RateLimit(RateLimitConfigs.RESET_PASSWORD)
   @ApiOperation({ summary: 'Reset password with token' })
   @ApiResponse({
     status: 200,
@@ -176,6 +185,7 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @RateLimit(RateLimitConfigs.REFRESH_TOKEN)
   @ApiOperation({ summary: 'Refresh access token' })
   @ApiResponse({
     status: 200,
@@ -202,6 +212,8 @@ export class AuthController {
       },
     },
   })
+  @ApiResponse({ status: 401, description: 'Invalid refresh token' })
+  @ApiResponse({ status: 429, description: 'Too many requests' })
   async refreshToken(
     @Body() refreshTokenDto: RefreshTokenDto,
     @Req() req: Request
@@ -214,6 +226,7 @@ export class AuthController {
   }
 
   @Post('mfa/verify')
+  @RateLimit(RateLimitConfigs.MFA_VERIFY)
   @ApiOperation({ summary: 'Verify MFA and complete login' })
   @ApiResponse({
     status: 200,
@@ -240,6 +253,8 @@ export class AuthController {
       },
     },
   })
+  @ApiResponse({ status: 400, description: 'Invalid MFA token' })
+  @ApiResponse({ status: 429, description: 'Too many requests' })
   async verifyMfaAndCompleteLogin(
     @Body() verifyMfaDto: VerifyMfaDto
   ): Promise<LoginResponse> {

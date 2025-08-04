@@ -8,6 +8,7 @@ import { env } from '@app/config';
 
 // Import modules (will be created in subsequent tasks)
 import { AuthModule } from './modules/auth/auth.module';
+import { CommonModule } from './common/common.module';
 // import { UsersModule } from './modules/users/users.module';
 // import { TenantsModule } from './modules/tenants/tenants.module';
 // import { BillingModule } from './modules/billing/billing.module';
@@ -71,6 +72,9 @@ import { AuthModule } from './modules/auth/auth.module';
         limit: env.RATE_LIMIT_MAX_REQUESTS,
       },
     ]),
+
+    // Common module for shared services
+    CommonModule,
 
     // Feature modules (will be uncommented as they are created)
     AuthModule,

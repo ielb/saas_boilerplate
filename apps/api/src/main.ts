@@ -8,62 +8,31 @@ import slowDown from 'express-slow-down';
 import { Request, Response } from 'express';
 import { AppModule } from './app.module';
 import { env, isDevelopment, isProduction } from '@app/config';
+import { SecurityConfigService } from './common/services/security-config.service';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
 
-  // Security middleware
-  app.use(
-    helmet({
-      contentSecurityPolicy: isProduction()
-        ? {
-            directives: {
-              defaultSrc: ["'self'"],
-              styleSrc: ["'self'", "'unsafe-inline'"],
-              scriptSrc: ["'self'"],
-              imgSrc: ["'self'", 'data:', 'https:'],
-            },
-          }
-        : false,
-    })
-  );
+  // Initialize security configuration service
+  const securityConfigService = app.get(SecurityConfigService);
+
+  // Security middleware with enhanced configuration
+  app.use(helmet(securityConfigService.getHelmetConfig()));
 
   // Compression middleware
   app.use(compression());
 
-  // Rate limiting
-  const limiter = rateLimit({
-    windowMs: env.RATE_LIMIT_WINDOW_MS,
-    max: env.RATE_LIMIT_MAX_REQUESTS,
-    skipSuccessfulRequests: env.RATE_LIMIT_SKIP_SUCCESSFUL_REQUESTS,
-    message: {
-      error: 'Too many requests from this IP, please try again later.',
-    },
-  });
-  app.use(limiter);
+  // Rate limiting with enhanced configuration
+  const rateLimitConfig = securityConfigService.getRateLimitConfig();
+  app.use(rateLimit(rateLimitConfig));
 
-  // Speed limiting
-  const speedLimiter = slowDown({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    delayAfter: 100, // allow 100 requests per 15 minutes, then...
-    delayMs: (hits: number) => hits * 500, // begin adding 500ms of delay per request above 100
-  });
-  app.use(speedLimiter);
+  // Speed limiting with enhanced configuration
+  const speedLimitConfig = securityConfigService.getSpeedLimitConfig();
+  app.use(slowDown(speedLimitConfig));
 
-  // CORS configuration
-  app.enableCors({
-    origin: env.CORS_ORIGIN,
-    credentials: env.CORS_CREDENTIALS,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: [
-      'Origin',
-      'X-Requested-With',
-      'Content-Type',
-      'Accept',
-      'Authorization',
-      'X-Tenant-ID',
-    ],
-  });
+  // CORS configuration with enhanced security
+  const corsConfig = securityConfigService.getCorsConfig();
+  app.enableCors(corsConfig);
 
   // Global validation pipe
   app.useGlobalPipes(
