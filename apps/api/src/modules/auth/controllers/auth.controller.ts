@@ -89,7 +89,8 @@ export class AuthController {
     @Req() req: Request
   ): Promise<LoginResponse> {
     const ipAddress = req.ip || req.connection.remoteAddress;
-    return this.authService.login(loginDto, ipAddress);
+    const userAgent = req.headers['user-agent'] as string;
+    return this.authService.login(loginDto, ipAddress, userAgent);
   }
 
   @Post('verify-email')
@@ -263,9 +264,12 @@ export class AuthController {
     },
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async logout(@Req() req: Request) {
+  async logout(
+    @Req() req: Request,
+    @Body('refreshToken') refreshToken: string
+  ) {
     const userId = (req.user as any)?.id;
-    return this.authService.logout(userId);
+    return this.authService.logout(refreshToken, userId);
   }
 
   @Get('profile')

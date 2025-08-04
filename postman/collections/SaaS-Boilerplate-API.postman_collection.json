@@ -29,6 +29,16 @@
       "key": "tenantId",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "sessionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "currentSessionId",
+      "value": "",
+      "type": "string"
     }
   ],
   "auth": {
@@ -388,6 +398,232 @@
               "raw": "{{baseUrl}}/auth/mfa/backup-codes/regenerate",
               "host": ["{{baseUrl}}"],
               "path": ["auth", "mfa", "backup-codes", "regenerate"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Session Management",
+      "item": [
+        {
+          "name": "Get All Sessions",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.sessions && response.sessions.length > 0) {",
+                  "        pm.environment.set('sessionId', response.sessions[0].id);",
+                  "        pm.environment.set('currentSessionId', response.sessions[0].id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sessions",
+              "host": ["{{baseUrl}}"],
+              "path": ["sessions"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Active Sessions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sessions/active",
+              "host": ["{{baseUrl}}"],
+              "path": ["sessions", "active"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Session by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sessions/{{sessionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["sessions", "{{sessionId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Session",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deviceName\": \"Updated Device Name\",\n  \"isTrusted\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sessions/{{sessionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["sessions", "{{sessionId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Revoke Session",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Security concern\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sessions/{{sessionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["sessions", "{{sessionId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Revoke All Sessions",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Logout all devices\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sessions",
+              "host": ["{{baseUrl}}"],
+              "path": ["sessions"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Revoke Other Sessions",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-session-id",
+                "value": "{{currentSessionId}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Security concern\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sessions/others",
+              "host": ["{{baseUrl}}"],
+              "path": ["sessions", "others"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mark Device as Trusted",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sessions/{{sessionId}}/trust",
+              "host": ["{{baseUrl}}"],
+              "path": ["sessions", "{{sessionId}}", "trust"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Session Activity",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sessions/{{sessionId}}/activity",
+              "host": ["{{baseUrl}}"],
+              "path": ["sessions", "{{sessionId}}", "activity"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Extend Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"additionalMinutes\": 60\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/sessions/{{sessionId}}/extend",
+              "host": ["{{baseUrl}}"],
+              "path": ["sessions", "{{sessionId}}", "extend"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mark Session as Suspicious",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sessions/{{sessionId}}/suspicious",
+              "host": ["{{baseUrl}}"],
+              "path": ["sessions", "{{sessionId}}", "suspicious"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Session Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/sessions/stats/summary",
+              "host": ["{{baseUrl}}"],
+              "path": ["sessions", "stats", "summary"]
             }
           },
           "response": []

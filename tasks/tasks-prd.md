@@ -111,7 +111,7 @@ Based on PRD: `docs/prd.md`
   - [x] 2.6 Implement multi-factor authentication (TOTP) (#4)
   - [x] 2.7 Create password reset functionality with secure tokens (#5)
   - [x] 2.7.1 implement comprehensive testing for all the done work
-  - [ ] 2.8 Implement session management and device tracking (#6)
+  - [x] 2.8 Implement session management and device tracking (#6)
   - [ ] 2.9 Set up role-based access control (RBAC) (#7)
   - [ ] 2.10 Create resource-level permission system (#8)
   - [ ] 2.11 Implement API rate limiting and brute force protection (#14)

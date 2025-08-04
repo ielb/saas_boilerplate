@@ -10,6 +10,7 @@ import { JwtService } from './jwt.service';
 import { RefreshTokenService } from './refresh-token.service';
 import { MfaService } from './mfa.service';
 import { EmailService } from './email.service';
+import { SessionService } from './session.service';
 import { UserStatus } from '@app/shared';
 
 describe('AuthService - Password Reset', () => {
@@ -85,6 +86,18 @@ describe('AuthService - Password Reset', () => {
           useValue: {
             sendPasswordReset: jest.fn(),
             sendEmailVerification: jest.fn(),
+          },
+        },
+        {
+          provide: SessionService,
+          useValue: {
+            generateDeviceFingerprint: jest.fn(),
+            parseBrowserInfo: jest.fn(),
+            parseOperatingSystem: jest.fn(),
+            detectDeviceType: jest.fn(),
+            createSession: jest.fn(),
+            getUserSessions: jest.fn(),
+            revokeSession: jest.fn(),
           },
         },
       ],
