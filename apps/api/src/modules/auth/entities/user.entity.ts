@@ -10,6 +10,8 @@ import {
   BeforeUpdate,
   ManyToOne,
   JoinColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import {
   IsEmail,
@@ -24,6 +26,7 @@ import * as argon2 from 'argon2';
 
 import { UserRole, UserStatus, AuthProvider } from '@app/shared';
 import { Tenant } from './tenant.entity';
+import { Role } from './role.entity';
 
 @Entity('users')
 @Index(['email', 'tenantId'], { unique: true })
@@ -151,6 +154,14 @@ export class User {
   @ManyToOne(() => Tenant, tenant => tenant.users)
   @JoinColumn({ name: 'tenantId' })
   tenant?: Tenant;
+
+  @ManyToMany(() => Role, role => role.users)
+  @JoinTable({
+    name: 'user_roles',
+    joinColumn: { name: 'userId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'roleId', referencedColumnName: 'id' },
+  })
+  roles!: Role[];
 
   @BeforeInsert()
   @BeforeUpdate()

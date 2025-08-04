@@ -21,7 +21,10 @@
     "clean": "yarn workspaces run clean",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
-    "docker:build": "docker-compose build"
+    "docker:build": "docker-compose build",
+    "test:postman": "newman run postman/collections/SaaS-Boilerplate-API.postman_collection.json",
+    "test:rbac": "./postman/scripts/run-rbac-tests.sh",
+    "test:rbac:quick": "newman run postman/collections/RBAC-Tests.postman_collection.json --reporters cli"
   },
   "devDependencies": {
     "@commitlint/cli": "^18.4.0",

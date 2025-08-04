@@ -14,6 +14,8 @@ import { RefreshTokenService } from './refresh-token.service';
 import { MfaService } from './mfa.service';
 import { EmailService } from './email.service';
 import { SessionService } from './session.service';
+import { RoleService } from './role.service';
+import { PermissionService } from './permission.service';
 import { LoginDto, RegisterDto } from '../dto';
 import {
   LoginResponse,
@@ -35,7 +37,9 @@ export class AuthService {
     private readonly refreshTokenService: RefreshTokenService,
     private readonly mfaService: MfaService,
     private readonly emailService: EmailService,
-    private readonly sessionService: SessionService
+    private readonly sessionService: SessionService,
+    private readonly roleService: RoleService,
+    private readonly permissionService: PermissionService
   ) {}
 
   /**
@@ -76,6 +80,24 @@ export class AuthService {
 
     await user.hashPassword();
     await this.userRepository.save(user);
+
+    // Create default permissions and roles for the tenant if they don't exist
+    await this.permissionService.createDefaultPermissions();
+    await this.roleService.createDefaultRoles(tenant.id);
+
+    // Assign "Member" role to the new user
+    const memberRole = await this.roleService.getRoleByName(
+      'Member',
+      tenant.id
+    );
+    if (memberRole) {
+      await this.roleService.assignRoleToUser(user.id, {
+        roleId: memberRole.id,
+      });
+      this.logger.log(`Assigned Member role to user: ${user.email}`);
+    } else {
+      this.logger.warn(`Member role not found for tenant: ${tenant.id}`);
+    }
 
     // Send email verification
     await this.emailService.sendEmailVerification(user);

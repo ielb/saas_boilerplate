@@ -32,6 +32,30 @@
     {
       "key": "currentSessionId",
       "value": ""
+    },
+    {
+      "key": "roleId",
+      "value": ""
+    },
+    {
+      "key": "permissionId",
+      "value": ""
+    },
+    {
+      "key": "permissionId1",
+      "value": ""
+    },
+    {
+      "key": "permissionId2",
+      "value": ""
+    },
+    {
+      "key": "permissionId3",
+      "value": ""
+    },
+    {
+      "key": "parentRoleId",
+      "value": ""
     }
   ],
   "item": [
@@ -465,7 +489,7 @@
                 ]
               }
             }
-          ],
+          ]
         },
         {
           "name": "11. Forgot Password - Success",
@@ -666,7 +690,27 @@
             }
           },
           "response": []
-        }
+        },
+        {
+          "name": "11. Logout - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Logout successful', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "    pm.expect(response.message).to.include('Logged out successfully');",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -1624,6 +1668,830 @@
               "raw": "{{baseUrl}}/health",
               "host": ["{{baseUrl}}"],
               "path": ["health"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "RBAC Setup - Authentication",
+      "item": [
+        {
+          "name": "Login to Get Token for RBAC Tests",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has authentication tokens', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('accessToken');",
+                  "    pm.expect(response).to.have.property('refreshToken');",
+                  "    pm.expect(response).to.have.property('user');",
+                  "});",
+                  "",
+                  "// Set authentication variables",
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('accessToken', response.accessToken);",
+                  "    pm.collectionVariables.set('userId', response.user.id);",
+                  "    pm.collectionVariables.set('tenantId', response.user.tenantId);",
+                  "}",
+                  "",
+                  "// Set default parent role ID (Admin role)",
+                  "pm.collectionVariables.set('parentRoleId', 'admin-role-id');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"AdminPassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "RBAC Permission Management Tests",
+      "item": [
+        {
+          "name": "1. Create Custom Permission",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Permission created successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.name).to.equal('files:manage');",
+                  "    pm.expect(response.resource).to.equal('files');",
+                  "    pm.expect(response.action).to.equal('manage');",
+                  "    pm.expect(response.scope).to.equal('tenant');",
+                  "    pm.expect(response.isSystem).to.be.false;",
+                  "    pm.expect(response.isActive).to.be.true;",
+                  "});",
+                  "",
+                  "// Store permission ID",
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('permissionId', response.id);",
+                  "    pm.collectionVariables.set('permissionId1', response.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"files:manage\",\n  \"description\": \"File management permission\",\n  \"resource\": \"files\",\n  \"action\": \"manage\",\n  \"scope\": \"tenant\",\n  \"conditions\": {\n    \"requireApproval\": true\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/permissions",
+              "host": ["{{baseUrl}}"],
+              "path": ["permissions"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2. Create Second Permission",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Second permission created successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.name).to.equal('files:read');",
+                  "    pm.expect(response.resource).to.equal('files');",
+                  "    pm.expect(response.action).to.equal('read');",
+                  "    pm.expect(response.scope).to.equal('tenant');",
+                  "});",
+                  "",
+                  "// Store second permission ID",
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('permissionId2', response.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"files:read\",\n  \"description\": \"File read permission\",\n  \"resource\": \"files\",\n  \"action\": \"read\",\n  \"scope\": \"tenant\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/permissions",
+              "host": ["{{baseUrl}}"],
+              "path": ["permissions"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3. Get All Permissions",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Permissions list retrieved successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.permissions).to.be.an('array');",
+                  "    pm.expect(response.total).to.be.a('number');",
+                  "    pm.expect(response.page).to.equal(1);",
+                  "    pm.expect(response.limit).to.equal(50);",
+                  "});",
+                  "",
+                  "pm.test('File permissions exist in list', function () {",
+                  "    const response = pm.response.json();",
+                  "    const filePermissions = response.permissions.filter(p => p.name.startsWith('files:'));",
+                  "    pm.expect(filePermissions.length).to.be.at.least(2);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/permissions?page=1&limit=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["permissions"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4. Get Permission by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Permission retrieved successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.id).to.equal(pm.collectionVariables.get('permissionId'));",
+                  "    pm.expect(response.name).to.equal('files:manage');",
+                  "    pm.expect(response.resource).to.equal('files');",
+                  "    pm.expect(response.action).to.equal('manage');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/permissions/{{permissionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["permissions", "{{permissionId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5. Update Permission",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Permission updated successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.name).to.equal('files:manage:enhanced');",
+                  "    pm.expect(response.description).to.equal('Enhanced file management permission');",
+                  "    pm.expect(response.scope).to.equal('team');",
+                  "    pm.expect(response.isActive).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"files:manage:enhanced\",\n  \"description\": \"Enhanced file management permission\",\n  \"scope\": \"team\",\n  \"conditions\": {\n    \"requireAudit\": true\n  },\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/permissions/{{permissionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["permissions", "{{permissionId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "RBAC Role Management Tests",
+      "item": [
+        {
+          "name": "1. Create Custom Role",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Role created successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.name).to.equal('Team Lead');",
+                  "    pm.expect(response.description).to.equal('Team lead role with enhanced permissions');",
+                  "    pm.expect(response.type).to.equal('custom');",
+                  "    pm.expect(response.level).to.equal(3);",
+                  "    pm.expect(response.isSystem).to.be.false;",
+                  "    pm.expect(response.isActive).to.be.true;",
+                  "    pm.expect(response.permissions).to.be.an('array');",
+                  "    pm.expect(response.totalPermissions).to.be.a('number');",
+                  "});",
+                  "",
+                  "// Store role ID",
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('roleId', response.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Team Lead\",\n  \"description\": \"Team lead role with enhanced permissions\",\n  \"type\": \"custom\",\n  \"level\": 3,\n  \"parentRoleId\": \"{{parentRoleId}}\",\n  \"metadata\": {\n    \"canManageTeam\": true,\n    \"canViewReports\": true\n  },\n  \"permissionIds\": [\n    \"{{permissionId1}}\",\n    \"{{permissionId2}}\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/roles",
+              "host": ["{{baseUrl}}"],
+              "path": ["roles"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2. Get All Roles",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Roles list retrieved successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.roles).to.be.an('array');",
+                  "    pm.expect(response.total).to.be.a('number');",
+                  "    pm.expect(response.page).to.equal(1);",
+                  "    pm.expect(response.limit).to.equal(50);",
+                  "});",
+                  "",
+                  "pm.test('Custom role exists in list', function () {",
+                  "    const response = pm.response.json();",
+                  "    const teamLeadRole = response.roles.find(r => r.name === 'Team Lead');",
+                  "    pm.expect(teamLeadRole).to.exist;",
+                  "    pm.expect(teamLeadRole.type).to.equal('custom');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/roles?page=1&limit=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["roles"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3. Get Role by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Role retrieved successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.id).to.equal(pm.collectionVariables.get('roleId'));",
+                  "    pm.expect(response.name).to.equal('Team Lead');",
+                  "    pm.expect(response.type).to.equal('custom');",
+                  "    pm.expect(response.level).to.equal(3);",
+                  "    pm.expect(response.permissions).to.be.an('array');",
+                  "    pm.expect(response.totalPermissions).to.be.at.least(2);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/roles/{{roleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["roles", "{{roleId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4. Update Role",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Role updated successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.name).to.equal('Senior Team Lead');",
+                  "    pm.expect(response.description).to.equal('Senior team lead with additional privileges');",
+                  "    pm.expect(response.level).to.equal(2);",
+                  "    pm.expect(response.isActive).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Senior Team Lead\",\n  \"description\": \"Senior team lead with additional privileges\",\n  \"level\": 2,\n  \"metadata\": {\n    \"canManageTeam\": true,\n    \"canViewReports\": true,\n    \"canManageBudget\": true\n  },\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/roles/{{roleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["roles", "{{roleId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5. Assign Additional Permissions to Role",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Permissions assigned successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.permissions).to.be.an('array');",
+                  "    pm.expect(response.totalPermissions).to.be.at.least(3);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"permissionIds\": [\n    \"{{permissionId3}}\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/roles/{{roleId}}/permissions",
+              "host": ["{{baseUrl}}"],
+              "path": ["roles", "{{roleId}}", "permissions"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "RBAC User Role Management Tests",
+      "item": [
+        {
+          "name": "1. Assign Role to User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Role assigned successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "    pm.expect(response.message).to.include('Role assigned successfully');",
+                  "    pm.expect(response.userId).to.equal(pm.collectionVariables.get('userId'));",
+                  "    pm.expect(response.roleId).to.equal(pm.collectionVariables.get('roleId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roleId\": \"{{roleId}}\",\n  \"metadata\": {\n    \"assignedBy\": \"{{userId}}\",\n    \"reason\": \"Promotion to team lead\",\n    \"effectiveDate\": \"2024-01-01\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/roles/users/{{userId}}/roles",
+              "host": ["{{baseUrl}}"],
+              "path": ["roles", "users", "{{userId}}", "roles"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2. Get User Roles",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('User roles retrieved successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.userRoles).to.be.an('array');",
+                  "    pm.expect(response.total).to.be.a('number');",
+                  "    pm.expect(response.total).to.be.at.least(1);",
+                  "});",
+                  "",
+                  "pm.test('Assigned role exists in user roles', function () {",
+                  "    const response = pm.response.json();",
+                  "    const assignedRole = response.userRoles.find(ur => ur.roleId === pm.collectionVariables.get('roleId'));",
+                  "    pm.expect(assignedRole).to.exist;",
+                  "    pm.expect(assignedRole.roleName).to.equal('Senior Team Lead');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/roles/users/{{userId}}/roles",
+              "host": ["{{baseUrl}}"],
+              "path": ["roles", "users", "{{userId}}", "roles"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3. Get User Permissions",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('User permissions retrieved successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.permissions).to.be.an('array');",
+                  "    pm.expect(response.userId).to.equal(pm.collectionVariables.get('userId'));",
+                  "});",
+                  "",
+                  "pm.test('User has file permissions', function () {",
+                  "    const response = pm.response.json();",
+                  "    const filePermissions = response.permissions.filter(p => p.startsWith('files:'));",
+                  "    pm.expect(filePermissions.length).to.be.at.least(2);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/roles/users/{{userId}}/permissions",
+              "host": ["{{baseUrl}}"],
+              "path": ["roles", "users", "{{userId}}", "permissions"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4. Check User Permission - Has Access",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Permission check successful', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('hasPermission');",
+                  "    pm.expect(response).to.have.property('resource');",
+                  "    pm.expect(response).to.have.property('action');",
+                  "    pm.expect(response).to.have.property('scope');",
+                  "    pm.expect(response).to.have.property('userId');",
+                  "    pm.expect(response).to.have.property('grantedByRoles');",
+                  "});",
+                  "",
+                  "pm.test('User has files:manage permission', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.hasPermission).to.be.true;",
+                  "    pm.expect(response.resource).to.equal('files');",
+                  "    pm.expect(response.action).to.equal('manage');",
+                  "    pm.expect(response.scope).to.equal('tenant');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resource\": \"files\",\n  \"action\": \"manage\",\n  \"scope\": \"tenant\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/roles/users/{{userId}}/permissions/check",
+              "host": ["{{baseUrl}}"],
+              "path": ["roles", "users", "{{userId}}", "permissions", "check"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5. Check User Permission - No Access",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Permission check indicates no access', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.hasPermission).to.be.false;",
+                  "    pm.expect(response.resource).to.equal('admin');",
+                  "    pm.expect(response.action).to.equal('delete');",
+                  "    pm.expect(response.scope).to.equal('global');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"resource\": \"admin\",\n  \"action\": \"delete\",\n  \"scope\": \"global\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/roles/users/{{userId}}/permissions/check",
+              "host": ["{{baseUrl}}"],
+              "path": ["roles", "users", "{{userId}}", "permissions", "check"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "RBAC Cleanup Tests",
+      "item": [
+        {
+          "name": "1. Remove Role from User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Role removed successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "    pm.expect(response.message).to.include('Role removed successfully');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/roles/users/{{userId}}/roles/{{roleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["roles", "users", "{{userId}}", "roles", "{{roleId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2. Delete Custom Role",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Role deleted successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "    pm.expect(response.message).to.include('Role deleted successfully');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/roles/{{roleId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["roles", "{{roleId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3. Delete Custom Permissions",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Permission deleted successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "    pm.expect(response.message).to.include('Permission deleted successfully');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/permissions/{{permissionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["permissions", "{{permissionId}}"]
             }
           },
           "response": []
