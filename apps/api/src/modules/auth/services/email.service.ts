@@ -194,7 +194,12 @@ export class EmailService {
     // In a real implementation, you would load templates from files
     // For now, we'll use inline templates
 
-    type TemplateType = 'email-verification' | 'password-reset' | 'welcome';
+    type TemplateType =
+      | 'email-verification'
+      | 'password-reset'
+      | 'welcome'
+      | 'account-recovery'
+      | 'account-recovery-completed';
 
     const templates: Record<TemplateType, { html: string; text: string }> = {
       'email-verification': {
@@ -263,6 +268,59 @@ export class EmailService {
           If you have any questions, feel free to contact our support team.
         `,
       },
+      'account-recovery': {
+        html: `
+          <h1>Account Recovery Request</h1>
+          <p>Hello {{name}},</p>
+          <p>We received a request to recover your account. If this was you, please use the recovery token below:</p>
+          <p><strong>Recovery Token: {{recoveryToken}}</strong></p>
+          <p>Or click the link below to proceed with account recovery:</p>
+          <a href="{{recoveryUrl}}">Recover Account</a>
+          <p>This recovery session will expire at: {{expiresAt}}</p>
+          <p>If you didn't request account recovery, please ignore this email and ensure your account is secure.</p>
+        `,
+        text: `
+          Account Recovery Request
+          
+          Hello {{name}},
+          
+          We received a request to recover your account. If this was you, please use the recovery token below:
+          
+          Recovery Token: {{recoveryToken}}
+          
+          Or visit this link to proceed with account recovery:
+          {{recoveryUrl}}
+          
+          This recovery session will expire at: {{expiresAt}}
+          
+          If you didn't request account recovery, please ignore this email and ensure your account is secure.
+        `,
+      },
+      'account-recovery-completed': {
+        html: `
+          <h1>Account Recovery Completed</h1>
+          <p>Hello {{name}},</p>
+          <p>Your account recovery has been completed successfully. Your MFA has been reset and new backup codes have been generated.</p>
+          <p>You can now log in to your account:</p>
+          <a href="{{loginUrl}}">Login to Your Account</a>
+          <p>Please set up your new MFA device and save your new backup codes in a secure location.</p>
+          <p>If you didn't complete this recovery, please contact our support team immediately.</p>
+        `,
+        text: `
+          Account Recovery Completed
+          
+          Hello {{name}},
+          
+          Your account recovery has been completed successfully. Your MFA has been reset and new backup codes have been generated.
+          
+          You can now log in to your account:
+          {{loginUrl}}
+          
+          Please set up your new MFA device and save your new backup codes in a secure location.
+          
+          If you didn't complete this recovery, please contact our support team immediately.
+        `,
+      },
     };
 
     const template = templates[templateName as TemplateType];
@@ -290,5 +348,49 @@ export class EmailService {
       console.error('Email configuration test failed:', error);
       return false;
     }
+  }
+
+  /**
+   * Send account recovery email
+   */
+  async sendAccountRecoveryEmail(
+    email: string,
+    firstName: string,
+    recoveryToken: string,
+    expiresAt: Date
+  ): Promise<void> {
+    const emailData = {
+      to: email,
+      subject: 'Account Recovery Request',
+      template: 'account-recovery',
+      context: {
+        name: firstName,
+        recoveryToken,
+        expiresAt: expiresAt.toISOString(),
+        recoveryUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/recover-account?token=${recoveryToken}`,
+      },
+    };
+
+    await this.sendEmail(emailData);
+  }
+
+  /**
+   * Send account recovery completed email
+   */
+  async sendAccountRecoveryCompletedEmail(
+    email: string,
+    firstName: string
+  ): Promise<void> {
+    const emailData = {
+      to: email,
+      subject: 'Account Recovery Completed',
+      template: 'account-recovery-completed',
+      context: {
+        name: firstName,
+        loginUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login`,
+      },
+    };
+
+    await this.sendEmail(emailData);
   }
 }

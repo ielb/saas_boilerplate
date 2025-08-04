@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsEmail } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class SetupMfaDto {
@@ -77,4 +77,90 @@ export class MfaStatusDto {
     example: 10,
   })
   backupCodesRemaining!: number;
+}
+
+// New DTOs for Account Recovery
+export class InitiateAccountRecoveryDto {
+  @ApiProperty({
+    description: 'User email address',
+    example: 'user@example.com',
+  })
+  @IsEmail()
+  @IsNotEmpty()
+  email!: string;
+}
+
+export class VerifyAccountRecoveryDto {
+  @ApiProperty({
+    description: 'Recovery token sent to email',
+    example: 'abc123def456',
+  })
+  @IsString()
+  @IsNotEmpty()
+  recoveryToken!: string;
+
+  @ApiProperty({
+    description: 'Backup code for account recovery',
+    example: 'ABCD1234EF',
+  })
+  @IsString()
+  @IsNotEmpty()
+  backupCode!: string;
+}
+
+export class CompleteAccountRecoveryDto {
+  @ApiProperty({
+    description: 'Recovery session token',
+    example: 'xyz789abc123',
+  })
+  @IsString()
+  @IsNotEmpty()
+  recoverySessionToken!: string;
+
+  @ApiProperty({
+    description: 'New TOTP secret (optional, will generate if not provided)',
+    example: 'JBSWY3DPEHPK3PXP',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  newTotpSecret?: string;
+}
+
+export class AccountRecoveryStatusDto {
+  @ApiProperty({
+    description: 'Whether recovery is in progress',
+    example: true,
+  })
+  isRecoveryInProgress!: boolean;
+
+  @ApiProperty({
+    description: 'Recovery session expiry time',
+    example: '2023-12-31T23:59:59Z',
+  })
+  recoverySessionExpiresAt!: string;
+
+  @ApiProperty({
+    description: 'Number of remaining recovery attempts',
+    example: 3,
+  })
+  remainingAttempts!: number;
+}
+
+export class RecoveryAttemptDto {
+  @ApiProperty({
+    description: 'Recovery session token',
+    example: 'xyz789abc123',
+  })
+  @IsString()
+  @IsNotEmpty()
+  recoverySessionToken!: string;
+
+  @ApiProperty({
+    description: 'Backup code attempt',
+    example: 'ABCD1234EF',
+  })
+  @IsString()
+  @IsNotEmpty()
+  backupCode!: string;
 }

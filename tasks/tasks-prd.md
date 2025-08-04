@@ -35,6 +35,12 @@ Based on PRD: `docs/prd.md`
 - `apps/api/src/common/examples/auth-usage.example.ts` - Example controller showing guard and decorator usage
 - `apps/api/src/common/services/permission-checker.service.ts` - Permission checking utility service
 - `apps/api/src/common/services/permission-checker.service.spec.ts` - Permission checker service unit tests
+- `apps/api/src/modules/auth/entities/account-recovery.entity.ts` - Account recovery entity
+- `apps/api/src/modules/auth/services/account-recovery.service.ts` - Account recovery service
+- `apps/api/src/modules/auth/services/account-recovery.service.spec.ts` - Account recovery service tests
+- `apps/api/src/modules/auth/controllers/account-recovery.controller.ts` - Account recovery controller
+- `apps/api/src/modules/auth/controllers/account-recovery.controller.spec.ts` - Account recovery controller tests
+- `apps/api/src/database/migrations/1700000000004-CreateAccountRecovery.ts` - Account recovery database migration
 - `apps/api/src/shared/` - Shared types and configurations
 - `apps/api/src/config/` - Environment and application configuration
 - `apps/api/src/database/` - Database connection and migrations
@@ -134,7 +140,7 @@ Based on PRD: `docs/prd.md`
   - [x] 2.11 Implement API rate limiting and brute force protection (#14)
   - [x] 2.12 Add security headers and CORS configuration (#15)
   - [x] 2.13 Create authentication guards and decorators (#16)
-  - [ ] 2.14 Implement account recovery with backup codes (#17)
+  - [x] 2.14 Implement account recovery with backup codes (#17)
   - [ ] 2.15 Set up audit logging for authentication events (#18)
 
 - [ ] 3.0 Multi-Tenant Architecture & User Management

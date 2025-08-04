@@ -1147,6 +1147,554 @@
       ]
     },
     {
+      "name": "Account Recovery Tests",
+      "item": [
+        {
+          "name": "1. Initiate Account Recovery - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Success message is present', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "    pm.expect(response.message).to.include('recovery email sent');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{testEmail}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/recovery/initiate",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "recovery", "initiate"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2. Initiate Account Recovery - Invalid Email",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Error message is present', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"invalid-email\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/recovery/initiate",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "recovery", "initiate"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3. Initiate Account Recovery - Non-existent User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Error message is present', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"nonexistent@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/recovery/initiate",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "recovery", "initiate"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4. Verify Account Recovery - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has required fields', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('recoverySessionToken');",
+                  "    pm.expect(response).to.have.property('message');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('recoverySessionToken', response.recoverySessionToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recoveryToken\": \"{{recoveryToken}}\",\n  \"backupCode\": \"{{recoveryBackupCode}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/recovery/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "recovery", "verify"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5. Verify Account Recovery - Invalid Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Error message is present', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recoveryToken\": \"invalid-token\",\n  \"backupCode\": \"12345678\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/recovery/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "recovery", "verify"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "6. Verify Account Recovery - Invalid Backup Code",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Error message is present', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.response.to.have.status(400);",
+                  "    pm.expect(response).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recoveryToken\": \"{{recoveryToken}}\",\n  \"backupCode\": \"invalid-code\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/recovery/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "recovery", "verify"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "7. Complete Account Recovery - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has required fields', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('secret');",
+                  "    pm.expect(response).to.have.property('qrCode');",
+                  "    pm.expect(response).to.have.property('backupCodes');",
+                  "    pm.expect(response.backupCodes).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Secret is a valid base32 string', function () {",
+                  "    const response = pm.response.json();",
+                  "    const base32Regex = /^[A-Z2-7]+=*$/;",
+                  "    pm.expect(response.secret).to.match(base32Regex);",
+                  "});",
+                  "",
+                  "pm.test('QR code is a valid data URL', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.qrCode).to.match(/^data:image\\/png;base64,/);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recoverySessionToken\": \"{{recoverySessionToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/recovery/complete",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "recovery", "complete"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "8. Complete Account Recovery - Invalid Session Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Error message is present', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recoverySessionToken\": \"invalid-session-token\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/recovery/complete",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "recovery", "complete"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "9. Get Recovery Status - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has required fields', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('isValid');",
+                  "    pm.expect(response).to.have.property('remainingAttempts');",
+                  "    pm.expect(response).to.have.property('expiresAt');",
+                  "});",
+                  "",
+                  "pm.test('Status is valid', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.isValid).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/recovery/status?recoverySessionToken={{recoverySessionToken}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "recovery", "status"],
+              "query": [
+                {
+                  "key": "recoverySessionToken",
+                  "value": "{{recoverySessionToken}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "10. Get Recovery Status - Invalid Session Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Error message is present', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/recovery/status?recoverySessionToken=invalid-session-token",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "recovery", "status"],
+              "query": [
+                {
+                  "key": "recoverySessionToken",
+                  "value": "invalid-session-token"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "11. Attempt Backup Code - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has required fields', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('isValid');",
+                  "    pm.expect(response).to.have.property('remainingAttempts');",
+                  "});",
+                  "",
+                  "pm.test('Backup code is valid', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.isValid).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recoveryToken\": \"{{recoveryToken}}\",\n  \"backupCode\": \"{{recoveryBackupCode}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/recovery/attempt",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "recovery", "attempt"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "12. Attempt Backup Code - Invalid Code",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has required fields', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('isValid');",
+                  "    pm.expect(response).to.have.property('remainingAttempts');",
+                  "});",
+                  "",
+                  "pm.test('Backup code is invalid', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.isValid).to.be.false;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recoveryToken\": \"{{recoveryToken}}\",\n  \"backupCode\": \"invalid-code\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/recovery/attempt",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "recovery", "attempt"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "13. Attempt Backup Code - Exceeded Attempts",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 429', function () {",
+                  "    pm.response.to.have.status(429);",
+                  "});",
+                  "",
+                  "pm.test('Error message is present', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "    pm.expect(response.message).to.include('too many attempts');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recoveryToken\": \"{{recoveryToken}}\",\n  \"backupCode\": \"wrong-code-1\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/recovery/attempt",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "recovery", "attempt"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "Session Management Tests",
       "item": [
         {

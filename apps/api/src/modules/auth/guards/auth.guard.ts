@@ -14,7 +14,7 @@ import {
   TENANT_REQUIRED_KEY,
   MFA_REQUIRED_KEY,
 } from '../decorators/auth.decorator';
-import { JwtService } from '../../modules/auth/services/jwt.service';
+import { JwtService } from '../services/jwt.service';
 import { UserRole } from '@app/shared';
 
 @Injectable()

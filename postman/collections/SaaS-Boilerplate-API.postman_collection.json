@@ -435,6 +435,118 @@
       ]
     },
     {
+      "name": "Account Recovery",
+      "item": [
+        {
+          "name": "Initiate Account Recovery",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"test@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/recovery/initiate",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "recovery", "initiate"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Account Recovery",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recoveryToken\": \"recovery-token-here\",\n  \"backupCode\": \"12345678\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/recovery/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "recovery", "verify"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Complete Account Recovery",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recoverySessionToken\": \"recovery-session-token-here\",\n  \"newTotpSecret\": \"optional-new-totp-secret\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/recovery/complete",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "recovery", "complete"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Recovery Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/recovery/status?recoverySessionToken=recovery-session-token-here",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "recovery", "status"],
+              "query": [
+                {
+                  "key": "recoverySessionToken",
+                  "value": "recovery-session-token-here"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Attempt Backup Code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recoveryToken\": \"recovery-token-here\",\n  \"backupCode\": \"12345678\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/recovery/attempt",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "recovery", "attempt"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
       "name": "Session Management",
       "item": [
         {
