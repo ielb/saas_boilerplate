@@ -26,13 +26,14 @@ import { Tenant, TenantUsage, TenantFeatureFlag } from '../../auth/entities';
 import { TenantFeature } from '../../auth/entities/tenant-feature-flag.entity';
 import { TenantUsageMetric } from '../../auth/entities/tenant-usage.entity';
 import { AuthGuard } from '../../auth/guards/auth.guard';
-import { RolesGuard } from '../../common/guards';
-import { Roles } from '../../common/decorators';
+import { RolesGuard } from '../../../common/guards';
+import { Roles } from '../../../common/decorators';
 import {
   AuditInterceptor,
   AuditConfigs,
   AuditEvent,
 } from '../../auth/interceptors/audit.interceptor';
+import { UserRole } from '@app/shared';
 
 @ApiTags('tenants')
 @Controller('tenants')
@@ -44,7 +45,7 @@ export class TenantController {
   @Post()
   @UseInterceptors(AuditInterceptor)
   @AuditEvent(AuditConfigs.TENANT_CREATED)
-  @Roles('admin', 'owner')
+  @Roles(UserRole.ADMIN, UserRole.OWNER)
   @ApiOperation({ summary: 'Create a new tenant' })
   @ApiResponse({
     status: 201,
@@ -66,7 +67,7 @@ export class TenantController {
   }
 
   @Get()
-  @Roles('admin', 'owner')
+  @Roles(UserRole.ADMIN, UserRole.OWNER)
   @ApiOperation({ summary: 'Get all tenants with filtering and pagination' })
   @ApiResponse({
     status: 200,
@@ -90,7 +91,7 @@ export class TenantController {
   }
 
   @Get('statistics')
-  @Roles('admin', 'owner')
+  @Roles(UserRole.ADMIN, UserRole.OWNER)
   @ApiOperation({ summary: 'Get tenant statistics' })
   @ApiResponse({
     status: 200,
@@ -101,7 +102,7 @@ export class TenantController {
   }
 
   @Get(':id')
-  @Roles('admin', 'owner')
+  @Roles(UserRole.ADMIN, UserRole.OWNER)
   @ApiOperation({ summary: 'Get tenant by ID' })
   @ApiParam({ name: 'id', description: 'Tenant ID' })
   @ApiResponse({
@@ -118,7 +119,7 @@ export class TenantController {
   }
 
   @Get('domain/:domain')
-  @Roles('admin', 'owner')
+  @Roles(UserRole.ADMIN, UserRole.OWNER)
   @ApiOperation({ summary: 'Get tenant by domain' })
   @ApiParam({ name: 'domain', description: 'Tenant domain' })
   @ApiResponse({
@@ -137,7 +138,7 @@ export class TenantController {
   @Put(':id')
   @UseInterceptors(AuditInterceptor)
   @AuditEvent(AuditConfigs.TENANT_UPDATED)
-  @Roles('admin', 'owner')
+  @Roles(UserRole.ADMIN, UserRole.OWNER)
   @ApiOperation({ summary: 'Update tenant' })
   @ApiParam({ name: 'id', description: 'Tenant ID' })
   @ApiResponse({
@@ -163,7 +164,7 @@ export class TenantController {
   @Delete(':id')
   @UseInterceptors(AuditInterceptor)
   @AuditEvent(AuditConfigs.TENANT_DELETED)
-  @Roles('admin', 'owner')
+  @Roles(UserRole.ADMIN, UserRole.OWNER)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete tenant (soft delete)' })
   @ApiParam({ name: 'id', description: 'Tenant ID' })
@@ -186,7 +187,7 @@ export class TenantController {
   @Post(':id/restore')
   @UseInterceptors(AuditInterceptor)
   @AuditEvent(AuditConfigs.TENANT_RESTORED)
-  @Roles('admin', 'owner')
+  @Roles(UserRole.ADMIN, UserRole.OWNER)
   @ApiOperation({ summary: 'Restore soft deleted tenant' })
   @ApiParam({ name: 'id', description: 'Tenant ID' })
   @ApiResponse({
@@ -205,7 +206,7 @@ export class TenantController {
   @Post(':id/verify')
   @UseInterceptors(AuditInterceptor)
   @AuditEvent(AuditConfigs.TENANT_VERIFIED)
-  @Roles('admin', 'owner')
+  @Roles(UserRole.ADMIN, UserRole.OWNER)
   @ApiOperation({ summary: 'Verify tenant' })
   @ApiParam({ name: 'id', description: 'Tenant ID' })
   @ApiResponse({
@@ -222,7 +223,7 @@ export class TenantController {
   }
 
   @Get(':id/usage')
-  @Roles('admin', 'owner')
+  @Roles(UserRole.ADMIN, UserRole.OWNER)
   @ApiOperation({ summary: 'Get tenant usage summary' })
   @ApiParam({ name: 'id', description: 'Tenant ID' })
   @ApiResponse({
@@ -238,7 +239,7 @@ export class TenantController {
   }
 
   @Put(':id/usage/:metric')
-  @Roles('admin', 'owner')
+  @Roles(UserRole.ADMIN, UserRole.OWNER)
   @ApiOperation({ summary: 'Update tenant usage' })
   @ApiParam({ name: 'id', description: 'Tenant ID' })
   @ApiParam({
@@ -269,7 +270,7 @@ export class TenantController {
   }
 
   @Get(':id/features')
-  @Roles('admin', 'owner')
+  @Roles(UserRole.ADMIN, UserRole.OWNER)
   @ApiOperation({ summary: 'Get tenant feature flags' })
   @ApiParam({ name: 'id', description: 'Tenant ID' })
   @ApiResponse({
@@ -290,7 +291,7 @@ export class TenantController {
   }
 
   @Get(':id/features/:feature')
-  @Roles('admin', 'owner')
+  @Roles(UserRole.ADMIN, UserRole.OWNER)
   @ApiOperation({ summary: 'Check if feature is enabled for tenant' })
   @ApiParam({ name: 'id', description: 'Tenant ID' })
   @ApiParam({
@@ -323,7 +324,7 @@ export class TenantController {
   @Put(':id/features/:feature')
   @UseInterceptors(AuditInterceptor)
   @AuditEvent(AuditConfigs.FEATURE_FLAG_UPDATED)
-  @Roles('admin', 'owner')
+  @Roles(UserRole.ADMIN, UserRole.OWNER)
   @ApiOperation({ summary: 'Update tenant feature flag' })
   @ApiParam({ name: 'id', description: 'Tenant ID' })
   @ApiParam({

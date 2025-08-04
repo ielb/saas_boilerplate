@@ -3045,6 +3045,430 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Tenant Management Tests",
+      "item": [
+        {
+          "name": "1. Create Tenant - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has tenant data', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('id');",
+                  "    pm.expect(response).to.have.property('name');",
+                  "    pm.expect(response).to.have.property('domain');",
+                  "    pm.expect(response).to.have.property('plan');",
+                  "    pm.expect(response).to.have.property('isActive');",
+                  "});",
+                  "",
+                  "pm.test('Tenant is active by default', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.isActive).to.be.true;",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('testTenantId', response.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Tenant\",\n  \"domain\": \"test-tenant.com\",\n  \"plan\": \"basic\",\n  \"maxUsers\": 10,\n  \"maxStorage\": 1024,\n  \"isActive\": true,\n  \"features\": [\"mfa_enforcement\", \"email_templates\"],\n  \"settings\": {\n    \"timezone\": \"America/New_York\",\n    \"locale\": \"en-US\",\n    \"currency\": \"USD\"\n  },\n  \"metadata\": {\n    \"industry\": \"technology\",\n    \"size\": \"small\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tenants",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2. Get All Tenants",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has tenants array', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('tenants');",
+                  "    pm.expect(response.tenants).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Response has total count', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('total');",
+                  "    pm.expect(response.total).to.be.a('number');",
+                  "});",
+                  "",
+                  "pm.test('At least one tenant exists', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.total).to.be.greaterThan(0);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tenants?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3. Get Tenant Statistics",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has statistics data', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('totalTenants');",
+                  "    pm.expect(response).to.have.property('activeTenants');",
+                  "    pm.expect(response).to.have.property('trialTenants');",
+                  "    pm.expect(response).to.have.property('verifiedTenants');",
+                  "    pm.expect(response).to.have.property('tenantsByPlan');",
+                  "    pm.expect(response).to.have.property('recentTenants');",
+                  "    pm.expect(response).to.have.property('growthRate');",
+                  "});",
+                  "",
+                  "pm.test('Statistics are valid numbers', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.totalTenants).to.be.a('number');",
+                  "    pm.expect(response.activeTenants).to.be.a('number');",
+                  "    pm.expect(response.growthRate).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tenants/statistics",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "statistics"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4. Get Tenant by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has tenant data', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('id');",
+                  "    pm.expect(response).to.have.property('name');",
+                  "    pm.expect(response).to.have.property('domain');",
+                  "    pm.expect(response).to.have.property('plan');",
+                  "    pm.expect(response).to.have.property('isActive');",
+                  "});",
+                  "",
+                  "pm.test('Tenant ID matches request', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.id).to.equal(pm.environment.get('testTenantId'));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tenants/{{testTenantId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "{{testTenantId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5. Update Tenant",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has updated tenant data', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('id');",
+                  "    pm.expect(response).to.have.property('name');",
+                  "    pm.expect(response).to.have.property('plan');",
+                  "    pm.expect(response.name).to.equal('Updated Test Tenant');",
+                  "    pm.expect(response.plan).to.equal('premium');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Test Tenant\",\n  \"plan\": \"premium\",\n  \"maxUsers\": 50,\n  \"maxStorage\": 2048,\n  \"isActive\": true,\n  \"features\": [\"mfa_enforcement\", \"email_templates\", \"advanced_analytics\"],\n  \"settings\": {\n    \"timezone\": \"America/New_York\",\n    \"locale\": \"en-US\",\n    \"currency\": \"USD\"\n  },\n  \"metadata\": {\n    \"industry\": \"technology\",\n    \"size\": \"medium\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tenants/{{testTenantId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "{{testTenantId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "6. Get Tenant Usage",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has usage summary', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('tenantId');",
+                  "    pm.expect(response).to.have.property('tenantName');",
+                  "    pm.expect(response).to.have.property('currentUsage');",
+                  "    pm.expect(response).to.have.property('limits');",
+                  "    pm.expect(response).to.have.property('usagePercentage');",
+                  "    pm.expect(response).to.have.property('isOverLimit');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tenants/{{testTenantId}}/usage",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "{{testTenantId}}", "usage"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "7. Update Tenant Usage",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has updated usage data', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('tenantId');",
+                  "    pm.expect(response).to.have.property('metric');",
+                  "    pm.expect(response).to.have.property('value');",
+                  "    pm.expect(response).to.have.property('limit');",
+                  "    pm.expect(response.metric).to.equal('apiCalls');",
+                  "    pm.expect(response.value).to.equal(150);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"value\": 150,\n  \"limit\": 1000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tenants/{{testTenantId}}/usage/apiCalls",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "{{testTenantId}}", "usage", "apiCalls"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "8. Check Feature Enabled",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has enabled status', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('enabled');",
+                  "    pm.expect(response.enabled).to.be.a('boolean');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tenants/{{testTenantId}}/features/ADVANCED_ANALYTICS",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "tenants",
+                "{{testTenantId}}",
+                "features",
+                "ADVANCED_ANALYTICS"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "9. Update Feature Flag",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has updated feature flag', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('id');",
+                  "    pm.expect(response).to.have.property('tenantId');",
+                  "    pm.expect(response).to.have.property('feature');",
+                  "    pm.expect(response).to.have.property('isEnabled');",
+                  "    pm.expect(response.feature).to.equal('ADVANCED_ANALYTICS');",
+                  "    pm.expect(response.isEnabled).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"enabled\": true,\n  \"config\": {\n    \"retentionDays\": 30,\n    \"maxQueries\": 1000\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tenants/{{testTenantId}}/features/ADVANCED_ANALYTICS",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "tenants",
+                "{{testTenantId}}",
+                "features",
+                "ADVANCED_ANALYTICS"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "10. Delete Tenant",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tenants/{{testTenantId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "{{testTenantId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }
