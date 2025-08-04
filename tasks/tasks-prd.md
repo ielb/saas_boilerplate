@@ -46,6 +46,17 @@ Based on PRD: `docs/prd.md`
 - `apps/api/src/modules/auth/services/audit.service.spec.ts` - Audit service unit tests
 - `apps/api/src/modules/auth/interceptors/audit.interceptor.ts` - Audit interceptor for automatic event capture
 - `apps/api/src/database/migrations/1700000000005-CreateAuditLogs.ts` - Audit logs database migration
+- `apps/api/src/database/migrations/1700000000006-CreateTenants.ts` - Tenants database migration
+- `apps/api/src/modules/auth/entities/tenant-usage.entity.ts` - Tenant usage tracking entity
+- `apps/api/src/modules/auth/entities/tenant-feature-flag.entity.ts` - Tenant feature flags entity
+- `apps/api/src/modules/tenants/` - Tenants module directory
+- `apps/api/src/modules/tenants/dto/create-tenant.dto.ts` - Create tenant DTO
+- `apps/api/src/modules/tenants/dto/update-tenant.dto.ts` - Update tenant DTO
+- `apps/api/src/modules/tenants/dto/tenant-query.dto.ts` - Tenant query parameters DTO
+- `apps/api/src/modules/tenants/dto/index.ts` - DTOs barrel export
+- `apps/api/src/modules/tenants/services/tenant.service.ts` - Tenant service with CRUD operations
+- `apps/api/src/modules/tenants/controllers/tenant.controller.ts` - Tenant controller with API endpoints
+- `apps/api/src/modules/tenants/tenants.module.ts` - Tenants module configuration
 - `apps/api/src/shared/` - Shared types and configurations
 - `apps/api/src/config/` - Environment and application configuration
 - `apps/api/src/database/` - Database connection and migrations
@@ -149,7 +160,7 @@ Based on PRD: `docs/prd.md`
   - [x] 2.15 Set up audit logging for authentication events (#18) - **COMPLETED**
 
 - [ ] 3.0 Multi-Tenant Architecture & User Management
-  - [ ] 3.1 Design and implement tenant database schema (#9)
+  - [x] 3.1 Design and implement tenant database schema (#9) - **COMPLETED**
   - [ ] 3.2 Create tenant isolation middleware and interceptors (#10)
   - [ ] 3.3 Implement tenant-scoped database queries (#19)
   - [ ] 3.4 Set up tenant onboarding workflow (#20)

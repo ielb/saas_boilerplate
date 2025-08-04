@@ -48,6 +48,14 @@ export enum AuditEventType {
   RATE_LIMIT_EXCEEDED = 'rate_limit_exceeded',
   INVALID_TOKEN = 'invalid_token',
   TOKEN_EXPIRED = 'token_expired',
+
+  // Tenant Events
+  TENANT_CREATED = 'tenant_created',
+  TENANT_UPDATED = 'tenant_updated',
+  TENANT_DELETED = 'tenant_deleted',
+  TENANT_RESTORED = 'tenant_restored',
+  TENANT_VERIFIED = 'tenant_verified',
+  FEATURE_FLAG_UPDATED = 'feature_flag_updated',
 }
 
 export enum AuditEventStatus {

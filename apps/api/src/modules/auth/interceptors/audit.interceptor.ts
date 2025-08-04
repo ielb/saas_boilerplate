@@ -243,6 +243,18 @@ export class AuditInterceptor implements NestInterceptor {
         return `Brute force attempt detected via ${method} ${url}`;
       case AuditEventType.RATE_LIMIT_EXCEEDED:
         return `Rate limit exceeded via ${method} ${url}`;
+      case AuditEventType.TENANT_CREATED:
+        return `Tenant created via ${method} ${url}`;
+      case AuditEventType.TENANT_UPDATED:
+        return `Tenant updated via ${method} ${url}`;
+      case AuditEventType.TENANT_DELETED:
+        return `Tenant deleted via ${method} ${url}`;
+      case AuditEventType.TENANT_RESTORED:
+        return `Tenant restored via ${method} ${url}`;
+      case AuditEventType.TENANT_VERIFIED:
+        return `Tenant verified via ${method} ${url}`;
+      case AuditEventType.FEATURE_FLAG_UPDATED:
+        return `Feature flag updated via ${method} ${url}`;
       default:
         return `${eventType} via ${method} ${url}`;
     }
@@ -425,5 +437,71 @@ export const AuditConfigs = {
     eventType: AuditEventType.RATE_LIMIT_EXCEEDED,
     severity: AuditEventSeverity.MEDIUM,
     extractUserEmail: (req: Request, result: any) => req.body?.email,
+  } as AuditEventConfig,
+
+  // Tenant events
+  TENANT_CREATED: {
+    eventType: AuditEventType.TENANT_CREATED,
+    severity: AuditEventSeverity.MEDIUM,
+    extractUserId: (req: Request, result: any) => (req.user as any)?.id,
+    extractUserEmail: (req: Request, result: any) => (req.user as any)?.email,
+    extractMetadata: (req: Request, result: any) => ({
+      tenantName: req.body?.name,
+      tenantDomain: req.body?.domain,
+      plan: req.body?.plan,
+    }),
+  } as AuditEventConfig,
+
+  TENANT_UPDATED: {
+    eventType: AuditEventType.TENANT_UPDATED,
+    severity: AuditEventSeverity.LOW,
+    extractUserId: (req: Request, result: any) => (req.user as any)?.id,
+    extractUserEmail: (req: Request, result: any) => (req.user as any)?.email,
+    extractMetadata: (req: Request, result: any) => ({
+      tenantId: req.params?.id,
+      updatedFields: Object.keys(req.body),
+    }),
+  } as AuditEventConfig,
+
+  TENANT_DELETED: {
+    eventType: AuditEventType.TENANT_DELETED,
+    severity: AuditEventSeverity.HIGH,
+    extractUserId: (req: Request, result: any) => (req.user as any)?.id,
+    extractUserEmail: (req: Request, result: any) => (req.user as any)?.email,
+    extractMetadata: (req: Request, result: any) => ({
+      tenantId: req.params?.id,
+    }),
+  } as AuditEventConfig,
+
+  TENANT_RESTORED: {
+    eventType: AuditEventType.TENANT_RESTORED,
+    severity: AuditEventSeverity.MEDIUM,
+    extractUserId: (req: Request, result: any) => (req.user as any)?.id,
+    extractUserEmail: (req: Request, result: any) => (req.user as any)?.email,
+    extractMetadata: (req: Request, result: any) => ({
+      tenantId: req.params?.id,
+    }),
+  } as AuditEventConfig,
+
+  TENANT_VERIFIED: {
+    eventType: AuditEventType.TENANT_VERIFIED,
+    severity: AuditEventSeverity.MEDIUM,
+    extractUserId: (req: Request, result: any) => (req.user as any)?.id,
+    extractUserEmail: (req: Request, result: any) => (req.user as any)?.email,
+    extractMetadata: (req: Request, result: any) => ({
+      tenantId: req.params?.id,
+    }),
+  } as AuditEventConfig,
+
+  FEATURE_FLAG_UPDATED: {
+    eventType: AuditEventType.FEATURE_FLAG_UPDATED,
+    severity: AuditEventSeverity.LOW,
+    extractUserId: (req: Request, result: any) => (req.user as any)?.id,
+    extractUserEmail: (req: Request, result: any) => (req.user as any)?.email,
+    extractMetadata: (req: Request, result: any) => ({
+      tenantId: req.params?.id,
+      feature: req.params?.feature,
+      enabled: req.body?.enabled,
+    }),
   } as AuditEventConfig,
 };

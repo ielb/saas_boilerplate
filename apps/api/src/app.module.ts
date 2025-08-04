@@ -10,7 +10,7 @@ import { env } from '@app/config';
 import { CommonModule } from './common/common.module';
 import { AuthModule } from './modules/auth/auth.module';
 // import { UsersModule } from './modules/users/users.module';
-// import { TenantsModule } from './modules/tenants/tenants.module';
+import { TenantsModule } from './modules/tenants/tenants.module';
 // import { BillingModule } from './modules/billing/billing.module';
 // import { NotificationsModule } from './modules/notifications/notifications.module';
 // import { FilesModule } from './modules/files/files.module';
@@ -77,7 +77,7 @@ import { AuthModule } from './modules/auth/auth.module';
     CommonModule,
     AuthModule,
     // UsersModule,
-    // TenantsModule,
+    TenantsModule,
     // BillingModule,
     // NotificationsModule,
     // FilesModule,
