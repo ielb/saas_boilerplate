@@ -165,6 +165,11 @@ describe('AuthService - Password Reset', () => {
         generatePasswordResetToken: jest.fn(),
       };
 
+      // Mock the logger to suppress error output
+      const loggerSpy = jest
+        .spyOn(service['logger'], 'error')
+        .mockImplementation();
+
       jest
         .spyOn(userRepository, 'findOne')
         .mockResolvedValue(mockUserWithToken);
@@ -178,6 +183,10 @@ describe('AuthService - Password Reset', () => {
         BadRequestException
       );
       expect(mockUserWithToken.generatePasswordResetToken).toHaveBeenCalled();
+      expect(loggerSpy).toHaveBeenCalled();
+
+      // Restore logger
+      loggerSpy.mockRestore();
     });
   });
 
