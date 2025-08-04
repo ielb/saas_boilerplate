@@ -140,7 +140,7 @@ Based on PRD: `docs/prd.md`
   - [x] 2.11 Implement API rate limiting and brute force protection (#14)
   - [x] 2.12 Add security headers and CORS configuration (#15)
   - [x] 2.13 Create authentication guards and decorators (#16)
-  - [x] 2.14 Implement account recovery with backup codes (#17)
+  - [x] 2.14 Implement account recovery with backup codes (#17) - **COMPLETED**
   - [ ] 2.15 Set up audit logging for authentication events (#18)
 
 - [ ] 3.0 Multi-Tenant Architecture & User Management
