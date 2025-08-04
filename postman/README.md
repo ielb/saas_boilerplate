@@ -77,7 +77,13 @@ postman/
 
 **Test Categories**:
 
-- ✅ Authentication Tests (10 tests)
+- ✅ Authentication Tests (15 tests)
+- ✅ Multi-Factor Authentication Tests (9 tests)
+- ✅ Session Management Tests (12 tests)
+- ✅ RBAC Permission Management Tests (5 tests)
+- ✅ RBAC Role Management Tests (5 tests)
+- ✅ RBAC User Role Management Tests (5 tests)
+- ✅ RBAC Cleanup Tests (3 tests)
 - ✅ Health Check Tests (1 test)
 - 🔄 User Management Tests (Coming soon)
 - 🏢 Tenant Management Tests (Coming soon)
@@ -128,6 +134,17 @@ postman/
 - Token revocation
 - Unauthorized access
 - Invalid tokens
+
+### RBAC Tests
+
+- Permission creation and management
+- Role creation and management
+- User role assignment and removal
+- Permission checking and validation
+- Resource-level access control
+- Permission inheritance (manage permissions)
+- Custom permission conditions
+- Role hierarchy and inheritance
 
 ## 🚀 Running Tests
 
@@ -282,6 +299,26 @@ newman run collections/SaaS-Boilerplate-Tests.postman_collection.json \
 | POST   | `/auth/forgot-password` | Request password reset        |
 | POST   | `/auth/reset-password`  | Reset password                |
 
+### RBAC Endpoints
+
+| Method | Endpoint                             | Description              |
+| ------ | ------------------------------------ | ------------------------ |
+| POST   | `/permissions`                       | Create custom permission |
+| GET    | `/permissions`                       | Get all permissions      |
+| GET    | `/permissions/:id`                   | Get permission by ID     |
+| PUT    | `/permissions/:id`                   | Update permission        |
+| DELETE | `/permissions/:id`                   | Delete permission        |
+| POST   | `/roles`                             | Create custom role       |
+| GET    | `/roles`                             | Get all roles            |
+| GET    | `/roles/:id`                         | Get role by ID           |
+| PUT    | `/roles/:id`                         | Update role              |
+| DELETE | `/roles/:id`                         | Delete role              |
+| POST   | `/roles/users/:id/roles`             | Assign role to user      |
+| GET    | `/roles/users/:id/roles`             | Get user roles           |
+| DELETE | `/roles/users/:id/roles/:roleId`     | Remove role from user    |
+| GET    | `/roles/users/:id/permissions`       | Get user permissions     |
+| POST   | `/roles/users/:id/permissions/check` | Check user permission    |
+
 ### Health Check Endpoints
 
 | Method | Endpoint  | Description       |
@@ -327,6 +364,7 @@ For issues with the Postman collections:
 
 ## 🚀 Next Steps
 
+- [x] ✅ RBAC Tests (Complete)
 - [ ] Add User Management tests
 - [ ] Add Tenant Management tests
 - [ ] Add Billing & Subscription tests

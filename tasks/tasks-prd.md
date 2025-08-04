@@ -18,6 +18,11 @@ Based on PRD: `docs/prd.md`
 - `apps/api/src/modules/websocket/` - Real-time features module directory
 - `apps/api/src/modules/admin/` - Administrative features module directory
 - `apps/api/src/common/` - Shared utilities and common code
+- `apps/api/src/common/decorators/permissions.decorator.ts` - Resource-level permission decorators
+- `apps/api/src/common/services/permission-checker.service.ts` - Permission checking utility service
+- `apps/api/src/modules/auth/guards/permissions.guard.ts` - Resource-level permission guard
+- `apps/api/src/modules/auth/guards/permissions.guard.spec.ts` - Permission guard unit tests
+- `apps/api/src/common/services/permission-checker.service.spec.ts` - Permission checker service unit tests
 - `apps/api/src/shared/` - Shared types and configurations
 - `apps/api/src/config/` - Environment and application configuration
 - `apps/api/src/database/` - Database connection and migrations
@@ -112,8 +117,8 @@ Based on PRD: `docs/prd.md`
   - [x] 2.7 Create password reset functionality with secure tokens (#5)
   - [x] 2.7.1 implement comprehensive testing for all the done work
   - [x] 2.8 Implement session management and device tracking (#6)
-  - [ ] 2.9 Set up role-based access control (RBAC) (#7)
-  - [ ] 2.10 Create resource-level permission system (#8)
+  - [x] 2.9 Set up role-based access control (RBAC) (#7)
+  - [x] 2.10 Create resource-level permission system (#8)
   - [ ] 2.11 Implement API rate limiting and brute force protection (#14)
   - [ ] 2.12 Add security headers and CORS configuration (#15)
   - [ ] 2.13 Create authentication guards and decorators (#16)

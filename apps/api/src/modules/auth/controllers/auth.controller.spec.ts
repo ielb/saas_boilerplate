@@ -215,6 +215,7 @@ describe('AuthController', () => {
       const mockRequest = {
         ip: '192.168.1.1',
         connection: { remoteAddress: '192.168.1.1' },
+        headers: { 'user-agent': 'test-user-agent' },
       } as any;
 
       jest.spyOn(authService, 'login').mockResolvedValue(mockLoginResponse);
@@ -224,7 +225,11 @@ describe('AuthController', () => {
 
       // Assert
       expect(result).toEqual(mockLoginResponse);
-      expect(authService.login).toHaveBeenCalledWith(loginDto, '192.168.1.1');
+      expect(authService.login).toHaveBeenCalledWith(
+        loginDto,
+        '192.168.1.1',
+        'test-user-agent'
+      );
     });
 
     it('should handle login with invalid credentials', async () => {
@@ -237,6 +242,7 @@ describe('AuthController', () => {
       const mockRequest = {
         ip: '192.168.1.1',
         connection: { remoteAddress: '192.168.1.1' },
+        headers: { 'user-agent': 'test-user-agent' },
       } as any;
 
       jest
@@ -247,7 +253,11 @@ describe('AuthController', () => {
       await expect(controller.login(loginDto, mockRequest)).rejects.toThrow(
         UnauthorizedException
       );
-      expect(authService.login).toHaveBeenCalledWith(loginDto, '192.168.1.1');
+      expect(authService.login).toHaveBeenCalledWith(
+        loginDto,
+        '192.168.1.1',
+        'test-user-agent'
+      );
     });
   });
 
@@ -536,7 +546,10 @@ describe('AuthController', () => {
 
       // Assert
       expect(result).toBeUndefined();
-      expect(authService.logout).toHaveBeenCalledWith('user-123');
+      expect(authService.logout).toHaveBeenCalledWith(
+        'valid-refresh-token',
+        'user-123'
+      );
     });
   });
 

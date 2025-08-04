@@ -118,6 +118,24 @@ services:
       - saas-network-prod
     restart: unless-stopped
 
+  # Adminer - Database Management Interface (Optional for Production)
+  adminer:
+    image: adminer:latest
+    container_name: saas-adminer-prod
+    ports:
+      - '8081:8080' # Different port for production
+    environment:
+      ADMINER_DEFAULT_SERVER: postgres
+      ADMINER_DESIGN: pepa-linha-dark
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - saas-network-prod
+    restart: unless-stopped
+    profiles:
+      - adminer # Only start when explicitly requested
+
 volumes:
   postgres_data:
     driver: local

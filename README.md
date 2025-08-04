@@ -87,6 +87,93 @@ A comprehensive, production-ready SaaS boilerplate template that combines NestJS
 - PostgreSQL
 - Redis
 
+### Setup Scripts
+
+We provide convenient setup scripts to get you started quickly:
+
+```bash
+# ⭐ RECOMMENDED: Complete tenant setup (permissions, roles, users)
+./scripts/setup-tenant.sh
+
+# Test your API setup first
+./scripts/test-api.sh
+
+# Start Adminer for database management
+./scripts/start-adminer.sh
+```
+
+**Configuration:**
+Edit `scripts/config.sh` to match your local API and database setup.
+
+**Generated Test Accounts:**
+
+#### 🔴 SuperAdmin (Level 1 - Full System Access)
+
+- **Email**: `superadmin@example.com`
+- **Password**: `SuperAdmin123!`
+- **Permissions**: ALL permissions (full system access)
+- **Role**: SuperAdmin
+
+#### 🟡 Admin (Level 2 - Administrative Access)
+
+- **Email**: `admin@example.com`
+- **Password**: `Admin123!`
+- **Permissions**: All except system_settings (tenant management)
+- **Role**: Admin
+
+#### 🟠 Manager (Level 3 - Team Management)
+
+- **Email**: `manager@example.com`
+- **Password**: `Manager123!`
+- **Permissions**: Team management, user management, content management
+- **Role**: Manager
+
+#### 🟢 User (Level 4 - Basic Access)
+
+- **Email**: `user@example.com`
+- **Password**: `User123!`
+- **Permissions**: Basic file operations, notifications, user read
+- **Role**: User
+
+#### 🔵 Viewer (Level 5 - Read-Only Access)
+
+- **Email**: `viewer@example.com`
+- **Password**: `Viewer123!`
+- **Permissions**: Read-only access (users, files, notifications)
+- **Role**: Viewer
+
+### Permission Hierarchy
+
+```
+SuperAdmin > Admin > Manager > User > Viewer
+```
+
+### Quick Login Commands
+
+You can test the accounts using curl:
+
+```bash
+# SuperAdmin login
+curl -X POST "http://localhost:3001/api/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"superadmin@example.com","password":"SuperAdmin123!"}'
+
+# Admin login
+curl -X POST "http://localhost:3001/api/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@example.com","password":"Admin123!"}'
+
+# User login
+curl -X POST "http://localhost:3001/api/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@example.com","password":"User123!"}'
+```
+
+⚠️ **Note**: These are test accounts. Change passwords in production!
+💡 **Tip**: Use these accounts to test different permission levels and RBAC functionality!
+
+See [scripts/README.md](scripts/README.md) for detailed documentation.
+
 ### Installation
 
 1. **Clone the repository**
@@ -127,6 +214,17 @@ A comprehensive, production-ready SaaS boilerplate template that combines NestJS
    - **Web App**: http://localhost:3000
    - **Mobile**: Expo Go app
 
+6. **Development Tools**
+   - **Adminer (Database Management)**: http://localhost:8080
+     - Server: `postgres`
+     - Username: `saas_user`
+     - Password: `saas_password`
+     - Database: `saas_boilerplate`
+   - **Mailhog (Email Testing)**: http://localhost:8025
+   - **MinIO Console (File Storage)**: http://localhost:9001
+     - Username: `minioadmin`
+     - Password: `minioadmin123`
+
 ## 📁 Project Structure
 
 ```
@@ -141,6 +239,7 @@ saas_boilerplate/
 │   └── config/              # Shared configuration
 ├── docker/                  # Docker configurations
 ├── docs/                    # Documentation
+├── scripts/                 # Setup scripts (setup-tenant.sh, test-api.sh, etc.)
 ├── tasks/                   # Task tracking
 └── tools/                   # Build tools and scripts
 ```
@@ -192,6 +291,16 @@ docker-compose up -d
 
 ```bash
 docker-compose -f docker-compose.prod.yml up -d
+```
+
+**Optional: Start Adminer in Production**
+
+```bash
+# Start Adminer with other services
+docker-compose -f docker-compose.prod.yml --profile adminer up -d
+
+# Access Adminer at: http://localhost:8081
+# Use the same database credentials as configured in your environment
 ```
 
 ### Environment Variables
