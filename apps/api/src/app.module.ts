@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BullModule } from '@nestjs/bull';
@@ -15,6 +15,8 @@ import { TenantsModule } from './modules/tenants/tenants.module';
 // import { NotificationsModule } from './modules/notifications/notifications.module';
 // import { FilesModule } from './modules/files/files.module';
 // import { AdminModule } from './modules/admin/admin.module';
+import { TenantMiddlewareModule } from './common/middleware/tenant-middleware.module';
+import { TenantIsolationMiddleware } from './common/middleware/tenant-isolation.middleware';
 
 @Module({
   imports: [
@@ -78,6 +80,7 @@ import { TenantsModule } from './modules/tenants/tenants.module';
     AuthModule,
     // UsersModule,
     TenantsModule,
+    TenantMiddlewareModule,
     // BillingModule,
     // NotificationsModule,
     // FilesModule,
@@ -86,4 +89,8 @@ import { TenantsModule } from './modules/tenants/tenants.module';
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(TenantIsolationMiddleware).forRoutes('*'); // Apply to all routes
+  }
+}

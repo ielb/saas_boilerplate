@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { SecurityConfigService } from './services/security-config.service';
 import { SecurityInterceptor } from './interceptors/security.interceptor';
+import { TenantContextInterceptor } from './interceptors/tenant-context.interceptor';
+import { TenantScopingInterceptor } from './interceptors/tenant-scoping.interceptor';
 import { RolesGuard } from './guards/roles.guard';
 import { TenantGuard } from './guards/tenant.guard';
 import { MfaGuard } from './guards/mfa.guard';
@@ -9,6 +11,8 @@ import { MfaGuard } from './guards/mfa.guard';
   providers: [
     SecurityConfigService,
     SecurityInterceptor,
+    TenantContextInterceptor,
+    TenantScopingInterceptor,
     RolesGuard,
     TenantGuard,
     MfaGuard,
@@ -16,6 +20,8 @@ import { MfaGuard } from './guards/mfa.guard';
   exports: [
     SecurityConfigService,
     SecurityInterceptor,
+    TenantContextInterceptor,
+    TenantScopingInterceptor,
     RolesGuard,
     TenantGuard,
     MfaGuard,
