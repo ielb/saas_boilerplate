@@ -157,7 +157,7 @@ export class Tenant {
   deletedAt?: Date;
 
   // Relations
-  @OneToMany(() => User, user => user.tenantId)
+  @OneToMany(() => User, user => user.tenant)
   users?: User[];
 
   /**
