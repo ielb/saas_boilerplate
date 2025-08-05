@@ -33,6 +33,18 @@ Based on PRD: `docs/prd.md`
 - `apps/api/src/common/guards/permissions.guard.ts` - Resource-level permission guard
 - `apps/api/src/common/guards/permissions.guard.spec.ts` - Permission guard unit tests
 - `apps/api/src/common/examples/auth-usage.example.ts` - Example controller showing guard and decorator usage
+- `apps/api/src/common/middleware/tenant-isolation.middleware.ts` - Tenant isolation middleware for extracting tenant context
+- `apps/api/src/common/middleware/tenant-isolation.middleware.spec.ts` - Tenant isolation middleware unit tests
+- `apps/api/src/common/middleware/tenant-middleware.module.ts` - Module for tenant middleware dependencies
+- `apps/api/src/common/interceptors/tenant-context.interceptor.ts` - Interceptor for injecting tenant context into responses
+- `apps/api/src/common/interceptors/tenant-context.interceptor.spec.ts` - Tenant context interceptor unit tests
+- `apps/api/src/common/interceptors/tenant-scoping.interceptor.ts` - Interceptor for automatic tenant scoping of database queries
+- `apps/api/src/common/interceptors/tenant-scoping.interceptor.spec.ts` - Tenant scoping interceptor unit tests
+- `apps/api/src/common/repositories/tenant-scoped.repository.ts` - Base repository class with automatic tenant scoping
+- `apps/api/src/common/repositories/tenant-scoped.repository.spec.ts` - Tenant scoped repository unit tests
+- `apps/api/src/common/decorators/tenant.decorator.ts` - Decorators for extracting tenant information from requests
+- `apps/api/src/common/decorators/tenant.decorator.spec.ts` - Tenant decorators unit tests
+- `apps/api/src/common/examples/tenant-usage.example.ts` - Example controller demonstrating tenant isolation usage
 - `apps/api/src/common/services/permission-checker.service.ts` - Permission checking utility service
 - `apps/api/src/common/services/permission-checker.service.spec.ts` - Permission checker service unit tests
 - `apps/api/src/modules/auth/entities/account-recovery.entity.ts` - Account recovery entity
@@ -161,7 +173,7 @@ Based on PRD: `docs/prd.md`
 
 - [ ] 3.0 Multi-Tenant Architecture & User Management
   - [x] 3.1 Design and implement tenant database schema (#9) - **COMPLETED**
-  - [ ] 3.2 Create tenant isolation middleware and interceptors (#10)
+  - [x] 3.2 Create tenant isolation middleware and interceptors (#10) - **COMPLETED**
   - [ ] 3.3 Implement tenant-scoped database queries (#19)
   - [ ] 3.4 Set up tenant onboarding workflow (#20)
   - [ ] 3.5 Create tenant switching functionality (#21)

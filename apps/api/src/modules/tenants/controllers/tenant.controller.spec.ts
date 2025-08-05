@@ -28,6 +28,7 @@ describe('TenantController', () => {
     getFeatureFlag: jest.fn(),
     isFeatureEnabled: jest.fn(),
     updateFeatureFlag: jest.fn(),
+    getTenantFeatures: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -106,15 +107,9 @@ describe('TenantController', () => {
 
   describe('getTenants', () => {
     it('should return paginated tenants', async () => {
-      const queryDto: TenantQueryDto = {
-        page: 1,
-        limit: 10,
-        search: 'test',
-        plan: 'basic',
-        isActive: true,
-      };
+      const queryDto: TenantQueryDto = {};
 
-      const mockResponse = {
+      const mockServiceResponse = {
         tenants: [
           { id: '1', name: 'Tenant 1', domain: 'tenant1.com' },
           { id: '2', name: 'Tenant 2', domain: 'tenant2.com' },
@@ -122,27 +117,50 @@ describe('TenantController', () => {
         total: 2,
       };
 
-      mockTenantService.getTenants.mockResolvedValue(mockResponse);
+      const expectedResponse = {
+        data: [
+          { id: '1', name: 'Tenant 1', domain: 'tenant1.com' },
+          { id: '2', name: 'Tenant 2', domain: 'tenant2.com' },
+        ],
+        total: 2,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+        hasNextPage: false,
+        hasPreviousPage: false,
+      };
+
+      mockTenantService.getTenants.mockResolvedValue(mockServiceResponse);
 
       const result = await controller.getTenants(queryDto);
 
       expect(mockTenantService.getTenants).toHaveBeenCalledWith(queryDto);
-      expect(result).toEqual(mockResponse);
+      expect(result).toEqual(expectedResponse);
     });
 
     it('should handle empty results', async () => {
       const queryDto: TenantQueryDto = {};
 
-      const mockResponse = {
+      const mockServiceResponse = {
         tenants: [],
         total: 0,
       };
 
-      mockTenantService.getTenants.mockResolvedValue(mockResponse);
+      const expectedResponse = {
+        data: [],
+        total: 0,
+        page: 1,
+        limit: 10,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPreviousPage: false,
+      };
+
+      mockTenantService.getTenants.mockResolvedValue(mockServiceResponse);
 
       const result = await controller.getTenants(queryDto);
 
-      expect(result).toEqual(mockResponse);
+      expect(result).toEqual(expectedResponse);
     });
   });
 
@@ -395,8 +413,13 @@ describe('TenantController', () => {
     it('should return empty array for now', async () => {
       const tenantId = '1';
 
+      mockTenantService.getTenantFeatures.mockResolvedValue([]);
+
       const result = await controller.getTenantFeatures(tenantId);
 
+      expect(mockTenantService.getTenantFeatures).toHaveBeenCalledWith(
+        tenantId
+      );
       expect(result).toEqual([]);
     });
   });
