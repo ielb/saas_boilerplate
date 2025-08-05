@@ -3,3 +3,6 @@ export * from './auth.decorator';
 
 // Permission decorators
 export * from './permissions.decorator';
+
+// Tenant decorators
+export * from './tenant.decorator';
