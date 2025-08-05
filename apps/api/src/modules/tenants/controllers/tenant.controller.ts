@@ -11,6 +11,7 @@ import {
   HttpStatus,
   UseGuards,
   UseInterceptors,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -21,7 +22,22 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { TenantService } from '../services/tenant.service';
-import { CreateTenantDto, UpdateTenantDto, TenantQueryDto } from '../dto';
+import {
+  CreateTenantDto,
+  UpdateTenantDto,
+  TenantQueryDto,
+  UpdateUsageDto,
+  UpdateFeatureFlagDto,
+  PaginationResponseDto,
+} from '../dto';
+import {
+  convertMetricToEnum,
+  getValidMetrics,
+} from '../utils/metric-converter.util';
+import {
+  convertFeatureToEnum,
+  getValidFeatures,
+} from '../utils/feature-converter.util';
 import { Tenant, TenantUsage, TenantFeatureFlag } from '../../auth/entities';
 import { TenantFeature } from '../../auth/entities/tenant-feature-flag.entity';
 import { TenantUsageMetric } from '../../auth/entities/tenant-usage.entity';
@@ -60,6 +76,7 @@ export class TenantController {
     status: 409,
     description: 'Conflict - tenant name or domain already exists',
   })
+  @HttpCode(HttpStatus.CREATED)
   async createTenant(
     @Body() createTenantDto: CreateTenantDto
   ): Promise<Tenant> {
@@ -72,22 +89,25 @@ export class TenantController {
   @ApiResponse({
     status: 200,
     description: 'Tenants retrieved successfully',
-    schema: {
-      type: 'object',
-      properties: {
-        tenants: {
-          type: 'array',
-          items: { $ref: '#/components/schemas/Tenant' },
-        },
-        total: { type: 'number' },
-      },
-    },
+    type: PaginationResponseDto,
   })
-  async getTenants(@Query() query: TenantQueryDto): Promise<{
-    tenants: Tenant[];
-    total: number;
-  }> {
-    return await this.tenantService.getTenants(query);
+  async getTenants(
+    @Query() query: TenantQueryDto
+  ): Promise<PaginationResponseDto<Tenant>> {
+    const { tenants, total } = await this.tenantService.getTenants(query);
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 10;
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data: tenants,
+      total,
+      page,
+      limit,
+      totalPages,
+      hasNextPage: page < totalPages,
+      hasPreviousPage: page > 1,
+    };
   }
 
   @Get('statistics')
@@ -245,7 +265,24 @@ export class TenantController {
   @ApiParam({
     name: 'metric',
     enum: TenantUsageMetric,
-    description: 'Usage metric',
+    description:
+      'Usage metric (use snake_case format, e.g., api_calls, storage_bytes)',
+    examples: {
+      api_calls: { value: 'api_calls', summary: 'API Calls' },
+      storage_bytes: { value: 'storage_bytes', summary: 'Storage in Bytes' },
+      users: { value: 'users', summary: 'Number of Users' },
+      emails_sent: { value: 'emails_sent', summary: 'Emails Sent' },
+      files_uploaded: { value: 'files_uploaded', summary: 'Files Uploaded' },
+      database_queries: {
+        value: 'database_queries',
+        summary: 'Database Queries',
+      },
+      websocket_connections: {
+        value: 'websocket_connections',
+        summary: 'WebSocket Connections',
+      },
+      background_jobs: { value: 'background_jobs', summary: 'Background Jobs' },
+    },
   })
   @ApiResponse({
     status: 200,
@@ -253,17 +290,29 @@ export class TenantController {
     type: TenantUsage,
   })
   @ApiResponse({
+    status: 400,
+    description: 'Invalid metric value',
+  })
+  @ApiResponse({
     status: 404,
     description: 'Tenant not found',
   })
   async updateTenantUsage(
     @Param('id') id: string,
-    @Param('metric') metric: TenantUsageMetric,
-    @Body() body: { value: number; limit?: number }
+    @Param('metric') metric: string,
+    @Body() body: UpdateUsageDto
   ): Promise<TenantUsage> {
+    // Convert and validate the metric parameter
+    const enumMetric = convertMetricToEnum(metric);
+    if (!enumMetric) {
+      throw new BadRequestException(
+        `Invalid metric: "${metric}". Valid metrics are: ${getValidMetrics().join(', ')}`
+      );
+    }
+
     return await this.tenantService.updateTenantUsage(
       id,
-      metric,
+      enumMetric,
       body.value,
       body.limit
     );
@@ -285,9 +334,7 @@ export class TenantController {
   async getTenantFeatures(
     @Param('id') id: string
   ): Promise<TenantFeatureFlag[]> {
-    // This would need to be implemented in the service
-    // For now, return empty array
-    return [];
+    return await this.tenantService.getTenantFeatures(id);
   }
 
   @Get(':id/features/:feature')
@@ -297,7 +344,16 @@ export class TenantController {
   @ApiParam({
     name: 'feature',
     enum: TenantFeature,
-    description: 'Feature name',
+    description:
+      'Feature name (use snake_case format, e.g., advanced_analytics, mfa_enforcement)',
+    examples: {
+      advanced_analytics: {
+        value: 'advanced_analytics',
+        summary: 'Advanced Analytics',
+      },
+      mfa_enforcement: { value: 'mfa_enforcement', summary: 'MFA Enforcement' },
+      audit_logging: { value: 'audit_logging', summary: 'Audit Logging' },
+    },
   })
   @ApiResponse({
     status: 200,
@@ -310,14 +366,26 @@ export class TenantController {
     },
   })
   @ApiResponse({
+    status: 400,
+    description: 'Invalid feature value',
+  })
+  @ApiResponse({
     status: 404,
     description: 'Tenant not found',
   })
   async isFeatureEnabled(
     @Param('id') id: string,
-    @Param('feature') feature: TenantFeature
+    @Param('feature') feature: string
   ): Promise<{ enabled: boolean }> {
-    const enabled = await this.tenantService.isFeatureEnabled(id, feature);
+    // Convert and validate the feature parameter
+    const enumFeature = convertFeatureToEnum(feature);
+    if (!enumFeature) {
+      throw new BadRequestException(
+        `Invalid feature: "${feature}". Valid features are: ${getValidFeatures().join(', ')}`
+      );
+    }
+
+    const enabled = await this.tenantService.isFeatureEnabled(id, enumFeature);
     return { enabled };
   }
 
@@ -330,7 +398,16 @@ export class TenantController {
   @ApiParam({
     name: 'feature',
     enum: TenantFeature,
-    description: 'Feature name',
+    description:
+      'Feature name (use snake_case format, e.g., advanced_analytics, mfa_enforcement)',
+    examples: {
+      advanced_analytics: {
+        value: 'advanced_analytics',
+        summary: 'Advanced Analytics',
+      },
+      mfa_enforcement: { value: 'mfa_enforcement', summary: 'MFA Enforcement' },
+      audit_logging: { value: 'audit_logging', summary: 'Audit Logging' },
+    },
   })
   @ApiResponse({
     status: 200,
@@ -338,17 +415,29 @@ export class TenantController {
     type: TenantFeatureFlag,
   })
   @ApiResponse({
+    status: 400,
+    description: 'Invalid feature value',
+  })
+  @ApiResponse({
     status: 404,
     description: 'Tenant not found',
   })
   async updateFeatureFlag(
     @Param('id') id: string,
-    @Param('feature') feature: TenantFeature,
-    @Body() body: { enabled: boolean; config?: Record<string, any> }
+    @Param('feature') feature: string,
+    @Body() body: UpdateFeatureFlagDto
   ): Promise<TenantFeatureFlag> {
+    // Convert and validate the feature parameter
+    const enumFeature = convertFeatureToEnum(feature);
+    if (!enumFeature) {
+      throw new BadRequestException(
+        `Invalid feature: "${feature}". Valid features are: ${getValidFeatures().join(', ')}`
+      );
+    }
+
     return await this.tenantService.updateFeatureFlag(
       id,
-      feature,
+      enumFeature,
       body.enabled,
       body.config
     );

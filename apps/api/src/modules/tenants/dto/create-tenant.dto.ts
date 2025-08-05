@@ -9,6 +9,9 @@ import {
   MinLength,
   MaxLength,
   Matches,
+  IsNumber,
+  Min,
+  IsDateString,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -30,7 +33,13 @@ export class CreateTenantDto {
     example: 'acme.example.com',
   })
   @IsOptional()
-  @IsUrl()
+  @IsString()
+  @Matches(
+    /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/,
+    {
+      message: 'Domain must be a valid domain name (e.g., example.com)',
+    }
+  )
   @MaxLength(255)
   domain?: string;
 
@@ -185,6 +194,8 @@ export class CreateTenantDto {
     default: 0,
   })
   @IsOptional()
+  @IsNumber()
+  @Min(0)
   maxUsers?: number;
 
   @ApiPropertyOptional({
@@ -193,6 +204,8 @@ export class CreateTenantDto {
     default: 0,
   })
   @IsOptional()
+  @IsNumber()
+  @Min(0)
   maxStorage?: number;
 
   @ApiPropertyOptional({
@@ -223,6 +236,7 @@ export class CreateTenantDto {
     example: '2024-12-31T23:59:59.000Z',
   })
   @IsOptional()
+  @IsDateString()
   trialEndsAt?: Date;
 
   @ApiPropertyOptional({

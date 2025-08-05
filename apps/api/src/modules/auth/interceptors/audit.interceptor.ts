@@ -5,8 +5,8 @@ import {
   CallHandler,
   Logger,
 } from '@nestjs/common';
-import { Observable, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { Observable, throwError, from } from 'rxjs';
+import { catchError, tap, switchMap } from 'rxjs/operators';
 import { Request } from 'express';
 
 import { AuditService } from '../services/audit.service';
@@ -15,6 +15,7 @@ import {
   AuditEventStatus,
   AuditEventSeverity,
 } from '../entities/audit-log.entity';
+import { User } from '../entities/user.entity';
 
 // Extend the Request interface to include user
 declare global {
@@ -47,7 +48,6 @@ export class AuditInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest<Request>();
     const handler = context.getHandler();
-    const controller = context.getClass();
 
     // Get audit configuration from metadata or use default
     const auditConfig = Reflect.getMetadata(
@@ -57,45 +57,56 @@ export class AuditInterceptor implements NestInterceptor {
 
     if (!auditConfig) {
       // No audit configuration, just pass through
+      this.logger.debug('No audit configuration found for handler');
       return next.handle();
     }
 
+    this.logger.debug(
+      `Audit interceptor active for event: ${auditConfig.eventType}`
+    );
     const startTime = Date.now();
 
     return next.handle().pipe(
-      tap(async result => {
-        try {
-          await this.logAuditEvent(
+      tap(result => {
+        // Handle success case
+        from(
+          this.logAuditEvent(
             request,
             result,
             auditConfig,
             AuditEventStatus.SUCCESS,
             undefined,
             Date.now() - startTime
-          );
-        } catch (error) {
-          this.logger.error(
-            `Failed to log audit event: ${(error as Error).message}`,
-            (error as Error).stack
-          );
-        }
+          )
+        ).subscribe({
+          error: error => {
+            this.logger.error(
+              `Failed to log audit event: ${(error as Error).message}`,
+              (error as Error).stack
+            );
+          },
+        });
       }),
-      catchError(async error => {
-        try {
-          await this.logAuditEvent(
+      catchError(error => {
+        // Handle error case
+        from(
+          this.logAuditEvent(
             request,
             undefined,
             auditConfig,
             AuditEventStatus.FAILURE,
             error,
             Date.now() - startTime
-          );
-        } catch (auditError) {
-          this.logger.error(
-            `Failed to log audit error event: ${(auditError as Error).message}`,
-            (auditError as Error).stack
-          );
-        }
+          )
+        ).subscribe({
+          error: auditError => {
+            this.logger.error(
+              `Failed to log audit error event: ${(auditError as Error).message}`,
+              (auditError as Error).stack
+            );
+          },
+        });
+
         return throwError(() => error);
       })
     );
@@ -135,9 +146,13 @@ export class AuditInterceptor implements NestInterceptor {
 
       // Add error information if present
       if (error) {
-        metadata.errorCode = error.code || error.status || 'UNKNOWN_ERROR';
-        metadata.errorMessage = error.message || 'Unknown error';
+        metadata.errorCode =
+          error.code || error.status || error.statusCode || 'UNKNOWN_ERROR';
+        metadata.errorMessage = error.message || error.error || 'Unknown error';
         metadata.errorStack = error.stack;
+
+        // Log the error for debugging
+        this.logger.debug(`Audit logging error: ${error.message}`, error.stack);
       }
 
       // Extract request data
@@ -173,14 +188,16 @@ export class AuditInterceptor implements NestInterceptor {
           metadata,
           requestData,
           responseData,
-          errorCode: error?.code || error?.status,
-          errorMessage: error?.message,
+          errorCode: error?.code || error?.status || error?.statusCode,
+          errorMessage: error?.message || error?.error,
           severity: config.severity || AuditEventSeverity.LOW,
           status,
           source: 'interceptor',
         },
         request
       );
+
+      this.logger.debug(`Audit log created successfully: ${auditLog.id}`);
 
       // Call success/error callbacks
       if (status === AuditEventStatus.SUCCESS && config.onSuccess) {
@@ -192,6 +209,12 @@ export class AuditInterceptor implements NestInterceptor {
       this.logger.error(
         `Failed to create audit log: ${(auditError as Error).message}`,
         (auditError as Error).stack
+      );
+
+      // Don't re-throw the audit error as it shouldn't break the main request
+      // Just log it and continue
+      this.logger.warn(
+        'Audit logging failed, but continuing with request processing'
       );
     }
   }

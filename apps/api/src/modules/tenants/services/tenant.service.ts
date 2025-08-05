@@ -5,8 +5,17 @@ import {
   BadRequestException,
   Logger,
 } from '@nestjs/common';
+import { validate as validateUUID } from 'uuid';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like, In, Between, IsNull, Not } from 'typeorm';
+import {
+  Repository,
+  Like,
+  In,
+  Between,
+  IsNull,
+  Not,
+  DataSource,
+} from 'typeorm';
 import { Tenant } from '../../auth/entities/tenant.entity';
 import {
   TenantUsage,
@@ -47,7 +56,8 @@ export class TenantService {
     @InjectRepository(TenantUsage)
     private readonly tenantUsageRepository: Repository<TenantUsage>,
     @InjectRepository(TenantFeatureFlag)
-    private readonly tenantFeatureFlagRepository: Repository<TenantFeatureFlag>
+    private readonly tenantFeatureFlagRepository: Repository<TenantFeatureFlag>,
+    private readonly dataSource: DataSource
   ) {}
 
   /**
@@ -80,47 +90,53 @@ export class TenantService {
       }
     }
 
-    // Create tenant
-    const tenant = this.tenantRepository.create({
-      ...createTenantDto,
-      isActive: createTenantDto.isActive ?? true,
-      plan: createTenantDto.plan ?? 'free',
-      maxUsers: createTenantDto.maxUsers ?? 0,
-      maxStorage: createTenantDto.maxStorage ?? 0,
-      features: createTenantDto.features ?? [],
-      settings: createTenantDto.settings ?? {},
-      metadata: createTenantDto.metadata ?? {},
-    });
+    // Use transaction to ensure data consistency
+    return await this.dataSource.transaction(async manager => {
+      // Create tenant
+      const tenant = manager.create(Tenant, {
+        ...createTenantDto,
+        isActive: createTenantDto.isActive ?? true,
+        plan: createTenantDto.plan ?? 'free',
+        maxUsers: createTenantDto.maxUsers ?? 0,
+        maxStorage: createTenantDto.maxStorage ?? 0,
+        features: createTenantDto.features ?? [],
+        settings: createTenantDto.settings ?? {},
+        metadata: createTenantDto.metadata ?? {},
+      });
 
-    let savedTenant: Tenant;
-    try {
-      savedTenant = await this.tenantRepository.save(tenant);
-    } catch (error: any) {
-      // Handle database constraint violations
-      if (error.code === '23505') {
-        // Unique violation
-        if (error.constraint?.includes('name')) {
-          throw new ConflictException(
-            `Tenant with name "${createTenantDto.name}" already exists`
-          );
-        } else if (error.constraint?.includes('domain')) {
-          throw new ConflictException(
-            `Tenant with domain "${createTenantDto.domain}" already exists`
-          );
-        } else {
-          throw new ConflictException(
-            'Tenant with this name or domain already exists'
-          );
+      let savedTenant: Tenant;
+      try {
+        savedTenant = await manager.save(Tenant, tenant);
+      } catch (error: any) {
+        // Handle database constraint violations
+        if (error.code === '23505') {
+          // Unique violation
+          if (error.constraint?.includes('name')) {
+            throw new ConflictException(
+              `Tenant with name "${createTenantDto.name}" already exists`
+            );
+          } else if (error.constraint?.includes('domain')) {
+            throw new ConflictException(
+              `Tenant with domain "${createTenantDto.domain}" already exists`
+            );
+          } else {
+            throw new ConflictException(
+              'Tenant with this name or domain already exists'
+            );
+          }
         }
+        throw error; // Re-throw other errors
       }
-      throw error; // Re-throw other errors
-    }
 
-    // Initialize default feature flags
-    await this.initializeDefaultFeatureFlags(savedTenant.id);
+      // Initialize default feature flags
+      await this.initializeDefaultFeatureFlagsWithManager(
+        savedTenant.id,
+        manager
+      );
 
-    this.logger.log(`Tenant created successfully: ${savedTenant.id}`);
-    return savedTenant;
+      this.logger.log(`Tenant created successfully: ${savedTenant.id}`);
+      return savedTenant;
+    });
   }
 
   /**
@@ -197,16 +213,34 @@ export class TenantService {
    * Get tenant by ID
    */
   async getTenantById(id: string): Promise<Tenant> {
-    const tenant = await this.tenantRepository.findOne({
-      where: { id },
-      relations: ['users'],
-    });
-
-    if (!tenant) {
-      throw new NotFoundException(`Tenant with ID "${id}" not found`);
+    if (!validateUUID(id)) {
+      throw new BadRequestException(`Invalid tenant ID format: "${id}"`);
     }
 
-    return tenant;
+    try {
+      const tenant = await this.tenantRepository.findOne({
+        where: { id },
+        relations: ['users'],
+      });
+
+      if (!tenant) {
+        throw new NotFoundException(`Tenant with ID "${id}" not found`);
+      }
+
+      return tenant;
+    } catch (error: any) {
+      this.logger.error(`Failed to get tenant ${id}:`, error);
+
+      // Handle TypeORM relationship errors
+      if (error.message?.includes('joinColumns')) {
+        this.logger.error('TypeORM relationship error in getTenantById');
+        throw new BadRequestException(
+          'Invalid entity relationship configuration'
+        );
+      }
+
+      throw error;
+    }
   }
 
   /**
@@ -225,6 +259,30 @@ export class TenantService {
   }
 
   /**
+   * Get tenant by ID without relations (for update operations)
+   */
+  async getTenantByIdWithoutRelations(id: string): Promise<Tenant> {
+    if (!validateUUID(id)) {
+      throw new BadRequestException(`Invalid tenant ID format: "${id}"`);
+    }
+
+    try {
+      const tenant = await this.tenantRepository.findOne({
+        where: { id },
+      });
+
+      if (!tenant) {
+        throw new NotFoundException(`Tenant with ID "${id}" not found`);
+      }
+
+      return tenant;
+    } catch (error: any) {
+      this.logger.error(`Failed to get tenant ${id}:`, error);
+      throw error;
+    }
+  }
+
+  /**
    * Update tenant
    */
   async updateTenant(
@@ -233,7 +291,11 @@ export class TenantService {
   ): Promise<Tenant> {
     this.logger.log(`Updating tenant: ${id}`);
 
-    const tenant = await this.getTenantById(id);
+    if (!validateUUID(id)) {
+      throw new BadRequestException(`Invalid tenant ID format: "${id}"`);
+    }
+
+    const tenant = await this.getTenantByIdWithoutRelations(id);
 
     // Check for name uniqueness if name is being updated (excluding soft-deleted tenants)
     if (updateTenantDto.name && updateTenantDto.name !== tenant.name) {
@@ -268,6 +330,8 @@ export class TenantService {
     try {
       updatedTenant = await this.tenantRepository.save(tenant);
     } catch (error: any) {
+      this.logger.error(`Failed to update tenant ${id}:`, error);
+
       // Handle database constraint violations
       if (error.code === '23505') {
         // Unique violation
@@ -285,6 +349,15 @@ export class TenantService {
           );
         }
       }
+
+      // Handle TypeORM relationship errors
+      if (error.message?.includes('joinColumns')) {
+        this.logger.error('TypeORM relationship error detected');
+        throw new BadRequestException(
+          'Invalid entity relationship configuration'
+        );
+      }
+
       throw error; // Re-throw other errors
     }
 
@@ -505,33 +578,61 @@ export class TenantService {
     value: number,
     limit?: number
   ): Promise<TenantUsage> {
+    // Validate UUID
+    if (!validateUUID(tenantId)) {
+      throw new BadRequestException(`Invalid tenant ID format: "${tenantId}"`);
+    }
+
+    // Validate metric enum
+    if (!Object.values(TenantUsageMetric).includes(metric)) {
+      throw new BadRequestException(
+        `Invalid metric: "${metric}". Valid metrics are: ${Object.values(TenantUsageMetric).join(', ')}`
+      );
+    }
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    let usageRecord = await this.tenantUsageRepository.findOne({
-      where: {
-        tenantId,
-        date: today,
-        metric,
-      },
-    });
-
-    if (!usageRecord) {
-      usageRecord = this.tenantUsageRepository.create({
-        tenantId,
-        date: today,
-        metric,
-        value: 0,
-        limit: limit ?? 0,
+    try {
+      let usageRecord = await this.tenantUsageRepository.findOne({
+        where: {
+          tenantId,
+          date: today,
+          metric,
+        },
       });
-    }
 
-    usageRecord.value = value;
-    if (limit !== undefined) {
-      usageRecord.limit = limit;
-    }
+      if (!usageRecord) {
+        usageRecord = this.tenantUsageRepository.create({
+          tenantId,
+          date: today,
+          metric,
+          value: 0,
+          limit: limit ?? 0,
+        });
+      }
 
-    return await this.tenantUsageRepository.save(usageRecord);
+      usageRecord.value = value;
+      if (limit !== undefined) {
+        usageRecord.limit = limit;
+      }
+
+      return await this.tenantUsageRepository.save(usageRecord);
+    } catch (error: any) {
+      this.logger.error(
+        `Failed to update tenant usage: ${error.message}`,
+        error
+      );
+
+      // Handle enum validation errors
+      if (error.message?.includes('tenant_usage_metric_enum')) {
+        throw new BadRequestException(
+          `Invalid metric value: "${metric}". Valid values are: ${Object.values(TenantUsageMetric).join(', ')}. Please use snake_case format (e.g., 'api_calls' not 'apiCalls').`
+        );
+      }
+
+      throw error;
+    }
   }
 
   /**
@@ -541,9 +642,25 @@ export class TenantService {
     tenantId: string,
     feature: TenantFeature
   ): Promise<TenantFeatureFlag | null> {
-    return await this.tenantFeatureFlagRepository.findOne({
-      where: { tenantId, feature },
-    });
+    try {
+      return await this.tenantFeatureFlagRepository.findOne({
+        where: { tenantId, feature },
+      });
+    } catch (error: any) {
+      this.logger.error(
+        `Failed to get feature flag ${feature} for tenant ${tenantId}:`,
+        error
+      );
+
+      // Handle enum validation errors
+      if (error.message?.includes('tenant_feature_flags_feature_enum')) {
+        throw new BadRequestException(
+          `Invalid feature value: "${feature}". Valid values are: ${Object.values(TenantFeature).join(', ')}. Please use snake_case format (e.g., 'advanced_analytics' not 'ADVANCED_ANALYTICS').`
+        );
+      }
+
+      throw error;
+    }
   }
 
   /**
@@ -553,8 +670,24 @@ export class TenantService {
     tenantId: string,
     feature: TenantFeature
   ): Promise<boolean> {
-    const featureFlag = await this.getFeatureFlag(tenantId, feature);
-    return featureFlag?.isEnabled ?? false;
+    try {
+      const featureFlag = await this.getFeatureFlag(tenantId, feature);
+      return featureFlag?.isEnabled ?? false;
+    } catch (error: any) {
+      this.logger.error(
+        `Failed to check feature ${feature} for tenant ${tenantId}:`,
+        error
+      );
+
+      // Handle enum validation errors
+      if (error.message?.includes('tenant_feature_flags_feature_enum')) {
+        throw new BadRequestException(
+          `Invalid feature value: "${feature}". Valid values are: ${Object.values(TenantFeature).join(', ')}. Please use snake_case format (e.g., 'advanced_analytics' not 'ADVANCED_ANALYTICS').`
+        );
+      }
+
+      throw error;
+    }
   }
 
   /**
@@ -566,23 +699,51 @@ export class TenantService {
     isEnabled: boolean,
     config?: Record<string, any>
   ): Promise<TenantFeatureFlag> {
-    let featureFlag = await this.getFeatureFlag(tenantId, feature);
+    try {
+      let featureFlag = await this.getFeatureFlag(tenantId, feature);
 
-    if (!featureFlag) {
-      featureFlag = this.tenantFeatureFlagRepository.create({
-        tenantId,
-        feature,
-        isEnabled,
-        ...(config && { config }),
-      });
-    } else {
-      featureFlag.isEnabled = isEnabled;
-      if (config) {
-        featureFlag.config = config;
+      if (!featureFlag) {
+        featureFlag = this.tenantFeatureFlagRepository.create({
+          tenantId,
+          feature,
+          isEnabled,
+          ...(config && { config }),
+        });
+      } else {
+        featureFlag.isEnabled = isEnabled;
+        if (config) {
+          featureFlag.config = config;
+        }
       }
-    }
 
-    return await this.tenantFeatureFlagRepository.save(featureFlag);
+      return await this.tenantFeatureFlagRepository.save(featureFlag);
+    } catch (error: any) {
+      this.logger.error(
+        `Failed to update feature flag ${feature} for tenant ${tenantId}:`,
+        error
+      );
+
+      // Handle enum validation errors
+      if (error.message?.includes('tenant_feature_flags_feature_enum')) {
+        throw new BadRequestException(
+          `Invalid feature value: "${feature}". Valid values are: ${Object.values(TenantFeature).join(', ')}. Please use snake_case format (e.g., 'advanced_analytics' not 'ADVANCED_ANALYTICS').`
+        );
+      }
+
+      throw error;
+    }
+  }
+
+  /**
+   * Get all feature flags for a tenant
+   */
+  async getTenantFeatures(tenantId: string): Promise<TenantFeatureFlag[]> {
+    await this.getTenantById(tenantId); // Verify tenant exists
+
+    return await this.tenantFeatureFlagRepository.find({
+      where: { tenantId },
+      order: { feature: 'ASC' },
+    });
   }
 
   /**
@@ -605,5 +766,30 @@ export class TenantService {
     );
 
     await this.tenantFeatureFlagRepository.save(featureFlags);
+  }
+
+  /**
+   * Initialize default feature flags for a new tenant with transaction manager
+   */
+  private async initializeDefaultFeatureFlagsWithManager(
+    tenantId: string,
+    manager: any
+  ): Promise<void> {
+    const defaultFeatures = [
+      TenantFeature.MFA_ENFORCEMENT,
+      TenantFeature.EMAIL_TEMPLATES,
+      TenantFeature.AUDIT_LOGGING,
+    ];
+
+    const featureFlags = defaultFeatures.map(feature =>
+      manager.create(TenantFeatureFlag, {
+        tenantId,
+        feature,
+        isEnabled: true,
+        config: {},
+      })
+    );
+
+    await manager.save(TenantFeatureFlag, featureFlags);
   }
 }
