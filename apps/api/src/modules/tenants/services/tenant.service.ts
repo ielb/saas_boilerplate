@@ -56,9 +56,9 @@ export class TenantService {
   async createTenant(createTenantDto: CreateTenantDto): Promise<Tenant> {
     this.logger.log(`Creating new tenant: ${createTenantDto.name}`);
 
-    // Check for name uniqueness
+    // Check for name uniqueness (excluding soft-deleted tenants)
     const existingTenantByName = await this.tenantRepository.findOne({
-      where: { name: createTenantDto.name },
+      where: { name: createTenantDto.name, deletedAt: IsNull() },
     });
 
     if (existingTenantByName) {
@@ -67,10 +67,10 @@ export class TenantService {
       );
     }
 
-    // Check for domain uniqueness if provided
+    // Check for domain uniqueness if provided (excluding soft-deleted tenants)
     if (createTenantDto.domain) {
       const existingTenantByDomain = await this.tenantRepository.findOne({
-        where: { domain: createTenantDto.domain },
+        where: { domain: createTenantDto.domain, deletedAt: IsNull() },
       });
 
       if (existingTenantByDomain) {
@@ -92,7 +92,29 @@ export class TenantService {
       metadata: createTenantDto.metadata ?? {},
     });
 
-    const savedTenant = await this.tenantRepository.save(tenant);
+    let savedTenant: Tenant;
+    try {
+      savedTenant = await this.tenantRepository.save(tenant);
+    } catch (error: any) {
+      // Handle database constraint violations
+      if (error.code === '23505') {
+        // Unique violation
+        if (error.constraint?.includes('name')) {
+          throw new ConflictException(
+            `Tenant with name "${createTenantDto.name}" already exists`
+          );
+        } else if (error.constraint?.includes('domain')) {
+          throw new ConflictException(
+            `Tenant with domain "${createTenantDto.domain}" already exists`
+          );
+        } else {
+          throw new ConflictException(
+            'Tenant with this name or domain already exists'
+          );
+        }
+      }
+      throw error; // Re-throw other errors
+    }
 
     // Initialize default feature flags
     await this.initializeDefaultFeatureFlags(savedTenant.id);
@@ -213,10 +235,10 @@ export class TenantService {
 
     const tenant = await this.getTenantById(id);
 
-    // Check for name uniqueness if name is being updated
+    // Check for name uniqueness if name is being updated (excluding soft-deleted tenants)
     if (updateTenantDto.name && updateTenantDto.name !== tenant.name) {
       const existingTenant = await this.tenantRepository.findOne({
-        where: { name: updateTenantDto.name },
+        where: { name: updateTenantDto.name, deletedAt: IsNull() },
       });
 
       if (existingTenant) {
@@ -226,10 +248,10 @@ export class TenantService {
       }
     }
 
-    // Check for domain uniqueness if domain is being updated
+    // Check for domain uniqueness if domain is being updated (excluding soft-deleted tenants)
     if (updateTenantDto.domain && updateTenantDto.domain !== tenant.domain) {
       const existingTenant = await this.tenantRepository.findOne({
-        where: { domain: updateTenantDto.domain },
+        where: { domain: updateTenantDto.domain, deletedAt: IsNull() },
       });
 
       if (existingTenant) {
@@ -241,7 +263,30 @@ export class TenantService {
 
     // Update tenant
     Object.assign(tenant, updateTenantDto);
-    const updatedTenant = await this.tenantRepository.save(tenant);
+
+    let updatedTenant: Tenant;
+    try {
+      updatedTenant = await this.tenantRepository.save(tenant);
+    } catch (error: any) {
+      // Handle database constraint violations
+      if (error.code === '23505') {
+        // Unique violation
+        if (error.constraint?.includes('name')) {
+          throw new ConflictException(
+            `Tenant with name "${updateTenantDto.name}" already exists`
+          );
+        } else if (error.constraint?.includes('domain')) {
+          throw new ConflictException(
+            `Tenant with domain "${updateTenantDto.domain}" already exists`
+          );
+        } else {
+          throw new ConflictException(
+            'Tenant with this name or domain already exists'
+          );
+        }
+      }
+      throw error; // Re-throw other errors
+    }
 
     this.logger.log(`Tenant updated successfully: ${id}`);
     return updatedTenant;
