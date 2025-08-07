@@ -13,6 +13,6 @@ import { env } from '@app/config';
     TenantsModule,
   ],
   providers: [TenantIsolationMiddleware],
-  exports: [TenantIsolationMiddleware],
+  exports: [TenantIsolationMiddleware, JwtModule],
 })
 export class TenantMiddlewareModule {}

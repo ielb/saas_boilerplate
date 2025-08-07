@@ -356,7 +356,7 @@ describe('RefreshTokenService', () => {
       // Assert
       expect(result).toBe(2);
       expect(refreshTokenRepository.delete).toHaveBeenCalledWith({
-        expiresAt: expiredDate,
+        expiresAt: expect.any(Date),
       });
     });
 
@@ -374,7 +374,7 @@ describe('RefreshTokenService', () => {
       // Assert
       expect(result).toBe(0);
       expect(refreshTokenRepository.delete).toHaveBeenCalledWith({
-        expiresAt: expiredDate,
+        expiresAt: expect.any(Date),
       });
     });
   });

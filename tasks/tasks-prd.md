@@ -174,7 +174,7 @@ Based on PRD: `docs/prd.md`
 - [ ] 3.0 Multi-Tenant Architecture & User Management
   - [x] 3.1 Design and implement tenant database schema (#9) - **COMPLETED**
   - [x] 3.2 Create tenant isolation middleware and interceptors (#10) - **COMPLETED**
-  - [ ] 3.3 Implement tenant-scoped database queries (#19)
+  - [x] 3.3 Implement tenant-scoped database queries (#19) - **COMPLETED** _(includes pagination fixes and safe query utilities)_
   - [ ] 3.4 Set up tenant onboarding workflow (#20)
   - [ ] 3.5 Create tenant switching functionality (#21)
   - [ ] 3.6 Implement tenant branding customization (#30)
@@ -306,6 +306,22 @@ Based on PRD: `docs/prd.md`
   - [ ] 10.13 Add production logging and error tracking
   - [ ] 10.14 Implement production performance monitoring
   - [ ] 10.15 Create production security hardening and compliance
+
+## 🐛 **Bug Fixes & Maintenance** _(Completed)_
+
+- [x] **OFFSET Pagination Error Fix** - Fixed "OFFSET must not be negative" error across all pagination queries
+  - Added safe pagination utilities and validation (`packages/shared/src/utils/pagination.utils.ts`)
+  - Created comprehensive pagination DTOs and pipes
+  - Updated all repositories with proper error handling
+  - 21 passing unit tests for pagination validation
+  - Proper 400 Bad Request responses for invalid pagination parameters
+
+- [x] **Script Cleanup & Consolidation** - Removed 9 unnecessary/duplicate scripts
+  - Consolidated Super Admin management into unified scripts
+  - Removed duplicate SQL files and shell scripts
+  - Updated documentation to reflect cleanup
+  - Saved ~20KB and improved maintainability
+  - **Files Removed**: `update-super-admin-permissions.sql`, `update-owner-with-all-permissions.sql`, `create-super-admin-with-all-permissions.sql`, `fix-super-admin-permissions.sql`, `verify-super-admin-permissions.sql`, `update-super-admin-permissions.sh`, `quick-super-admin-update.sh`, `test-role-creation.sh`, `test-pagination-fix.sh`
 
 ### Notes
 

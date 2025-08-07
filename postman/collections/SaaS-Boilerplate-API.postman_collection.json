@@ -87,6 +87,51 @@
       "item": [
         {
           "name": "Register User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has user data', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('user');",
+                  "    pm.expect(response.user).to.have.property('id');",
+                  "    pm.expect(response.user).to.have.property('email');",
+                  "    pm.expect(response.user).to.have.property('firstName');",
+                  "    pm.expect(response.user).to.have.property('lastName');",
+                  "});",
+                  "",
+                  "pm.test('Response has tenant data', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('tenant');",
+                  "    pm.expect(response.tenant).to.have.property('id');",
+                  "    pm.expect(response.tenant).to.have.property('name');",
+                  "    pm.expect(response.tenant).to.have.property('domain');",
+                  "});",
+                  "",
+                  "pm.test('User email matches request', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.user.email).to.equal('test@example.com');",
+                  "});",
+                  "",
+                  "pm.test('Tenant domain matches request', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.tenant.domain).to.equal('testcompany.com');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('userId', response.user.id);",
+                  "    pm.environment.set('tenantId', response.tenant.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -147,6 +192,29 @@
         },
         {
           "name": "Verify Email",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has success message', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "    pm.expect(response.message).to.include('Email verified successfully');",
+                  "});",
+                  "",
+                  "pm.test('Response indicates email verification', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.message).to.include('verified');",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -169,6 +237,29 @@
         },
         {
           "name": "Resend Email Verification",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has success message', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "    pm.expect(response.message).to.include('Verification email sent');",
+                  "});",
+                  "",
+                  "pm.test('Response indicates email was sent', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.message).to.include('sent');",
+                  "});"
+                ]
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -1060,6 +1151,40 @@
             },
             {
               "name": "Get Role by ID",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response has required fields', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response).to.have.property('id');",
+                      "    pm.expect(response).to.have.property('name');",
+                      "    pm.expect(response).to.have.property('type');",
+                      "    pm.expect(response).to.have.property('level');",
+                      "    pm.expect(response).to.have.property('isSystem');",
+                      "    pm.expect(response).to.have.property('isActive');",
+                      "    pm.expect(response).to.have.property('permissions');",
+                      "    pm.expect(response).to.have.property('totalPermissions');",
+                      "});",
+                      "",
+                      "pm.test('Role ID matches request', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.id).to.equal(pm.collectionVariables.get('roleId'));",
+                      "});",
+                      "",
+                      "pm.test('Permissions is an array', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.permissions).to.be.an('array');",
+                      "});"
+                    ]
+                  }
+                }
+              ],
               "request": {
                 "method": "GET",
                 "header": [],
@@ -1145,6 +1270,48 @@
             },
             {
               "name": "Update Role",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response has updated fields', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response).to.have.property('id');",
+                      "    pm.expect(response).to.have.property('name');",
+                      "    pm.expect(response).to.have.property('description');",
+                      "    pm.expect(response).to.have.property('level');",
+                      "    pm.expect(response.name).to.equal('Senior Team Lead');",
+                      "    pm.expect(response.description).to.equal('Senior team lead with additional privileges');",
+                      "    pm.expect(response.level).to.equal(2);",
+                      "});",
+                      "",
+                      "pm.test('Role ID remains unchanged', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.id).to.equal(pm.collectionVariables.get('roleId'));",
+                      "});",
+                      "",
+                      "pm.test('Metadata is updated', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response).to.have.property('metadata');",
+                      "    pm.expect(response.metadata).to.have.property('canManageTeam');",
+                      "    pm.expect(response.metadata).to.have.property('canViewReports');",
+                      "    pm.expect(response.metadata).to.have.property('canManageBudget');",
+                      "});",
+                      "",
+                      "pm.test('Updated timestamp is present', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response).to.have.property('updatedAt');",
+                      "    pm.expect(response.updatedAt).to.be.a('string');",
+                      "});"
+                    ]
+                  }
+                }
+              ],
               "request": {
                 "method": "PUT",
                 "header": [
@@ -1167,6 +1334,22 @@
             },
             {
               "name": "Delete Role",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 204', function () {",
+                      "    pm.response.to.have.status(204);",
+                      "});",
+                      "",
+                      "pm.test('Response body is empty', function () {",
+                      "    pm.expect(pm.response.text()).to.be.empty;",
+                      "});"
+                    ]
+                  }
+                }
+              ],
               "request": {
                 "method": "DELETE",
                 "header": [],
@@ -1180,6 +1363,45 @@
             },
             {
               "name": "Get System Roles",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response is an array', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response).to.be.an('array');",
+                      "});",
+                      "",
+                      "pm.test('All roles are system roles', function () {",
+                      "    const response = pm.response.json();",
+                      "    if (response.length > 0) {",
+                      "        response.forEach(role => {",
+                      "            pm.expect(role).to.have.property('isSystem');",
+                      "            pm.expect(role.isSystem).to.be.true;",
+                      "        });",
+                      "    }",
+                      "});",
+                      "",
+                      "pm.test('System roles have required fields', function () {",
+                      "    const response = pm.response.json();",
+                      "    if (response.length > 0) {",
+                      "        const role = response[0];",
+                      "        pm.expect(role).to.have.property('id');",
+                      "        pm.expect(role).to.have.property('name');",
+                      "        pm.expect(role).to.have.property('type');",
+                      "        pm.expect(role).to.have.property('level');",
+                      "        pm.expect(role).to.have.property('isActive');",
+                      "    }",
+                      "});"
+                    ]
+                  }
+                }
+              ],
               "request": {
                 "method": "GET",
                 "header": [],
@@ -1193,6 +1415,45 @@
             },
             {
               "name": "Get Custom Roles",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response is an array', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response).to.be.an('array');",
+                      "});",
+                      "",
+                      "pm.test('All roles are custom roles', function () {",
+                      "    const response = pm.response.json();",
+                      "    if (response.length > 0) {",
+                      "        response.forEach(role => {",
+                      "            pm.expect(role).to.have.property('type');",
+                      "            pm.expect(role.type).to.equal('custom');",
+                      "        });",
+                      "    }",
+                      "});",
+                      "",
+                      "pm.test('Custom roles have required fields', function () {",
+                      "    const response = pm.response.json();",
+                      "    if (response.length > 0) {",
+                      "        const role = response[0];",
+                      "        pm.expect(role).to.have.property('id');",
+                      "        pm.expect(role).to.have.property('name');",
+                      "        pm.expect(role).to.have.property('type');",
+                      "        pm.expect(role).to.have.property('level');",
+                      "        pm.expect(role).to.have.property('isActive');",
+                      "    }",
+                      "});"
+                    ]
+                  }
+                }
+              ],
               "request": {
                 "method": "GET",
                 "header": [],
@@ -1205,7 +1466,171 @@
               "response": []
             },
             {
+              "name": "Create Default Roles",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response has success message', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response).to.have.property('message');",
+                      "    pm.expect(response.message).to.include('Default roles created successfully');",
+                      "});",
+                      "",
+                      "pm.test('Response indicates default roles were created', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.message).to.include('default');",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/roles/default",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["roles", "default"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Super Admin Permissions",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response has success message', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response).to.have.property('message');",
+                      "    pm.expect(response.message).to.include('Super Admin permissions updated successfully');",
+                      "});",
+                      "",
+                      "pm.test('Response has permissions count', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response).to.have.property('permissionsCount');",
+                      "    pm.expect(response.permissionsCount).to.be.a('number');",
+                      "    pm.expect(response.permissionsCount).to.be.greaterThan(0);",
+                      "});",
+                      "",
+                      "pm.test('Super Admin has comprehensive permissions', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.permissionsCount).to.be.greaterThan(100);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/roles/super-admin/update-permissions",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["roles", "super-admin", "update-permissions"]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Super Admin Permissions",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response is an array', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response).to.be.an('array');",
+                      "});",
+                      "",
+                      "pm.test('Super Admin has extensive permissions', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.length).to.be.greaterThan(100);",
+                      "});",
+                      "",
+                      "pm.test('Permissions have required fields', function () {",
+                      "    const response = pm.response.json();",
+                      "    if (response.length > 0) {",
+                      "        const permission = response[0];",
+                      "        pm.expect(permission).to.have.property('id');",
+                      "        pm.expect(permission).to.have.property('name');",
+                      "        pm.expect(permission).to.have.property('resource');",
+                      "        pm.expect(permission).to.have.property('action');",
+                      "        pm.expect(permission).to.have.property('scope');",
+                      "    }",
+                      "});",
+                      "",
+                      "pm.test('Super Admin has all resource types', function () {",
+                      "    const response = pm.response.json();",
+                      "    const resources = [...new Set(response.map(p => p.resource))];",
+                      "    pm.expect(resources.length).to.be.greaterThan(10);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/roles/super-admin/permissions",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["roles", "super-admin", "permissions"]
+                }
+              },
+              "response": []
+            },
+            {
               "name": "Assign Permissions to Role",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response has updated role data', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response).to.have.property('id');",
+                      "    pm.expect(response).to.have.property('name');",
+                      "    pm.expect(response).to.have.property('permissions');",
+                      "    pm.expect(response).to.have.property('totalPermissions');",
+                      "});",
+                      "",
+                      "pm.test('Permissions array is updated', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.permissions).to.be.an('array');",
+                      "    pm.expect(response.totalPermissions).to.be.a('number');",
+                      "    pm.expect(response.totalPermissions).to.be.greaterThan(0);",
+                      "});",
+                      "",
+                      "pm.test('Role ID matches request', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.id).to.equal(pm.collectionVariables.get('roleId'));",
+                      "});"
+                    ]
+                  }
+                }
+              ],
               "request": {
                 "method": "POST",
                 "header": [
@@ -1228,6 +1653,22 @@
             },
             {
               "name": "Remove Permissions from Role",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 204', function () {",
+                      "    pm.response.to.have.status(204);",
+                      "});",
+                      "",
+                      "pm.test('Response body is empty', function () {",
+                      "    pm.expect(pm.response.text()).to.be.empty;",
+                      "});"
+                    ]
+                  }
+                }
+              ],
               "request": {
                 "method": "DELETE",
                 "header": [
@@ -1303,6 +1744,22 @@
             },
             {
               "name": "Remove Role from User",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 204', function () {",
+                      "    pm.response.to.have.status(204);",
+                      "});",
+                      "",
+                      "pm.test('Response body is empty', function () {",
+                      "    pm.expect(pm.response.text()).to.be.empty;",
+                      "});"
+                    ]
+                  }
+                }
+              ],
               "request": {
                 "method": "DELETE",
                 "header": [],
@@ -1322,6 +1779,41 @@
             },
             {
               "name": "Get User Roles",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Response has user roles structure', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response).to.have.property('userId');",
+                      "    pm.expect(response).to.have.property('roles');",
+                      "    pm.expect(response).to.have.property('total');",
+                      "});",
+                      "",
+                      "pm.test('User ID matches request', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.userId).to.equal(pm.collectionVariables.get('userId'));",
+                      "});",
+                      "",
+                      "pm.test('Roles is an array', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.roles).to.be.an('array');",
+                      "});",
+                      "",
+                      "pm.test('Total count is a number', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.total).to.be.a('number');",
+                      "    pm.expect(response.total).to.be.greaterThanOrEqual(0);",
+                      "});"
+                    ]
+                  }
+                }
+              ],
               "request": {
                 "method": "GET",
                 "header": [],
