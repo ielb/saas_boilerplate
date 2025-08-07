@@ -199,9 +199,11 @@ export class TenantService {
     // Apply sorting
     queryBuilder.orderBy(`tenant.${sortBy}`, sortOrder);
 
-    // Apply pagination
-    const offset = ((page ?? 1) - 1) * (limit ?? 10);
-    queryBuilder.skip(offset).take(limit);
+    // Apply safe pagination
+    const safeLimit = Math.min(Math.max(1, limit ?? 10), 100);
+    const safePage = Math.max(1, page ?? 1);
+    const offset = (safePage - 1) * safeLimit;
+    queryBuilder.skip(offset).take(safeLimit);
 
     // Execute query
     const [tenants, total] = await queryBuilder.getManyAndCount();

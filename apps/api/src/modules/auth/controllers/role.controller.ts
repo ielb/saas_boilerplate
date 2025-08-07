@@ -31,6 +31,7 @@ import {
   UserRoleListResponseDto,
 } from '../dto/rbac.dto';
 import { RoleLevel } from '../entities/role.entity';
+import { RoleQueryDto } from '../dto/role-query.dto';
 import { Request } from 'express';
 
 @ApiTags('Roles')
@@ -89,9 +90,8 @@ export class RoleController {
     @Req() req: Request
   ): Promise<RoleResponseDto> {
     const userId = (req.user as any)?.id;
-    const tenantId = (req.user as any)?.tenantId;
 
-    const role = await this.roleService.createRole(createRoleDto, tenantId);
+    const role = await this.roleService.createRole(createRoleDto);
     return this.mapRoleToDto(role);
   }
 
@@ -123,12 +123,13 @@ export class RoleController {
   })
   async getAllRoles(
     @Req() req: Request,
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 50,
-    @Query('level') level?: RoleLevel
+    @Query() query: RoleQueryDto
   ): Promise<RoleListResponseDto> {
-    const tenantId = (req.user as any)?.tenantId;
-    return this.roleService.getAllRoles(tenantId, page, limit, level);
+    return this.roleService.getAllRoles(
+      query.page || 1,
+      query.limit || 50,
+      query.level
+    );
   }
 
   @Get('system')
@@ -182,8 +183,7 @@ export class RoleController {
   })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getCustomRoles(@Req() req: Request): Promise<RoleResponseDto[]> {
-    const tenantId = (req.user as any)?.tenantId;
-    const roles = await this.roleService.getCustomRoles(tenantId);
+    const roles = await this.roleService.getCustomRoles();
     return roles.map(role => ({
       id: role.id,
       name: role.name,
@@ -423,26 +423,114 @@ export class RoleController {
     return this.roleService.getUserRoles(userId);
   }
 
-  @Post('defaults')
+  @Post('default')
   @ApiOperation({ summary: 'Create default system roles' })
   @ApiResponse({
-    status: 201,
+    status: 200,
     description: 'Default roles created successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        message: {
+          type: 'string',
+          example: 'Default roles created successfully',
+        },
+      },
+    },
   })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
   async createDefaultRoles(@Req() req: Request): Promise<{ message: string }> {
-    const tenantId = (req.user as any)?.tenantId;
-    await this.roleService.createDefaultRoles(tenantId);
+    await this.roleService.createDefaultRoles();
     return { message: 'Default roles created successfully' };
+  }
+
+  @Post('super-admin/update-permissions')
+  @ApiOperation({
+    summary: 'Update Super Admin role with all available permissions',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Super Admin permissions updated successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        message: {
+          type: 'string',
+          example: 'Super Admin permissions updated successfully',
+        },
+        permissionsCount: {
+          type: 'number',
+          example: 150,
+        },
+      },
+    },
+  })
+  async updateSuperAdminPermissions(
+    @Req() req: Request
+  ): Promise<{ message: string; permissionsCount: number }> {
+    await this.roleService.updateSuperAdminPermissions();
+    const permissions = await this.roleService.getSuperAdminPermissions();
+    return {
+      message: 'Super Admin permissions updated successfully',
+      permissionsCount: permissions.length,
+    };
+  }
+
+  @Get('super-admin/permissions')
+  @ApiOperation({ summary: 'Get all permissions assigned to Super Admin role' })
+  @ApiResponse({
+    status: 200,
+    description: 'Super Admin permissions retrieved successfully',
+    type: [Object],
+  })
+  async getSuperAdminPermissions(@Req() req: Request): Promise<any[]> {
+    const permissions = await this.roleService.getSuperAdminPermissions();
+    return permissions.map(permission => ({
+      id: permission.id,
+      name: permission.name,
+      description: permission.description,
+      resource: permission.resource,
+      action: permission.action,
+      scope: permission.scope,
+      isSystem: permission.isSystem,
+      isActive: permission.isActive,
+    }));
   }
 
   @Get('users/:userId/permissions')
   @ApiOperation({ summary: 'Get all permissions for a user' })
-  @ApiResponse({ status: 200, description: 'User permissions', type: [String] })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getUserPermissions(@Param('userId') userId: string): Promise<string[]> {
+  @ApiResponse({
+    status: 200,
+    description: 'User permissions retrieved successfully',
+    type: [String],
+  })
+  async getUserPermissions(
+    @Param('userId') userId: string,
+    @Req() req: Request
+  ): Promise<string[]> {
     return this.roleService.getUserPermissions(userId);
+  }
+
+  @Get('debug/user-permissions')
+  @ApiOperation({ summary: 'Debug endpoint to check current user permissions' })
+  @ApiResponse({
+    status: 200,
+    description: 'Current user permissions retrieved successfully',
+  })
+  async getCurrentUserPermissions(@Req() req: Request): Promise<any> {
+    const user = req.user as any;
+    const permissions = await this.roleService.getUserPermissions(user.id);
+    const userRoles = await this.roleService.getUserRoles(user.id);
+
+    return {
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      userRoles: userRoles.userRoles,
+      permissions: permissions,
+      permissionsCount: permissions.length,
+      hasPermissionsRead: permissions.includes('permissions:read'),
+      hasPermissionsManage: permissions.includes('permissions:manage'),
+    };
   }
 
   @Post('users/:userId/permissions/check')
@@ -462,5 +550,67 @@ export class RoleController {
       scope
     );
     return { hasPermission };
+  }
+
+  @Get('debug/user-roles')
+  @ApiOperation({ summary: 'Debug endpoint to check user roles loading' })
+  @ApiResponse({
+    status: 200,
+    description: 'User roles debug info retrieved successfully',
+  })
+  async getUserRolesDebug(@Req() req: Request): Promise<any> {
+    const user = req.user as any;
+
+    // Get current tenant context
+    const currentTenantId = (req as any).tenantId;
+
+    // Try to find the Super Admin user directly
+    const superAdminUser = await this.roleService['userRepository'].findOne({
+      where: { email: 'superadmin@example.com' },
+      relations: ['roles'],
+    });
+
+    return {
+      currentUser: {
+        id: user.id,
+        email: user.email,
+        tenantId: user.tenantId,
+        role: user.role,
+      },
+      currentTenantId: currentTenantId,
+      superAdminUser: superAdminUser
+        ? {
+            id: superAdminUser.id,
+            email: superAdminUser.email,
+            tenantId: superAdminUser.tenantId,
+            rolesCount: superAdminUser.roles?.length || 0,
+            roles:
+              superAdminUser.roles?.map(r => ({ id: r.id, name: r.name })) ||
+              [],
+          }
+        : null,
+      debug: await this.roleService.getUserRolesDebug(user.id),
+    };
+  }
+
+  @Get('test-permissions')
+  @ApiOperation({ summary: 'Test endpoint to verify permissions are working' })
+  @ApiResponse({
+    status: 200,
+    description: 'Permissions test successful',
+  })
+  async testPermissions(@Req() req: Request): Promise<any> {
+    const user = req.user as any;
+    const permissions = await this.roleService.getUserPermissions(user.id);
+
+    return {
+      message: 'Permissions test successful',
+      userId: user.id,
+      userEmail: user.email,
+      hasPermissionsRead: permissions.includes('permissions:read'),
+      hasRolesRead: permissions.includes('roles:read'),
+      totalPermissions: permissions.length,
+      samplePermissions: permissions.slice(0, 10),
+    };
   }
 }

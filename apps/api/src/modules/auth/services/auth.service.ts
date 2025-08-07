@@ -83,13 +83,13 @@ export class AuthService {
 
     // Create default permissions and roles for the tenant if they don't exist
     await this.permissionService.createDefaultPermissions();
-    await this.roleService.createDefaultRoles(tenant.id);
+    await this.roleService.createDefaultRoles();
+
+    // Ensure Super Admin has all permissions
+    await this.roleService.updateSuperAdminPermissions();
 
     // Assign "Member" role to the new user
-    const memberRole = await this.roleService.getRoleByName(
-      'Member',
-      tenant.id
-    );
+    const memberRole = await this.roleService.getRoleByName('Member');
     if (memberRole) {
       await this.roleService.assignRoleToUser(user.id, {
         roleId: memberRole.id,

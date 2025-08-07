@@ -11,6 +11,8 @@ import {
   Request,
   HttpCode,
   HttpStatus,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -43,6 +45,7 @@ import {
   PermissionAction,
   PermissionScope,
 } from '../entities/permission.entity';
+import { PermissionQueryDto } from '../dto/permission-query.dto';
 
 @ApiTags('Permissions')
 @ApiBearerAuth()
@@ -96,16 +99,13 @@ export class PermissionController {
     description: 'Forbidden - insufficient permissions',
   })
   async getAllPermissions(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 50,
-    @Query('scope') scope?: PermissionScope,
-    @Query('resource') resource?: PermissionResource
+    @Query() query: PermissionQueryDto
   ): Promise<PermissionListResponseDto> {
     return this.permissionService.getAllPermissions(
-      page,
-      limit,
-      scope,
-      resource
+      query.page || 1,
+      query.limit || 50,
+      query.scope,
+      query.resource
     );
   }
 

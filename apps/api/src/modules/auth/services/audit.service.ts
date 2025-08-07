@@ -644,10 +644,14 @@ export class AuditService {
 
     const total = await queryBuilder.getCount();
 
+    // Apply safe pagination
+    const safeOffset = Math.max(0, filters.offset || 0);
+    const safeLimit = Math.min(Math.max(1, filters.limit || 50), 100);
+
     queryBuilder
       .orderBy('auditLog.createdAt', 'DESC')
-      .skip(filters.offset || 0)
-      .take(filters.limit || 50);
+      .skip(safeOffset)
+      .take(safeLimit);
 
     const logs = await queryBuilder.getMany();
 

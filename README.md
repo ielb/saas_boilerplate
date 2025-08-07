@@ -100,6 +100,7 @@ We provide convenient setup scripts to get you started quickly:
 
 # Start Adminer for database management
 ./scripts/start-adminer.sh
+# Access at: http://localhost:8081
 ```
 
 **Configuration:**
@@ -113,6 +114,11 @@ Edit `scripts/config.sh` to match your local API and database setup.
 - **Password**: `SuperAdmin123!`
 - **Permissions**: ALL permissions (full system access)
 - **Role**: SuperAdmin
+- **Features**:
+  - Automatically gets all available permissions
+  - Can manage all resources across all tenants
+  - Has global system administration capabilities
+  - Can update permissions dynamically
 
 #### 🟡 Admin (Level 2 - Administrative Access)
 
@@ -171,6 +177,52 @@ curl -X POST "http://localhost:3001/api/auth/login" \
 
 ⚠️ **Note**: These are test accounts. Change passwords in production!
 💡 **Tip**: Use these accounts to test different permission levels and RBAC functionality!
+
+### 🔐 Super Admin Permissions Management
+
+The Super Admin role automatically gets **ALL available permissions** in the system. This ensures complete system access for administration purposes.
+
+#### Automatic Permission Assignment
+
+- **On Registration**: When a new tenant is created, Super Admin automatically gets all permissions
+- **On Permission Creation**: New permissions are automatically assigned to Super Admin
+- **Dynamic Updates**: Super Admin permissions are updated when new features are added
+
+#### Manual Permission Management
+
+You can manually update Super Admin permissions using the provided script:
+
+```bash
+# Update Super Admin permissions
+./scripts/update-super-admin-permissions.sh
+```
+
+#### API Endpoints for Super Admin Management
+
+```bash
+# Update Super Admin permissions
+curl -X POST "http://localhost:3001/api/roles/super-admin/update-permissions"
+
+# Get Super Admin permissions
+curl -X GET "http://localhost:3001/api/roles/super-admin/permissions"
+
+# Create default roles (includes Super Admin)
+curl -X POST "http://localhost:3001/api/roles/default"
+```
+
+#### Super Admin Permissions Include
+
+- **User Management**: All CRUD operations on users
+- **Role Management**: All role and permission operations
+- **Tenant Management**: Full tenant administration
+- **System Settings**: Global system configuration
+- **Billing & Subscriptions**: Complete billing management
+- **File Management**: All file operations
+- **Analytics & Reports**: Full reporting access
+- **Audit Logs**: Complete audit trail access
+- **Feature Flags**: System feature management
+- **API Keys**: API key management
+- **Webhooks**: Webhook configuration
 
 See [scripts/README.md](scripts/README.md) for detailed documentation.
 

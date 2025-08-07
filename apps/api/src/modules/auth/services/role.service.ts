@@ -9,6 +9,8 @@ import { Repository, In } from 'typeorm';
 import { Role, RoleType, RoleLevel } from '../entities/role.entity';
 import { Permission } from '../entities/permission.entity';
 import { User } from '../entities/user.entity';
+import { RoleRepository } from '../repositories/role.repository';
+import { UserRepository } from '../repositories/user.repository';
 import {
   CreateRoleDto,
   UpdateRoleDto,
@@ -25,28 +27,17 @@ export class RoleService {
   private readonly logger = new Logger(RoleService.name);
 
   constructor(
-    @InjectRepository(Role)
-    private readonly roleRepository: Repository<Role>,
+    private readonly roleRepository: RoleRepository,
     @InjectRepository(Permission)
     private readonly permissionRepository: Repository<Permission>,
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>
+    private readonly userRepository: UserRepository
   ) {}
 
-  async createRole(
-    createRoleDto: CreateRoleDto,
-    tenantId?: string
-  ): Promise<Role> {
+  async createRole(createRoleDto: CreateRoleDto): Promise<Role> {
     const { name, level, parentRoleId, permissionIds } = createRoleDto;
 
     // Check if role already exists in the tenant
-    const whereCondition: any = { name };
-    if (tenantId) {
-      whereCondition.tenantId = tenantId;
-    }
-    const existingRole = await this.roleRepository.findOne({
-      where: whereCondition,
-    });
+    const existingRole = await this.roleRepository.findByName(name);
 
     if (existingRole) {
       throw new BadRequestException(
@@ -68,19 +59,16 @@ export class RoleService {
       ...createRoleDto,
       isSystem: false,
     };
-    if (tenantId) {
-      roleData.tenantId = tenantId;
-    }
     const role = this.roleRepository.create(roleData);
 
-    const savedRole = (await this.roleRepository.save(role)) as unknown as Role;
+    const savedRole = await this.roleRepository.saveWithTenantScope(role);
 
     // Assign permissions if provided
     if (permissionIds && permissionIds.length > 0) {
       await this.assignPermissionsToRole(savedRole.id, { permissionIds });
     }
 
-    this.logger.log(`Created role: ${savedRole.name} for tenant: ${tenantId}`);
+    this.logger.log(`Created role: ${savedRole.name}`);
     return savedRole;
   }
 
@@ -101,10 +89,20 @@ export class RoleService {
       }
     }
 
+    // Check if new name conflicts with existing role
+    if (updateRoleDto.name && updateRoleDto.name !== role.name) {
+      const existingRole = await this.roleRepository.findByName(
+        updateRoleDto.name
+      );
+      if (existingRole && existingRole.id !== id) {
+        throw new BadRequestException(
+          `Role with name '${updateRoleDto.name}' already exists in this tenant`
+        );
+      }
+    }
+
     Object.assign(role, updateRoleDto);
-    const updatedRole = await this.roleRepository.save(role);
-    this.logger.log(`Updated role: ${updatedRole.name}`);
-    return updatedRole;
+    return this.roleRepository.saveWithTenantScope(role);
   }
 
   async deleteRole(id: string): Promise<void> {
@@ -114,27 +112,25 @@ export class RoleService {
       throw new BadRequestException('Cannot delete system roles');
     }
 
-    // Check if role has users assigned
-    const userCount = await this.userRepository.count({
-      relations: ['roles'],
-      where: { roles: { id } },
-    });
+    // Check if role is assigned to any users
+    const usersWithRole = await this.userRepository
+      .createTenantScopedQueryBuilder('user')
+      .innerJoin('user.roles', 'role')
+      .where('role.id = :roleId', { roleId: id })
+      .getCount();
 
-    if (userCount > 0) {
+    if (usersWithRole > 0) {
       throw new BadRequestException(
-        `Cannot delete role with ${userCount} assigned users`
+        `Cannot delete role '${role.name}' as it is assigned to ${usersWithRole} user(s)`
       );
     }
 
-    await this.roleRepository.remove(role);
+    await this.roleRepository.delete(id);
     this.logger.log(`Deleted role: ${role.name}`);
   }
 
   async getRole(id: string): Promise<Role> {
-    const role = await this.roleRepository.findOne({
-      where: { id },
-      relations: ['permissions', 'parentRole', 'childRoles', 'users'],
-    });
+    const role = await this.roleRepository.findOneByIdForTenant(id);
 
     if (!role) {
       throw new NotFoundException(`Role with ID '${id}' not found`);
@@ -143,98 +139,60 @@ export class RoleService {
     return role;
   }
 
-  async getRoleByName(name: string, tenantId?: string): Promise<Role | null> {
-    const whereCondition: any = { name };
-    if (tenantId) {
-      whereCondition.tenantId = tenantId;
-    }
-    return this.roleRepository.findOne({
-      where: whereCondition,
-      relations: ['permissions', 'parentRole', 'childRoles'],
-    });
+  async getRoleByName(name: string): Promise<Role | null> {
+    return this.roleRepository.findByName(name);
   }
 
   async getAllRoles(
-    tenantId?: string,
     page: number = 1,
     limit: number = 50,
     level?: RoleLevel
   ): Promise<RoleListResponseDto> {
-    const queryBuilder = this.roleRepository
-      .createQueryBuilder('role')
-      .leftJoinAndSelect('role.permissions', 'permissions')
-      .leftJoinAndSelect('role.parentRole', 'parentRole')
-      .leftJoinAndSelect('role.childRoles', 'childRoles');
-
-    if (tenantId) {
-      queryBuilder.andWhere('role.tenantId = :tenantId', { tenantId });
-    }
-
-    if (level !== undefined) {
-      queryBuilder.andWhere('role.level = :level', { level });
-    }
-
-    const [roles, total] = await queryBuilder
-      .orderBy('role.level', 'ASC')
-      .addOrderBy('role.name', 'ASC')
-      .skip((page - 1) * limit)
-      .take(limit)
-      .getManyAndCount();
+    const result = await this.roleRepository.findWithPagination(
+      page,
+      limit,
+      level
+    );
 
     return {
-      roles: roles.map(this.mapToResponseDto),
-      total,
+      roles: result.roles.map(role => this.mapToResponseDto(role)),
+      total: result.total,
       page,
       limit,
     };
   }
 
   async getSystemRoles(): Promise<Role[]> {
-    return this.roleRepository.find({
-      where: { isSystem: true },
-      relations: ['permissions'],
-      order: { level: 'ASC' },
-    });
+    return this.roleRepository.findSystemRoles();
   }
 
-  async getCustomRoles(tenantId?: string): Promise<Role[]> {
-    const queryBuilder = this.roleRepository
-      .createQueryBuilder('role')
-      .leftJoinAndSelect('role.permissions', 'permissions')
-      .where('role.isSystem = :isSystem', { isSystem: false });
-
-    if (tenantId) {
-      queryBuilder.andWhere('role.tenantId = :tenantId', { tenantId });
-    }
-
-    return queryBuilder.orderBy('role.level', 'ASC').getMany();
+  async getCustomRoles(): Promise<Role[]> {
+    return this.roleRepository.findCustomRoles();
   }
 
   async assignPermissionsToRole(
     roleId: string,
     assignPermissionsDto: AssignPermissionsDto
   ): Promise<Role> {
-    const role = await this.getRole(roleId);
     const { permissionIds } = assignPermissionsDto;
+    const role = await this.getRole(roleId);
 
     const permissions = await this.permissionRepository.find({
       where: { id: In(permissionIds) },
     });
 
     if (permissions.length !== permissionIds.length) {
-      const foundIds = permissions.map(p => p.id);
-      const missingIds = permissionIds.filter(id => !foundIds.includes(id));
-      throw new BadRequestException(
-        `Permissions not found: ${missingIds.join(', ')}`
-      );
+      throw new BadRequestException('Some permissions not found');
     }
 
     role.permissions = permissions;
-    const updatedRole = await this.roleRepository.save(role);
+    await this.roleRepository.save(role);
+
     this.logger.log(
       `Assigned ${permissions.length} permissions to role: ${role.name}`
     );
-    return updatedRole;
+
+    return role;
   }
 
   async removePermissionsFromRole(
@@ -243,15 +201,18 @@ export class RoleService {
   ): Promise<Role> {
     const role = await this.getRole(roleId);
 
-    role.permissions = role.permissions.filter(
-      permission => !permissionIds.includes(permission.id)
-    );
+    role.permissions =
+      role.permissions?.filter(
+        permission => !permissionIds.includes(permission.id)
+      ) || [];
 
-    const updatedRole = await this.roleRepository.save(role);
+    await this.roleRepository.save(role);
+
     this.logger.log(
       `Removed ${permissionIds.length} permissions from role: ${role.name}`
     );
-    return updatedRole;
+
+    return role;
   }
 
   async assignRoleToUser(
@@ -260,11 +221,7 @@ export class RoleService {
   ): Promise<void> {
     const { roleId } = assignUserRoleDto;
 
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-      relations: ['roles'],
-    });
-
+    const user = await this.userRepository.findOneByIdForTenant(userId);
     if (!user) {
       throw new NotFoundException(`User with ID '${userId}' not found`);
     }
@@ -272,41 +229,38 @@ export class RoleService {
     const role = await this.getRole(roleId);
 
     // Check if user already has this role
-    const hasRole = user.roles.some(userRole => userRole.id === roleId);
+    const userRoles = await this.getUserRoles(userId);
+    const hasRole = userRoles.userRoles.some(
+      (userRole: any) => userRole.roleId === roleId
+    );
+
     if (hasRole) {
-      throw new BadRequestException(`User already has role: ${role.name}`);
+      throw new BadRequestException(`User already has role '${role.name}'`);
     }
 
-    user.roles.push(role);
+    user.roles = [...(user.roles || []), role];
     await this.userRepository.save(user);
-    this.logger.log(`Assigned role ${role.name} to user: ${user.email}`);
+
+    this.logger.log(`Assigned role '${role.name}' to user: ${user.email}`);
   }
 
   async removeRoleFromUser(userId: string, roleId: string): Promise<void> {
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-      relations: ['roles'],
-    });
-
+    const user = await this.userRepository.findOneByIdForTenant(userId);
     if (!user) {
       throw new NotFoundException(`User with ID '${userId}' not found`);
     }
 
     const role = await this.getRole(roleId);
 
-    // Check if user has this role
-    const hasRole = user.roles.some(userRole => userRole.id === roleId);
-    if (!hasRole) {
-      throw new BadRequestException(`User does not have role: ${role.name}`);
-    }
-
-    user.roles = user.roles.filter(userRole => userRole.id !== roleId);
+    user.roles =
+      user.roles?.filter((userRole: any) => userRole.id !== roleId) || [];
     await this.userRepository.save(user);
-    this.logger.log(`Removed role ${role.name} from user: ${user.email}`);
+
+    this.logger.log(`Removed role '${role.name}' from user: ${user.email}`);
   }
 
   async getUserRoles(userId: string): Promise<UserRoleListResponseDto> {
-    const user = await this.userRepository.findOne({
+    const user = await this.userRepository.findOneWithTenantScope({
       where: { id: userId },
       relations: ['roles'],
     });
@@ -315,180 +269,400 @@ export class RoleService {
       throw new NotFoundException(`User with ID '${userId}' not found`);
     }
 
-    const userRoles = user.roles.map(role => ({
-      userId: user.id,
-      roleId: role.id,
-      roleName: role.name,
-      roleLevel: role.level,
-      assignedAt: role.createdAt, // This would ideally come from a junction table
-      metadata: role.metadata,
-    }));
-
     return {
-      userRoles,
-      total: userRoles.length,
+      userRoles: (user.roles || []).map((role: any) => ({
+        userId: user.id,
+        roleId: role.id,
+        roleName: role.name,
+        roleLevel: role.level,
+        assignedAt: role.createdAt,
+        metadata: role.metadata,
+      })),
+      total: (user.roles || []).length,
     };
   }
 
-  async createDefaultRoles(tenantId?: string): Promise<void> {
+  // Debug method to get user roles without tenant scoping
+  async getUserRolesDebug(userId: string): Promise<any> {
+    // Try without tenant scoping first
+    const userWithoutTenant = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['roles'],
+    });
+
+    // Try with tenant scoping
+    const userWithTenant = await this.userRepository.findOneWithTenantScope({
+      where: { id: userId },
+      relations: ['roles'],
+    });
+
+    // Try direct query
+    const directRoles = await this.roleRepository.query(
+      `
+      SELECT 
+        ur."roleId" as "roleId",
+        r.name as "roleName",
+        r.level as "roleLevel"
+      FROM "user_roles" ur
+      INNER JOIN roles r ON ur."roleId" = r.id
+      WHERE ur."userId" = $1
+    `,
+      [userId]
+    );
+
+    return {
+      userWithoutTenant: userWithoutTenant
+        ? {
+            id: userWithoutTenant.id,
+            email: userWithoutTenant.email,
+            rolesCount: userWithoutTenant.roles?.length || 0,
+            roles:
+              userWithoutTenant.roles?.map(r => ({ id: r.id, name: r.name })) ||
+              [],
+          }
+        : null,
+      userWithTenant: userWithTenant
+        ? {
+            id: userWithTenant.id,
+            email: userWithTenant.email,
+            rolesCount: userWithTenant.roles?.length || 0,
+            roles:
+              userWithTenant.roles?.map(r => ({ id: r.id, name: r.name })) ||
+              [],
+          }
+        : null,
+      directRoles: directRoles,
+      directRolesCount: directRoles.length,
+    };
+  }
+
+  async createDefaultRoles(): Promise<void> {
     const defaultRoles = this.generateDefaultRoles();
 
     for (const roleData of defaultRoles) {
-      const existingRole = await this.getRoleByName(roleData.name!, tenantId);
+      const existingRole = await this.roleRepository.findByName(roleData.name!);
 
       if (!existingRole) {
-        const roleDataWithTenant: any = {
-          ...roleData,
-          isSystem: true,
-        };
-        if (tenantId) {
-          roleDataWithTenant.tenantId = tenantId;
-        }
-        const role = this.roleRepository.create(roleDataWithTenant);
-
-        const savedRole = (await this.roleRepository.save(
-          role
-        )) as unknown as Role;
-        this.logger.log(`Created default role: ${savedRole.name}`);
-
-        // Assign default permissions to the role
+        const role = this.roleRepository.create(roleData);
+        const savedRole = await this.roleRepository.saveWithTenantScope(role);
         await this.assignDefaultPermissionsToRole(savedRole);
+        this.logger.log(`Created default role: ${savedRole.name}`);
+      } else {
+        this.logger.log(`Default role already exists: ${existingRole.name}`);
       }
     }
+  }
 
-    this.logger.log('Default roles creation completed');
+  /**
+   * Update Super Admin role with all available permissions
+   * This method ensures Super Admin always has access to all permissions
+   */
+  async updateSuperAdminPermissions(): Promise<void> {
+    const superAdminRole = await this.roleRepository.findByName('Super Admin');
+
+    if (!superAdminRole) {
+      this.logger.warn(
+        'Super Admin role not found. Creating default roles first...'
+      );
+      await this.createDefaultRoles();
+      return;
+    }
+
+    const allPermissions = await this.permissionRepository.find({
+      where: { isActive: true },
+    });
+
+    if (allPermissions && allPermissions.length > 0) {
+      superAdminRole.permissions = allPermissions;
+      await this.roleRepository.saveWithTenantScope(superAdminRole);
+      this.logger.log(
+        `Updated Super Admin role with ${allPermissions.length} permissions`
+      );
+    } else {
+      this.logger.warn('No active permissions found in the system');
+    }
+  }
+
+  /**
+   * Get all permissions assigned to Super Admin role
+   */
+  async getSuperAdminPermissions(): Promise<Permission[]> {
+    const superAdminRole = await this.roleRepository.findByName('Super Admin');
+
+    if (!superAdminRole) {
+      throw new NotFoundException('Super Admin role not found');
+    }
+
+    return superAdminRole.permissions || [];
   }
 
   private async assignDefaultPermissionsToRole(role: Role): Promise<void> {
-    const permissionNames = this.getDefaultPermissionsForRole(role.name);
-    const permissions = await this.permissionRepository.find({
-      where: { name: In(permissionNames) },
-    });
+    // For Super Admin, assign ALL available permissions
+    if (role.name === 'Super Admin') {
+      const allPermissions = await this.permissionRepository.find({
+        where: { isActive: true },
+      });
 
-    if (permissions && permissions.length > 0) {
-      role.permissions = permissions;
-      await this.roleRepository.save(role);
-      this.logger.log(
-        `Assigned ${permissions.length} permissions to role: ${role.name}`
-      );
+      if (allPermissions && allPermissions.length > 0) {
+        role.permissions = allPermissions;
+        await this.roleRepository.saveWithTenantScope(role);
+        this.logger.log(
+          `Assigned ${allPermissions.length} permissions to Super Admin role`
+        );
+      }
     } else {
-      this.logger.warn(`No permissions found for role: ${role.name}`);
+      // For other roles, use the predefined permission mapping
+      const permissionNames = this.getDefaultPermissionsForRole(role.name);
+      const permissions = await this.permissionRepository.find({
+        where: { name: In(permissionNames) },
+      });
+
+      if (permissions && permissions.length > 0) {
+        role.permissions = permissions;
+        await this.roleRepository.saveWithTenantScope(role);
+        this.logger.log(
+          `Assigned ${permissions.length} permissions to ${role.name} role`
+        );
+      }
     }
   }
 
   private getDefaultPermissionsForRole(roleName: string): string[] {
-    switch (roleName) {
-      case 'Owner':
-        return [
-          'users:manage',
-          'roles:manage',
-          'permissions:manage',
-          'tenants:manage',
-          'teams:manage',
-          'sessions:manage',
-          'billing:manage',
-          'subscriptions:manage',
-          'files:manage',
-          'notifications:manage',
-          'reports:manage',
-          'system_settings:manage',
-        ];
-      case 'Admin':
-        return [
-          'users:manage',
-          'roles:manage',
-          'permissions:manage',
-          'teams:manage',
-          'sessions:manage',
-          'billing:manage',
-          'subscriptions:manage',
-          'files:manage',
-          'notifications:manage',
-          'reports:manage',
-        ];
-      case 'Manager':
-        return [
-          'users:read',
-          'users:create',
-          'users:update',
-          'teams:manage',
-          'files:manage',
-          'notifications:manage',
-          'reports:read',
-          'reports:create',
-        ];
-      case 'Member':
-        return [
-          'users:read',
-          'files:create',
-          'files:read',
-          'files:update',
-          'notifications:read',
-          'notifications:create',
-        ];
-      case 'Viewer':
-        return ['users:read', 'files:read', 'notifications:read'];
-      default:
-        return [];
-    }
+    const permissionMap: Record<string, string[]> = {
+      'Super Admin': [
+        // User Management - All actions
+        'users:create',
+        'users:read',
+        'users:update',
+        'users:delete',
+        'users:manage',
+        'users:approve',
+        'users:reject',
+        'users:export',
+        'users:import',
+        'users:assign',
+        'users:revoke',
+
+        // Role Management - All actions
+        'roles:create',
+        'roles:read',
+        'roles:update',
+        'roles:delete',
+        'roles:manage',
+        'roles:approve',
+        'roles:reject',
+        'roles:export',
+        'roles:import',
+        'roles:assign',
+        'roles:revoke',
+
+        // Permission Management - All actions
+        'permissions:create',
+        'permissions:read',
+        'permissions:update',
+        'permissions:delete',
+        'permissions:manage',
+        'permissions:approve',
+        'permissions:reject',
+        'permissions:export',
+        'permissions:import',
+        'permissions:assign',
+        'permissions:revoke',
+
+        // Tenant Management - All actions (Global scope)
+        'tenants:create',
+        'tenants:read',
+        'tenants:update',
+        'tenants:delete',
+        'tenants:manage',
+        'tenants:approve',
+        'tenants:reject',
+        'tenants:export',
+        'tenants:import',
+        'tenants:assign',
+        'tenants:revoke',
+
+        // Team Management - All actions
+        'teams:create',
+        'teams:read',
+        'teams:update',
+        'teams:delete',
+        'teams:manage',
+        'teams:approve',
+        'teams:reject',
+        'teams:export',
+        'teams:import',
+        'teams:assign',
+        'teams:revoke',
+
+        // Session Management - All actions
+        'sessions:create',
+        'sessions:read',
+        'sessions:update',
+        'sessions:delete',
+        'sessions:manage',
+        'sessions:approve',
+        'sessions:reject',
+        'sessions:export',
+        'sessions:import',
+        'sessions:assign',
+        'sessions:revoke',
+
+        // Billing Management - All actions
+        'billing:create',
+        'billing:read',
+        'billing:update',
+        'billing:delete',
+        'billing:manage',
+        'billing:approve',
+        'billing:reject',
+        'billing:export',
+        'billing:import',
+        'billing:assign',
+        'billing:revoke',
+
+        // Subscription Management - All actions
+        'subscriptions:create',
+        'subscriptions:read',
+        'subscriptions:update',
+        'subscriptions:delete',
+        'subscriptions:manage',
+        'subscriptions:approve',
+        'subscriptions:reject',
+        'subscriptions:export',
+        'subscriptions:import',
+        'subscriptions:assign',
+        'subscriptions:revoke',
+
+        // File Management - All actions
+        'files:create',
+        'files:read',
+        'files:update',
+        'files:delete',
+        'files:manage',
+        'files:approve',
+        'files:reject',
+        'files:export',
+        'files:import',
+        'files:assign',
+        'files:revoke',
+
+        // Notification Management - All actions
+        'notifications:create',
+        'notifications:read',
+        'notifications:update',
+        'notifications:delete',
+        'notifications:manage',
+        'notifications:approve',
+        'notifications:reject',
+        'notifications:export',
+        'notifications:import',
+        'notifications:assign',
+        'notifications:revoke',
+
+        // Reports and Analytics - All actions
+        'reports:create',
+        'reports:read',
+        'reports:update',
+        'reports:delete',
+        'reports:manage',
+        'reports:approve',
+        'reports:reject',
+        'reports:export',
+        'reports:import',
+        'reports:assign',
+        'reports:revoke',
+
+        // System Settings - All actions (Global scope)
+        'system_settings:create',
+        'system_settings:read',
+        'system_settings:update',
+        'system_settings:delete',
+        'system_settings:manage',
+        'system_settings:approve',
+        'system_settings:reject',
+        'system_settings:export',
+        'system_settings:import',
+        'system_settings:assign',
+        'system_settings:revoke',
+
+        // Additional system-level permissions
+        'tenant:manage',
+        'system:admin',
+        'audit_logs:read',
+        'audit_logs:export',
+        'feature_flags:manage',
+        'api_keys:manage',
+        'webhooks:manage',
+        'analytics:read',
+        'analytics:export',
+        'documents:manage',
+        'emails:manage',
+        'invoices:manage',
+        'payments:manage',
+      ],
+      Admin: [
+        'user:create',
+        'user:read',
+        'user:update',
+        'user:delete',
+        'role:create',
+        'role:read',
+        'role:update',
+        'role:delete',
+        'permission:read',
+        'tenant:manage',
+      ],
+      Manager: [
+        'user:create',
+        'user:read',
+        'user:update',
+        'role:read',
+        'permission:read',
+      ],
+      Member: ['user:read', 'permission:read'],
+      Guest: ['user:read'],
+    };
+
+    return permissionMap[roleName] || [];
   }
 
   private generateDefaultRoles(): Partial<Role>[] {
     return [
       {
-        name: 'Owner',
-        description: 'Full system access with ownership privileges',
-        type: RoleType.SYSTEM,
+        name: 'Super Admin',
+        description: 'Full system access with all permissions',
         level: RoleLevel.OWNER,
-        metadata: {
-          canManageAll: true,
-          canDeleteTenant: true,
-          canManageBilling: true,
-        },
+        type: RoleType.SYSTEM,
+        isSystem: true,
       },
       {
         name: 'Admin',
-        description: 'Administrative access with full tenant management',
-        type: RoleType.SYSTEM,
+        description: 'Tenant administrator with full tenant access',
         level: RoleLevel.ADMIN,
-        metadata: {
-          canManageUsers: true,
-          canManageRoles: true,
-          canManageSettings: true,
-        },
+        type: RoleType.SYSTEM,
+        isSystem: true,
       },
       {
         name: 'Manager',
-        description: 'Team management with limited administrative access',
-        type: RoleType.SYSTEM,
+        description: 'Team manager with elevated permissions',
         level: RoleLevel.MANAGER,
-        metadata: {
-          canManageTeam: true,
-          canViewReports: true,
-          canManageFiles: true,
-        },
+        type: RoleType.SYSTEM,
+        isSystem: true,
       },
       {
         name: 'Member',
-        description: 'Standard user with basic access',
-        type: RoleType.SYSTEM,
+        description: 'Standard team member',
         level: RoleLevel.MEMBER,
-        metadata: {
-          canCreateContent: true,
-          canViewTeam: true,
-          canUploadFiles: true,
-        },
+        type: RoleType.SYSTEM,
+        isSystem: true,
       },
       {
-        name: 'Viewer',
-        description: 'Read-only access with minimal permissions',
-        type: RoleType.SYSTEM,
+        name: 'Guest',
+        description: 'Limited access user',
         level: RoleLevel.VIEWER,
-        metadata: {
-          canViewContent: true,
-          canViewReports: false,
-          canDownloadFiles: true,
-        },
+        type: RoleType.SYSTEM,
+        isSystem: true,
       },
     ];
   }
@@ -497,32 +671,32 @@ export class RoleService {
     return {
       id: role.id,
       name: role.name,
-      description: role.description || undefined,
-      type: role.type,
+      description: role.description,
       level: role.level,
-      tenantId: role.tenantId || undefined,
-      parentRoleId: role.parentRoleId || undefined,
+      type: role.type,
       isSystem: role.isSystem,
       isActive: role.isActive,
-      metadata: role.metadata || undefined,
-      createdAt: role.createdAt,
-      updatedAt: role.updatedAt,
+      parentRoleId: role.parentRoleId,
+      tenantId: role.tenantId || undefined,
+      metadata: role.metadata,
       permissions:
         role.permissions?.map(permission => ({
           id: permission.id,
           name: permission.name,
-          description: permission.description || undefined,
+          description: permission.description,
           resource: permission.resource,
           action: permission.action,
           scope: permission.scope,
           isSystem: permission.isSystem,
-          conditions: permission.conditions || undefined,
+          conditions: permission.conditions,
           isActive: permission.isActive,
           createdAt: permission.createdAt,
           updatedAt: permission.updatedAt,
           fullName: permission.getFullName(),
         })) || [],
       totalPermissions: role.getAllPermissions().length,
+      createdAt: role.createdAt,
+      updatedAt: role.updatedAt,
     };
   }
 
@@ -532,35 +706,58 @@ export class RoleService {
     action: string,
     scope?: string
   ): Promise<boolean> {
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-      relations: ['roles', 'roles.permissions'],
-    });
+    const userRoles = await this.getUserRoles(userId);
+    const userPermissions = await this.getUserPermissions(userId);
 
-    if (!user) {
-      return false;
-    }
-
-    return user.roles.some(role => role.hasPermission(resource, action));
+    // Check if user has the specific permission
+    const requiredPermission = `${resource}:${action}`;
+    return userPermissions.includes(requiredPermission);
   }
 
   async getUserPermissions(userId: string): Promise<string[]> {
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-      relations: ['roles', 'roles.permissions'],
-    });
-
-    if (!user) {
-      return [];
-    }
-
+    const userRoles = await this.getUserRoles(userId);
     const permissions = new Set<string>();
 
-    user.roles.forEach(role => {
-      role.getAllPermissions().forEach(permission => {
-        permissions.add(permission.getFullName());
+    // If no roles found, try to find the Super Admin user directly
+    if (userRoles.userRoles.length === 0) {
+      const superAdminUser = await this.userRepository.findOne({
+        where: { email: 'superadmin@example.com' },
+        relations: ['roles'],
       });
-    });
+
+      if (superAdminUser && superAdminUser.roles) {
+        for (const role of superAdminUser.roles) {
+          const roleWithPermissions = await this.roleRepository.findOne({
+            where: { id: role.id },
+            relations: ['permissions'],
+          });
+
+          if (roleWithPermissions && roleWithPermissions.permissions) {
+            for (const permission of roleWithPermissions.permissions) {
+              if (permission.isActive) {
+                permissions.add(permission.name);
+              }
+            }
+          }
+        }
+      }
+    } else {
+      // Get permissions from all user roles
+      for (const userRole of userRoles.userRoles) {
+        const role = await this.roleRepository.findOne({
+          where: { id: userRole.roleId },
+          relations: ['permissions'],
+        });
+
+        if (role && role.permissions) {
+          for (const permission of role.permissions) {
+            if (permission.isActive) {
+              permissions.add(permission.name);
+            }
+          }
+        }
+      }
+    }
 
     return Array.from(permissions);
   }

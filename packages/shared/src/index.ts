@@ -6,3 +6,4 @@ export * from './types/common.types';
 
 // Utils
 export * from './utils/validation.utils';
+export * from './utils/pagination.utils';

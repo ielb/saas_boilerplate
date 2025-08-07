@@ -125,17 +125,22 @@ export class PermissionService {
       queryBuilder.andWhere('permission.resource = :resource', { resource });
     }
 
+    // Apply safe pagination
+    const safeLimit = Math.min(Math.max(1, limit), 100);
+    const safePage = Math.max(1, page);
+    const offset = (safePage - 1) * safeLimit;
+
     const [permissions, total] = await queryBuilder
       .orderBy('permission.name', 'ASC')
-      .skip((page - 1) * limit)
-      .take(limit)
+      .skip(offset)
+      .take(safeLimit)
       .getManyAndCount();
 
     return {
       permissions: permissions.map(this.mapToResponseDto),
       total,
-      page,
-      limit,
+      page: safePage,
+      limit: safeLimit,
     };
   }
 

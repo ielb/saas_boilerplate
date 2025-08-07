@@ -25,6 +25,13 @@ import { AuthGuard } from './guards/auth.guard';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PermissionCheckerService } from '../../common/services/permission-checker.service';
 import {
+  UserRepository,
+  RoleRepository,
+  AuditLogRepository,
+  TenantUsageRepository,
+  TenantFeatureFlagRepository,
+} from './repositories';
+import {
   User,
   Tenant,
   RefreshToken,
@@ -33,6 +40,8 @@ import {
   Role,
   AccountRecovery,
   AuditLog,
+  TenantUsage,
+  TenantFeatureFlag,
 } from './entities';
 import { env } from '@app/config';
 
@@ -47,6 +56,8 @@ import { env } from '@app/config';
       Role,
       AccountRecovery,
       AuditLog,
+      TenantUsage,
+      TenantFeatureFlag,
     ]),
     JwtModule.register({
       secret: env.JWT_SECRET,
@@ -82,6 +93,12 @@ import { env } from '@app/config';
     AuthGuard,
     JwtStrategy,
     PermissionCheckerService,
+    // Tenant-scoped repositories
+    UserRepository,
+    RoleRepository,
+    AuditLogRepository,
+    TenantUsageRepository,
+    TenantFeatureFlagRepository,
   ],
   exports: [
     AuthService,
@@ -99,6 +116,12 @@ import { env } from '@app/config';
     PermissionsGuard,
     AuthGuard,
     PermissionCheckerService,
+    // Export tenant-scoped repositories
+    UserRepository,
+    RoleRepository,
+    AuditLogRepository,
+    TenantUsageRepository,
+    TenantFeatureFlagRepository,
   ],
 })
 export class AuthModule {}
