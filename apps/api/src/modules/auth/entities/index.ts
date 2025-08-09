@@ -8,3 +8,4 @@ export * from './account-recovery.entity';
 export * from './audit-log.entity';
 export * from './tenant-usage.entity';
 export * from './tenant-feature-flag.entity';
+export * from './tenant-onboarding.entity';

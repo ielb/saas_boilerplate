@@ -69,6 +69,21 @@
       "key": "parentRoleId",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "onboardingId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "verificationToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminUserId",
+      "value": "",
+      "type": "string"
     }
   ],
   "auth": {
@@ -2500,6 +2515,428 @@
             }
           },
           "response": []
+        }
+      ]
+    },
+    {
+      "name": "Tenant Onboarding",
+      "item": [
+        {
+          "name": "Start Onboarding",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has onboarding data', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('onboardingId');",
+                  "    pm.expect(response).to.have.property('status');",
+                  "    pm.expect(response).to.have.property('currentStep');",
+                  "    pm.expect(response).to.have.property('progressPercentage');",
+                  "    pm.expect(response).to.have.property('nextAction');",
+                  "    pm.expect(response).to.have.property('estimatedCompletion');",
+                  "});",
+                  "",
+                  "pm.test('Onboarding is in progress', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.status).to.equal('in_progress');",
+                  "    pm.expect(response.progressPercentage).to.be.at.least(0);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('onboardingId', response.onboardingId);",
+                  "    if (response.tenantId) {",
+                  "        pm.collectionVariables.set('tenantId', response.tenantId);",
+                  "    }",
+                  "    if (response.adminUserId) {",
+                  "        pm.collectionVariables.set('adminUserId', response.adminUserId);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Acme Corporation\",\n  \"domain\": \"acme.example.com\",\n  \"adminUser\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"email\": \"admin@acme.com\",\n    \"password\": \"SecurePass123!\",\n    \"phone\": \"+1-555-123-4567\",\n    \"jobTitle\": \"CEO\"\n  },\n  \"description\": \"A leading technology company\",\n  \"industry\": \"Technology\",\n  \"companySize\": \"50-100\",\n  \"contactEmail\": \"contact@acme.com\",\n  \"contactPhone\": \"+1-555-123-4567\",\n  \"address\": \"123 Main Street\",\n  \"city\": \"San Francisco\",\n  \"state\": \"CA\",\n  \"postalCode\": \"94105\",\n  \"country\": \"United States\",\n  \"timezone\": \"America/Los_Angeles\",\n  \"locale\": \"en-US\",\n  \"currency\": \"USD\",\n  \"plan\": \"pro\",\n  \"requestedFeatures\": [\"advanced_analytics\", \"email_templates\"],\n  \"sendWelcomeEmail\": true,\n  \"autoVerify\": false,\n  \"trialDays\": 30,\n  \"metadata\": {\n    \"source\": \"website\",\n    \"campaign\": \"summer2024\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tenants/onboarding",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "onboarding"]
+            }
+          }
+        },
+        {
+          "name": "Get Onboarding Progress",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has progress data', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('onboardingId');",
+                  "    pm.expect(response).to.have.property('currentStep');",
+                  "    pm.expect(response).to.have.property('status');",
+                  "    pm.expect(response).to.have.property('completedSteps');",
+                  "    pm.expect(response).to.have.property('progressPercentage');",
+                  "});",
+                  "",
+                  "pm.test('Progress data is valid', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.progressPercentage).to.be.at.least(0).and.at.most(100);",
+                  "    pm.expect(response.completedSteps).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tenants/onboarding/{{onboardingId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "onboarding", "{{onboardingId}}"]
+            }
+          }
+        },
+        {
+          "name": "Verify Onboarding Email",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Onboarding verified successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('onboardingId');",
+                  "    pm.expect(response).to.have.property('status');",
+                  "    pm.expect(response.status).to.equal('completed');",
+                  "});",
+                  "",
+                  "pm.test('Progress is 100%', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.progressPercentage).to.equal(100);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"onboardingId\": \"{{onboardingId}}\",\n  \"verificationToken\": \"{{verificationToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tenants/onboarding/{{onboardingId}}/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "onboarding", "{{onboardingId}}", "verify"]
+            }
+          }
+        },
+        {
+          "name": "Resend Verification Email",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Verification email sent', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "    pm.expect(response.message).to.include('sent successfully');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"onboardingId\": \"{{onboardingId}}\",\n  \"email\": \"admin@acme.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tenants/onboarding/{{onboardingId}}/resend-verification",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "tenants",
+                "onboarding",
+                "{{onboardingId}}",
+                "resend-verification"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Cancel Onboarding",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Onboarding cancelled', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "    pm.expect(response.message).to.include('cancelled successfully');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"onboardingId\": \"{{onboardingId}}\",\n  \"reason\": \"User decided not to proceed\",\n  \"cleanup\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tenants/onboarding/{{onboardingId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "onboarding", "{{onboardingId}}"]
+            }
+          }
+        },
+        {
+          "name": "Check Onboarding Health",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Health check data is valid', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('status');",
+                  "    pm.expect(response).to.have.property('onboardingId');",
+                  "    pm.expect(response).to.have.property('currentStep');",
+                  "    pm.expect(response).to.have.property('issues');",
+                  "    pm.expect(response).to.have.property('lastActivity');",
+                  "});",
+                  "",
+                  "pm.test('Status is valid', function () {",
+                  "    const response = pm.response.json();",
+                  "    const validStatuses = ['healthy', 'warning', 'error'];",
+                  "    pm.expect(validStatuses).to.include(response.status);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tenants/onboarding/{{onboardingId}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "onboarding", "{{onboardingId}}", "health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Error Scenarios",
+      "item": [
+        {
+          "name": "Start Onboarding - Invalid Data",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Error response has message', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\",\n  \"adminUser\": {\n    \"firstName\": \"\",\n    \"lastName\": \"\",\n    \"email\": \"invalid-email\",\n    \"password\": \"weak\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tenants/onboarding",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "onboarding"]
+            }
+          }
+        },
+        {
+          "name": "Start Onboarding - Duplicate Tenant Name",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 409', function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "",
+                  "pm.test('Conflict error message', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "    pm.expect(response.message).to.include('already exists');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Acme Corporation\",\n  \"adminUser\": {\n    \"firstName\": \"Jane\",\n    \"lastName\": \"Smith\",\n    \"email\": \"jane@acme.com\",\n    \"password\": \"SecurePass123!\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tenants/onboarding",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "onboarding"]
+            }
+          }
+        },
+        {
+          "name": "Verify Onboarding - Invalid Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Invalid token error', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "    pm.expect(response.message).to.include('Invalid verification token');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"onboardingId\": \"{{onboardingId}}\",\n  \"verificationToken\": \"invalid-token\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tenants/onboarding/{{onboardingId}}/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "onboarding", "{{onboardingId}}", "verify"]
+            }
+          }
+        },
+        {
+          "name": "Get Progress - Not Found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Not found error', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "    pm.expect(response.message).to.include('not found');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tenants/onboarding/invalid-uuid",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "onboarding", "invalid-uuid"]
+            }
+          }
         }
       ]
     },
