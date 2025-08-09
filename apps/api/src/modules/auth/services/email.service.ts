@@ -179,8 +179,15 @@ export class EmailService {
       await this.transporter.sendMail(mailOptions);
     } catch (error) {
       console.error('Failed to send email:', error);
-      // In production, you might want to log this to a monitoring service
-      // or queue it for retry
+      console.error('Email data:', data);
+      console.error('SMTP config:', {
+        host: process.env.SMTP_HOST || 'localhost',
+        port: process.env.SMTP_PORT || '1025',
+        secure: process.env.SMTP_SECURE === 'true',
+        from: process.env.FROM_EMAIL || 'noreply@saas-boilerplate.com',
+      });
+      // Re-throw the error so it's not silently ignored
+      throw error;
     }
   }
 
@@ -199,7 +206,9 @@ export class EmailService {
       | 'password-reset'
       | 'welcome'
       | 'account-recovery'
-      | 'account-recovery-completed';
+      | 'account-recovery-completed'
+      | 'tenant-onboarding-verification'
+      | 'tenant-onboarding-welcome';
 
     const templates: Record<TemplateType, { html: string; text: string }> = {
       'email-verification': {
@@ -321,6 +330,72 @@ export class EmailService {
           If you didn't complete this recovery, please contact our support team immediately.
         `,
       },
+      'tenant-onboarding-verification': {
+        html: `
+          <h1>Verify Your Tenant Registration</h1>
+          <p>Hello {{name}},</p>
+          <p>Thank you for starting the registration process for <strong>{{tenantName}}</strong>!</p>
+          <p>To complete your tenant setup, please click the verification link below:</p>
+          <a href="{{verificationUrl}}" style="display: inline-block; padding: 12px 24px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px;">Verify Tenant Registration</a>
+          <p>This verification link will expire in 24 hours.</p>
+          <p>If you didn't request this tenant registration, you can safely ignore this email.</p>
+          <p>If you have any questions, feel free to contact our support team.</p>
+        `,
+        text: `
+          Verify Your Tenant Registration
+          
+          Hello {{name}},
+          
+          Thank you for starting the registration process for {{tenantName}}!
+          
+          To complete your tenant setup, please click the verification link below:
+          {{verificationUrl}}
+          
+          This verification link will expire in 24 hours.
+          
+          If you didn't request this tenant registration, you can safely ignore this email.
+          
+          If you have any questions, feel free to contact our support team.
+        `,
+      },
+      'tenant-onboarding-welcome': {
+        html: `
+          <h1>Welcome to {{tenantName}}!</h1>
+          <p>Hello {{name}},</p>
+          <p>Congratulations! Your tenant <strong>{{tenantName}}</strong> has been successfully set up and is ready to use.</p>
+          <p>Here's what you can do next:</p>
+          <ul>
+            <li>Log in to your admin dashboard</li>
+            <li>Invite team members to join your organization</li>
+            <li>Configure your tenant settings and branding</li>
+            <li>Explore the available features</li>
+          </ul>
+          <p>You can access your tenant dashboard here:</p>
+          <a href="{{loginUrl}}" style="display: inline-block; padding: 12px 24px; background-color: #28a745; color: white; text-decoration: none; border-radius: 4px;">Access Your Dashboard</a>
+          <p>If you need help getting started, check out our documentation or contact our support team.</p>
+          <p>Welcome aboard!</p>
+        `,
+        text: `
+          Welcome to {{tenantName}}!
+          
+          Hello {{name}},
+          
+          Congratulations! Your tenant {{tenantName}} has been successfully set up and is ready to use.
+          
+          Here's what you can do next:
+          - Log in to your admin dashboard
+          - Invite team members to join your organization
+          - Configure your tenant settings and branding
+          - Explore the available features
+          
+          You can access your tenant dashboard here:
+          {{loginUrl}}
+          
+          If you need help getting started, check out our documentation or contact our support team.
+          
+          Welcome aboard!
+        `,
+      },
     };
 
     const template = templates[templateName as TemplateType];
@@ -387,6 +462,54 @@ export class EmailService {
       template: 'account-recovery-completed',
       context: {
         name: firstName,
+        loginUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login`,
+      },
+    };
+
+    await this.sendEmail(emailData);
+  }
+
+  /**
+   * Send tenant onboarding verification email
+   */
+  async sendTenantOnboardingVerificationEmail(
+    email: string,
+    firstName: string,
+    tenantName: string,
+    verificationToken: string,
+    onboardingId: string
+  ): Promise<void> {
+    const emailData = {
+      to: email,
+      subject: `Verify Your Registration for ${tenantName}`,
+      template: 'tenant-onboarding-verification',
+      context: {
+        name: firstName,
+        tenantName,
+        verificationToken,
+        onboardingId,
+        verificationUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/onboarding/verify?token=${verificationToken}&id=${onboardingId}`,
+      },
+    };
+
+    await this.sendEmail(emailData);
+  }
+
+  /**
+   * Send tenant onboarding welcome email
+   */
+  async sendTenantOnboardingWelcomeEmail(
+    email: string,
+    firstName: string,
+    tenantName: string
+  ): Promise<void> {
+    const emailData = {
+      to: email,
+      subject: `Welcome to ${tenantName}!`,
+      template: 'tenant-onboarding-welcome',
+      context: {
+        name: firstName,
+        tenantName,
         loginUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login`,
       },
     };
