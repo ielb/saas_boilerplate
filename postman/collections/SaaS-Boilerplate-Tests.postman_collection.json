@@ -26,6 +26,14 @@
       "value": ""
     },
     {
+      "key": "targetTenantId",
+      "value": ""
+    },
+    {
+      "key": "membershipId",
+      "value": ""
+    },
+    {
       "key": "sessionId",
       "value": ""
     },
@@ -3467,6 +3475,548 @@
             }
           },
           "response": []
+        }
+      ]
+    },
+    {
+      "name": "Test Suite - Tenant Switching",
+      "item": [
+        {
+          "name": "Test: Get User Tenant Memberships",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response structure is correct', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('memberships');",
+                  "    pm.expect(response).to.have.property('currentTenantId');",
+                  "    pm.expect(response).to.have.property('totalCount');",
+                  "    pm.expect(response).to.have.property('activeCount');",
+                  "    pm.expect(response).to.have.property('pendingCount');",
+                  "});",
+                  "",
+                  "pm.test('User has at least one membership', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.memberships).to.be.an('array');",
+                  "    pm.expect(response.memberships.length).to.be.at.least(1);",
+                  "    pm.expect(response.totalCount).to.be.at.least(1);",
+                  "    pm.expect(response.activeCount).to.be.at.least(1);",
+                  "});",
+                  "",
+                  "pm.test('Membership data structure is valid', function () {",
+                  "    const response = pm.response.json();",
+                  "    const membership = response.memberships[0];",
+                  "    ",
+                  "    pm.expect(membership).to.have.property('id');",
+                  "    pm.expect(membership).to.have.property('tenant');",
+                  "    pm.expect(membership).to.have.property('role');",
+                  "    pm.expect(membership).to.have.property('status');",
+                  "    pm.expect(membership).to.have.property('isCurrentTenant');",
+                  "    pm.expect(membership).to.have.property('isActive');",
+                  "    pm.expect(membership).to.have.property('joinedAt');",
+                  "    pm.expect(membership).to.have.property('permissions');",
+                  "    ",
+                  "    // Tenant structure",
+                  "    pm.expect(membership.tenant).to.have.property('id');",
+                  "    pm.expect(membership.tenant).to.have.property('name');",
+                  "    pm.expect(membership.tenant).to.have.property('plan');",
+                  "    pm.expect(membership.tenant).to.have.property('features');",
+                  "    pm.expect(membership.tenant.features).to.be.an('array');",
+                  "    ",
+                  "    // Permissions structure",
+                  "    pm.expect(membership.permissions).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Current tenant is correctly identified', function () {",
+                  "    const response = pm.response.json();",
+                  "    const currentMembership = response.memberships.find(m => m.isCurrentTenant);",
+                  "    pm.expect(currentMembership).to.not.be.undefined;",
+                  "    pm.expect(currentMembership.tenant.id).to.equal(response.currentTenantId);",
+                  "});",
+                  "",
+                  "// Store data for subsequent tests",
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('membershipId', response.memberships[0].id);",
+                  "    ",
+                  "    // If there's more than one membership, store a target for switching",
+                  "    if (response.memberships.length > 1) {",
+                  "        const targetMembership = response.memberships.find(m => !m.isCurrentTenant);",
+                  "        if (targetMembership) {",
+                  "            pm.environment.set('targetTenantId', targetMembership.tenant.id);",
+                  "        }",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tenants/user/memberships",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "user", "memberships"]
+            }
+          }
+        },
+        {
+          "name": "Test: Get Current Tenant Context",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response structure is correct', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('success');",
+                  "    pm.expect(response).to.have.property('tenantContext');",
+                  "    pm.expect(response).to.have.property('membership');",
+                  "    pm.expect(response.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Tenant context is valid', function () {",
+                  "    const response = pm.response.json();",
+                  "    const context = response.tenantContext;",
+                  "    ",
+                  "    pm.expect(context).to.have.property('id');",
+                  "    pm.expect(context).to.have.property('name');",
+                  "    pm.expect(context).to.have.property('plan');",
+                  "    pm.expect(context).to.have.property('features');",
+                  "    pm.expect(context).to.have.property('settings');",
+                  "    pm.expect(context.features).to.be.an('array');",
+                  "    pm.expect(context.settings).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test('Membership context is valid', function () {",
+                  "    const response = pm.response.json();",
+                  "    const membership = response.membership;",
+                  "    ",
+                  "    pm.expect(membership).to.have.property('id');",
+                  "    pm.expect(membership).to.have.property('role');",
+                  "    pm.expect(membership).to.have.property('status');",
+                  "    pm.expect(membership).to.have.property('permissions');",
+                  "    pm.expect(membership).to.have.property('joinedAt');",
+                  "    pm.expect(membership.permissions).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tenants/current",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "current"]
+            }
+          }
+        },
+        {
+          "name": "Test: Verify Tenant Access - Valid",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Access granted for current tenant', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('hasAccess');",
+                  "    pm.expect(response.hasAccess).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Response contains access details', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('role');",
+                  "    pm.expect(response).to.have.property('status');",
+                  "    pm.expect(response).to.have.property('permissions');",
+                  "    pm.expect(response).to.have.property('tenant');",
+                  "    pm.expect(response.permissions).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Permission checks work correctly', function () {",
+                  "    const response = pm.response.json();",
+                  "    if (response.permissionChecks) {",
+                  "        pm.expect(response.permissionChecks).to.be.an('object');",
+                  "        Object.values(response.permissionChecks).forEach(check => {",
+                  "            pm.expect(check).to.be.a('boolean');",
+                  "        });",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"permissions\": [\"users:read\", \"projects:read\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tenants/{{tenantId}}/verify-access",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "{{tenantId}}", "verify-access"]
+            }
+          }
+        },
+        {
+          "name": "Test: Verify Tenant Access - Invalid Tenant",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Access denied for invalid tenant', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('hasAccess');",
+                  "    pm.expect(response.hasAccess).to.be.false;",
+                  "});",
+                  "",
+                  "pm.test('Denial reason provided', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('reason');",
+                  "    pm.expect(response.reason).to.be.a('string');",
+                  "    pm.expect(response.reason).to.not.be.empty;",
+                  "});",
+                  "",
+                  "pm.test('Empty permissions array for denied access', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('permissions');",
+                  "    pm.expect(response.permissions).to.be.an('array');",
+                  "    pm.expect(response.permissions).to.be.empty;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"permissions\": [\"users:read\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tenants/invalid-tenant-id/verify-access",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "invalid-tenant-id", "verify-access"]
+            }
+          }
+        },
+        {
+          "name": "Test: Bulk Verify Tenant Access",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response structure is correct', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('results');",
+                  "    pm.expect(response).to.have.property('summary');",
+                  "    pm.expect(response.results).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test('Summary data is accurate', function () {",
+                  "    const response = pm.response.json();",
+                  "    const summary = response.summary;",
+                  "    ",
+                  "    pm.expect(summary).to.have.property('totalChecked');",
+                  "    pm.expect(summary).to.have.property('accessGranted');",
+                  "    pm.expect(summary).to.have.property('accessDenied');",
+                  "    ",
+                  "    pm.expect(summary.totalChecked).to.equal(summary.accessGranted + summary.accessDenied);",
+                  "    pm.expect(summary.totalChecked).to.be.at.least(2);",
+                  "});",
+                  "",
+                  "pm.test('Individual results are valid', function () {",
+                  "    const response = pm.response.json();",
+                  "    const results = response.results;",
+                  "    ",
+                  "    Object.keys(results).forEach(tenantId => {",
+                  "        const result = results[tenantId];",
+                  "        pm.expect(result).to.have.property('hasAccess');",
+                  "        pm.expect(result).to.have.property('permissions');",
+                  "        pm.expect(result.hasAccess).to.be.a('boolean');",
+                  "        pm.expect(result.permissions).to.be.an('array');",
+                  "        ",
+                  "        if (!result.hasAccess) {",
+                  "            pm.expect(result).to.have.property('reason');",
+                  "        }",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test('At least one access granted', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.summary.accessGranted).to.be.at.least(1);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tenantIds\": [\"{{tenantId}}\", \"invalid-tenant-id\"],\n  \"permissions\": [\"users:read\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tenants/verify-access/bulk",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "verify-access", "bulk"]
+            }
+          }
+        },
+        {
+          "name": "Test: Clear User Cache",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Cache cleared successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('success');",
+                  "    pm.expect(response).to.have.property('message');",
+                  "    pm.expect(response.success).to.be.true;",
+                  "    pm.expect(response.message).to.include('cache cleared');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tenants/cache/clear",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "cache", "clear"]
+            }
+          }
+        },
+        {
+          "name": "Test: Tenant Switching Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Health check response is valid', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('status');",
+                  "    pm.expect(response).to.have.property('service');",
+                  "    pm.expect(response).to.have.property('timestamp');",
+                  "    pm.expect(response).to.have.property('version');",
+                  "    pm.expect(response.status).to.equal('ok');",
+                  "    pm.expect(response.service).to.equal('tenant-switching');",
+                  "    pm.expect(response.version).to.equal('1.0.0');",
+                  "});",
+                  "",
+                  "pm.test('Timestamp is recent', function () {",
+                  "    const response = pm.response.json();",
+                  "    const timestamp = new Date(response.timestamp);",
+                  "    const now = new Date();",
+                  "    const diff = now.getTime() - timestamp.getTime();",
+                  "    pm.expect(diff).to.be.below(5000); // Within 5 seconds",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tenants/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "health"]
+            }
+          }
+        },
+        {
+          "name": "Test: Response Time - Get Memberships",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response time is acceptable', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(500);",
+                  "});",
+                  "",
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tenants/user/memberships",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "user", "memberships"]
+            }
+          }
+        },
+        {
+          "name": "Test: Unauthorized Access",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 401', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Error response has message', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "    pm.expect(response.message).to.be.a('string');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tenants/user/memberships",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "user", "memberships"]
+            }
+          }
+        },
+        {
+          "name": "Test: Invalid Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 401', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Error response has message', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer invalid-token-here"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tenants/user/memberships",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "user", "memberships"]
+            }
+          }
         }
       ]
     }

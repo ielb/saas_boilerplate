@@ -9,6 +9,8 @@ import {
   JoinTable,
 } from 'typeorm';
 
+import { UserTenantMembership } from './user-tenant-membership.entity';
+
 export enum PermissionScope {
   GLOBAL = 'global',
   TENANT = 'tenant',
@@ -110,6 +112,9 @@ export class Permission {
     inverseJoinColumn: { name: 'roleId', referencedColumnName: 'id' },
   })
   roles!: any[];
+
+  @ManyToMany(() => UserTenantMembership, membership => membership.permissions)
+  userMemberships!: UserTenantMembership[];
 
   getFullName(): string {
     return `${this.resource}:${this.action}`;

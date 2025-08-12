@@ -56,6 +56,16 @@ export enum AuditEventType {
   TENANT_RESTORED = 'tenant_restored',
   TENANT_VERIFIED = 'tenant_verified',
   FEATURE_FLAG_UPDATED = 'feature_flag_updated',
+
+  // Tenant Switching Events
+  TENANT_SWITCHED = 'tenant_switched',
+  TENANT_ACCESS_VERIFIED = 'tenant_access_verified',
+  TENANT_ACCESS_DENIED = 'tenant_access_denied',
+  TENANT_MEMBERSHIP_CREATED = 'tenant_membership_created',
+  TENANT_MEMBERSHIP_UPDATED = 'tenant_membership_updated',
+  TENANT_MEMBERSHIP_DELETED = 'tenant_membership_deleted',
+  TENANT_MEMBERSHIP_SUSPENDED = 'tenant_membership_suspended',
+  TENANT_MEMBERSHIP_ACTIVATED = 'tenant_membership_activated',
 }
 
 export enum AuditEventStatus {

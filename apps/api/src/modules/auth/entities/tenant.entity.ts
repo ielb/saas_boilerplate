@@ -17,6 +17,7 @@ import {
 } from 'class-validator';
 
 import { User } from './user.entity';
+import { UserTenantMembership } from './user-tenant-membership.entity';
 
 @Entity('tenants')
 @Index(['name'], { unique: true })
@@ -159,6 +160,9 @@ export class Tenant {
   // Relations
   @OneToMany(() => User, user => user.tenant)
   users?: User[];
+
+  @OneToMany(() => UserTenantMembership, membership => membership.tenant)
+  userMemberships?: UserTenantMembership[];
 
   /**
    * Check if tenant is in trial

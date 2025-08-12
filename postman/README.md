@@ -56,6 +56,7 @@ postman/
 - 🔐 Authentication
 - 👥 User Management
 - 🏢 Tenant Management
+- 🔄 Tenant Switching
 - 💳 Billing & Subscriptions
 - 📧 Email & Notifications
 - 📁 File Management
@@ -85,6 +86,7 @@ postman/
 - ✅ RBAC User Role Management Tests (5 tests)
 - ✅ RBAC Cleanup Tests (3 tests)
 - ✅ Health Check Tests (1 test)
+- ✅ Tenant Switching Tests (10 tests)
 - 🔄 User Management Tests (Coming soon)
 - 🏢 Tenant Management Tests (Coming soon)
 - 💳 Billing Tests (Coming soon)
@@ -93,13 +95,15 @@ postman/
 
 ### Required Variables
 
-| Variable       | Description       | Example                     |
-| -------------- | ----------------- | --------------------------- |
-| `baseUrl`      | API base URL      | `http://localhost:3001/api` |
-| `accessToken`  | JWT access token  | Auto-populated after login  |
-| `refreshToken` | JWT refresh token | Auto-populated after login  |
-| `userId`       | Current user ID   | Auto-populated after login  |
-| `tenantId`     | Current tenant ID | Auto-populated after login  |
+| Variable         | Description                 | Example                         |
+| ---------------- | --------------------------- | ------------------------------- |
+| `baseUrl`        | API base URL                | `http://localhost:3001/api`     |
+| `accessToken`    | JWT access token            | Auto-populated after login      |
+| `refreshToken`   | JWT refresh token           | Auto-populated after login      |
+| `userId`         | Current user ID             | Auto-populated after login      |
+| `tenantId`       | Current tenant ID           | Auto-populated after login      |
+| `targetTenantId` | Target tenant for switching | Auto-populated from memberships |
+| `membershipId`   | User membership ID          | Auto-populated from memberships |
 
 ### Test Variables
 
@@ -319,6 +323,21 @@ newman run collections/SaaS-Boilerplate-Tests.postman_collection.json \
 | GET    | `/roles/users/:id/permissions`       | Get user permissions     |
 | POST   | `/roles/users/:id/permissions/check` | Check user permission    |
 
+### Tenant Switching Endpoints
+
+| Method | Endpoint                                              | Description                      |
+| ------ | ----------------------------------------------------- | -------------------------------- |
+| GET    | `/tenants/user/memberships`                           | Get user tenant memberships      |
+| GET    | `/tenants/current`                                    | Get current tenant context       |
+| POST   | `/tenants/switch`                                     | Switch to different tenant       |
+| POST   | `/tenants/:tenantId/verify-access`                    | Verify access to specific tenant |
+| POST   | `/tenants/verify-access/bulk`                         | Bulk verify access to tenants    |
+| POST   | `/tenants/cache/clear`                                | Clear user tenant cache          |
+| POST   | `/tenants/admin/memberships`                          | Add user to tenant (Admin)       |
+| POST   | `/tenants/admin/memberships/:userId/:tenantId/remove` | Remove user from tenant (Admin)  |
+| GET    | `/tenants/health`                                     | Tenant switching health check    |
+| GET    | `/tenants/memberships/:membershipId`                  | Get membership details           |
+
 ### Health Check Endpoints
 
 | Method | Endpoint  | Description       |
@@ -365,6 +384,7 @@ For issues with the Postman collections:
 ## 🚀 Next Steps
 
 - [x] ✅ RBAC Tests (Complete)
+- [x] ✅ Tenant Switching Tests (Complete)
 - [ ] Add User Management tests
 - [ ] Add Tenant Management tests
 - [ ] Add Billing & Subscription tests
