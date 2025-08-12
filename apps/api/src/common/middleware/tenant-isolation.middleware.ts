@@ -4,10 +4,13 @@ import {
   Logger,
   BadRequestException,
   UnauthorizedException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { TenantService } from '../../modules/tenants/services/tenant.service';
+import { TenantSwitchingService } from '../../modules/tenants/services/tenant-switching.service';
 
 export interface TenantRequest extends Request {
   tenantId?: string;
@@ -20,6 +23,14 @@ export interface TenantRequest extends Request {
     features?: string[];
     settings?: Record<string, any>;
   };
+  userMembership?: {
+    id: string;
+    role: string;
+    status: string;
+    permissions: string[];
+    joinedAt: Date;
+    lastAccessedAt?: Date;
+  };
 }
 
 @Injectable()
@@ -28,7 +39,9 @@ export class TenantIsolationMiddleware implements NestMiddleware {
 
   constructor(
     private readonly jwtService: JwtService,
-    private readonly tenantService: TenantService
+    private readonly tenantService: TenantService,
+    @Inject(forwardRef(() => TenantSwitchingService))
+    private readonly tenantSwitchingService: TenantSwitchingService
   ) {}
 
   async use(
@@ -63,6 +76,43 @@ export class TenantIsolationMiddleware implements NestMiddleware {
           features: tenant.features,
           settings: tenant.settings,
         };
+
+        // If user is authenticated, get their membership information
+        if ((req.user as any)?.id) {
+          try {
+            const userId = (req.user as any).id;
+            const { membership } =
+              await this.tenantSwitchingService.getCurrentTenantContext(userId);
+
+            if (membership && membership.tenantId === tenantId) {
+              req.userMembership = {
+                id: membership.id,
+                role: membership.role,
+                status: membership.status,
+                permissions:
+                  membership.permissions?.map(p => p.getFullName()) || [],
+                joinedAt: membership.joinedAt,
+                lastAccessedAt: membership.lastAccessedAt,
+              };
+
+              // Update last accessed time asynchronously
+              membership.updateLastAccessed();
+              // Note: We don't await this to avoid blocking the request
+              this.tenantSwitchingService['membershipRepository']
+                .save(membership)
+                .catch(error => {
+                  this.logger.warn(
+                    `Failed to update last accessed time: ${error.message}`
+                  );
+                });
+            }
+          } catch (error) {
+            // Don't block the request if membership lookup fails
+            this.logger.debug(
+              `Could not load user membership: ${error instanceof Error ? error.message : 'Unknown error'}`
+            );
+          }
+        }
 
         this.logger.debug(
           `Tenant context set: ${tenant.name} (${tenant.id}) for ${req.method} ${req.url}`

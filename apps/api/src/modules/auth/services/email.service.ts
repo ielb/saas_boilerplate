@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import * as nodemailer from 'nodemailer';
 import * as handlebars from 'handlebars';
 
@@ -19,6 +19,7 @@ interface EmailConfig {
 @Injectable()
 export class EmailService {
   private transporter!: nodemailer.Transporter;
+  private readonly logger = new Logger(EmailService.name);
 
   constructor() {
     this.initializeTransporter();
@@ -178,14 +179,7 @@ export class EmailService {
 
       await this.transporter.sendMail(mailOptions);
     } catch (error) {
-      console.error('Failed to send email:', error);
-      console.error('Email data:', data);
-      console.error('SMTP config:', {
-        host: process.env.SMTP_HOST || 'localhost',
-        port: process.env.SMTP_PORT || '1025',
-        secure: process.env.SMTP_SECURE === 'true',
-        from: process.env.FROM_EMAIL || 'noreply@saas-boilerplate.com',
-      });
+      this.logger.error('Failed to send email:', error);
       // Re-throw the error so it's not silently ignored
       throw error;
     }
@@ -420,7 +414,7 @@ export class EmailService {
       await this.transporter.verify();
       return true;
     } catch (error) {
-      console.error('Email configuration test failed:', error);
+      this.logger.error('Email configuration test failed:', error);
       return false;
     }
   }

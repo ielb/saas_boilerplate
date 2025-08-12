@@ -5,6 +5,7 @@ import {
   TenantRequest,
 } from './tenant-isolation.middleware';
 import { TenantService } from '../../modules/tenants/services/tenant.service';
+import { TenantSwitchingService } from '../../modules/tenants/services/tenant-switching.service';
 import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 
 // Create a partial mock type for testing
@@ -40,6 +41,10 @@ describe('TenantIsolationMiddleware', () => {
     getTenantByDomain: jest.fn(),
   };
 
+  const mockTenantSwitchingService = {
+    getUserTenantMemberships: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -51,6 +56,10 @@ describe('TenantIsolationMiddleware', () => {
         {
           provide: TenantService,
           useValue: mockTenantService,
+        },
+        {
+          provide: TenantSwitchingService,
+          useValue: mockTenantSwitchingService,
         },
       ],
     }).compile();

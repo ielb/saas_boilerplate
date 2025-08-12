@@ -2,10 +2,7 @@
  * Pagination utility functions to ensure safe offset calculations
  */
 
-export interface PaginationParams {
-  page?: number;
-  limit?: number;
-}
+import { PaginationParams } from '../types/common.types';
 
 export interface SafePaginationResult {
   page: number;

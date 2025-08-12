@@ -175,7 +175,7 @@ Based on PRD: `docs/prd.md`
   - [x] 3.1 Design and implement tenant database schema (#9) - **COMPLETED**
   - [x] 3.2 Create tenant isolation middleware and interceptors (#10) - **COMPLETED**
   - [x] 3.3 Implement tenant-scoped database queries (#19) - **COMPLETED** _(includes pagination fixes and safe query utilities)_
-  - [ ] 3.4 Set up tenant onboarding workflow (#20)
+  - [x] 3.4 Set up tenant onboarding workflow (#20)
   - [ ] 3.5 Create tenant switching functionality (#21)
   - [ ] 3.6 Implement tenant branding customization (#30)
   - [ ] 3.7 Set up feature flags per tenant (#31)

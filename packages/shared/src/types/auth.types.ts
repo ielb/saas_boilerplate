@@ -20,6 +20,13 @@ export enum AuthProvider {
   GITHUB = 'github',
 }
 
+export enum MembershipStatus {
+  ACTIVE = 'active',
+  PENDING = 'pending',
+  SUSPENDED = 'suspended',
+  EXPIRED = 'expired',
+}
+
 export interface JwtPayload {
   sub: string;
   email: string;

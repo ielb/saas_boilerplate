@@ -129,6 +129,131 @@ export class AuditService {
   }
 
   /**
+   * General audit logging method for any event type
+   */
+  async logEvent(
+    data: {
+      eventType: AuditEventType;
+      userId?: string;
+      tenantId?: string;
+      sessionId?: string;
+      ipAddress?: string;
+      userAgent?: string;
+      userEmail?: string;
+      targetUserId?: string;
+      targetUserEmail?: string;
+      description?: string;
+      metadata?: Record<string, any>;
+      requestData?: Record<string, any>;
+      responseData?: Record<string, any>;
+      errorCode?: string;
+      errorMessage?: string;
+      source?: string;
+      severity?: AuditEventSeverity;
+      status?: AuditEventStatus;
+    },
+    req?: Request
+  ): Promise<AuditLog> {
+    return this.logAuthEvent(
+      {
+        eventType: data.eventType,
+        userId: data.userId,
+        tenantId: data.tenantId,
+        sessionId: data.sessionId,
+        ipAddress: data.ipAddress,
+        userAgent: data.userAgent,
+        userEmail: data.userEmail,
+        targetUserId: data.targetUserId,
+        targetUserEmail: data.targetUserEmail,
+        description: data.description,
+        metadata: data.metadata,
+        requestData: data.requestData,
+        responseData: data.responseData,
+        errorCode: data.errorCode,
+        errorMessage: data.errorMessage,
+        source: data.source,
+        severity: data.severity,
+        status: data.status,
+      },
+      req
+    );
+  }
+
+  /**
+   * Log tenant switching events
+   */
+  async logTenantSwitchEvent(
+    data: {
+      eventType: AuditEventType;
+      userId: string;
+      userEmail?: string;
+      fromTenantId?: string;
+      toTenantId: string;
+      membershipId?: string;
+      reason?: string;
+      ipAddress?: string;
+      userAgent?: string;
+      status?: AuditEventStatus;
+      errorMessage?: string;
+    },
+    req?: Request
+  ): Promise<AuditLog> {
+    const metadata: Record<string, any> = {
+      fromTenantId: data.fromTenantId,
+      toTenantId: data.toTenantId,
+      membershipId: data.membershipId,
+      reason: data.reason,
+    };
+
+    const logData: any = {
+      eventType: data.eventType,
+      userId: data.userId,
+      tenantId: data.toTenantId,
+      description: this.getTenantSwitchDescription(
+        data.eventType,
+        data.fromTenantId,
+        data.toTenantId
+      ),
+      metadata,
+      status: data.status || AuditEventStatus.SUCCESS,
+      severity: AuditEventSeverity.MEDIUM,
+    };
+
+    // Only add optional fields if they have values
+    if (data.userEmail) logData.userEmail = data.userEmail;
+    if (data.ipAddress) logData.ipAddress = data.ipAddress;
+    if (data.userAgent) logData.userAgent = data.userAgent;
+    if (data.errorMessage) logData.errorMessage = data.errorMessage;
+
+    return this.logEvent(logData, req);
+  }
+
+  private getTenantSwitchDescription(
+    eventType: AuditEventType,
+    fromTenantId?: string,
+    toTenantId?: string
+  ): string {
+    switch (eventType) {
+      case AuditEventType.TENANT_SWITCHED:
+        return `User switched from tenant ${fromTenantId || 'none'} to tenant ${toTenantId}`;
+      case AuditEventType.TENANT_ACCESS_VERIFIED:
+        return `User access to tenant ${toTenantId} verified`;
+      case AuditEventType.TENANT_ACCESS_DENIED:
+        return `User access to tenant ${toTenantId} denied`;
+      case AuditEventType.TENANT_MEMBERSHIP_CREATED:
+        return `User membership created for tenant ${toTenantId}`;
+      case AuditEventType.TENANT_MEMBERSHIP_DELETED:
+        return `User membership deleted for tenant ${toTenantId}`;
+      case AuditEventType.TENANT_MEMBERSHIP_SUSPENDED:
+        return `User membership suspended for tenant ${toTenantId}`;
+      case AuditEventType.TENANT_MEMBERSHIP_ACTIVATED:
+        return `User membership activated for tenant ${toTenantId}`;
+      default:
+        return `Tenant event: ${eventType}`;
+    }
+  }
+
+  /**
    * Log user registration event
    */
   async logUserRegistration(user: User, req?: Request): Promise<AuditLog> {

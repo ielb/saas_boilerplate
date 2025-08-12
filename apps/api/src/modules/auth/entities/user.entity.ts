@@ -12,6 +12,7 @@ import {
   JoinColumn,
   ManyToMany,
   JoinTable,
+  OneToMany,
 } from 'typeorm';
 import {
   IsEmail,
@@ -27,6 +28,7 @@ import * as argon2 from 'argon2';
 import { UserRole, UserStatus, AuthProvider } from '@app/shared';
 import { Tenant } from './tenant.entity';
 import { Role } from './role.entity';
+import { UserTenantMembership } from './user-tenant-membership.entity';
 
 @Entity('users')
 @Index(['email', 'tenantId'], { unique: true })
@@ -162,6 +164,9 @@ export class User {
     inverseJoinColumn: { name: 'roleId', referencedColumnName: 'id' },
   })
   roles!: Role[];
+
+  @OneToMany(() => UserTenantMembership, membership => membership.user)
+  tenantMemberships!: UserTenantMembership[];
 
   @BeforeInsert()
   @BeforeUpdate()
