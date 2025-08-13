@@ -36,6 +36,10 @@ export class TenantCacheUtil {
     return `bulk-access:${userId}:${sortedIds}`;
   }
 
+  static getTenantBrandingKey(tenantId: string): string {
+    return `tenant:branding:${tenantId}`;
+  }
+
   // Cache operations
   async get<T>(key: string): Promise<T | null> {
     try {

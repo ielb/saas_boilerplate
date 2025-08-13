@@ -16,6 +16,11 @@ import { JwtService } from '../../auth/services/jwt.service';
 import { AuditService } from '../../auth/services/audit.service';
 import { PermissionService } from '../../auth/services/permission.service';
 import { TenantCacheUtil } from '../utils/tenant-cache.util';
+import { TenantAccessControlService } from './access/tenant-access-control.service';
+import { TenantAccessVerificationService } from './access/tenant-access-verification.service';
+import { TenantMembershipService } from './membership/tenant-membership.service';
+import { TenantCacheService } from './cache/tenant-cache.service';
+import { TenantJwtService } from './auth/tenant-jwt.service';
 import { UserRole, MembershipStatus } from '@app/shared';
 
 describe('TenantSwitchingService', () => {
@@ -29,6 +34,11 @@ describe('TenantSwitchingService', () => {
   let dataSource: jest.Mocked<DataSource>;
   let cacheManager: jest.Mocked<Cache>;
   let cacheUtil: jest.Mocked<TenantCacheUtil>;
+  let accessControl: jest.Mocked<TenantAccessControlService>;
+  let accessVerification: jest.Mocked<TenantAccessVerificationService>;
+  let membershipService: jest.Mocked<TenantMembershipService>;
+  let cacheService: jest.Mocked<TenantCacheService>;
+  let tenantJwtService: jest.Mocked<TenantJwtService>;
 
   const mockUser: Partial<User> = {
     id: 'user-1',
@@ -111,6 +121,38 @@ describe('TenantSwitchingService', () => {
       clearTenantCache: jest.fn(),
     };
 
+    const mockAccessControl = {
+      verifyUserAccess: jest.fn(),
+      checkPermission: jest.fn(),
+    };
+
+    const mockAccessVerification = {
+      verifyTenantAccess: jest.fn(),
+      bulkVerifyTenantAccess: jest.fn(),
+    };
+
+    const mockMembershipService = {
+      getUserTenantMemberships: jest.fn(),
+      addUserToTenant: jest.fn(),
+      removeUserFromTenant: jest.fn(),
+    };
+
+    const mockCacheService = {
+      get: jest.fn(),
+      set: jest.fn(),
+      del: jest.fn(),
+      getUserMembershipsKey: jest.fn(),
+      getUserAccessKey: jest.fn(),
+      getTenantBrandingKey: jest.fn(),
+      clearUserCache: jest.fn(),
+      clearTenantCache: jest.fn(),
+    };
+
+    const mockTenantJwtService = {
+      generateTenantSwitchToken: jest.fn(),
+      verifyTenantToken: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         TenantSwitchingService,
@@ -156,6 +198,26 @@ describe('TenantSwitchingService', () => {
           provide: TenantCacheUtil,
           useValue: mockCacheUtil,
         },
+        {
+          provide: TenantAccessControlService,
+          useValue: mockAccessControl,
+        },
+        {
+          provide: TenantAccessVerificationService,
+          useValue: mockAccessVerification,
+        },
+        {
+          provide: TenantMembershipService,
+          useValue: mockMembershipService,
+        },
+        {
+          provide: TenantCacheService,
+          useValue: mockCacheService,
+        },
+        {
+          provide: TenantJwtService,
+          useValue: mockTenantJwtService,
+        },
       ],
     }).compile();
 
@@ -169,6 +231,11 @@ describe('TenantSwitchingService', () => {
     dataSource = module.get(DataSource);
     cacheManager = module.get(CACHE_MANAGER);
     cacheUtil = module.get(TenantCacheUtil);
+    accessControl = module.get(TenantAccessControlService);
+    accessVerification = module.get(TenantAccessVerificationService);
+    membershipService = module.get(TenantMembershipService);
+    cacheService = module.get(TenantCacheService);
+    tenantJwtService = module.get(TenantJwtService);
   });
 
   beforeEach(() => {
@@ -177,42 +244,26 @@ describe('TenantSwitchingService', () => {
   });
 
   describe('getUserTenantMemberships', () => {
-    it('should return cached memberships if available', async () => {
+    it('should return user tenant memberships', async () => {
       // Arrange
       const userId = 'user-1';
-      const cachedResponse = {
-        memberships: [],
+      const mockResponse = {
+        memberships: [
+          {
+            ...mockMembership,
+            tenant: mockTenant,
+            permissions: [{ getFullName: () => 'users:read' }],
+          } as UserTenantMembership,
+        ],
         currentTenantId: 'tenant-1',
-        totalCount: 0,
-        activeCount: 0,
+        totalCount: 1,
+        activeCount: 1,
         pendingCount: 0,
       };
 
-      cacheUtil.get.mockResolvedValue(cachedResponse);
-
-      // Act
-      const result = await service.getUserTenantMemberships(userId);
-
-      // Assert
-      expect(result).toEqual(cachedResponse);
-      expect(cacheUtil.get).toHaveBeenCalledWith(
-        TenantCacheUtil.getUserMembershipsKey(userId)
+      membershipService.getUserTenantMemberships.mockResolvedValue(
+        mockResponse
       );
-      expect(userRepository.findOne).not.toHaveBeenCalled();
-    });
-
-    it('should fetch and cache memberships if not in cache', async () => {
-      // Arrange
-      const userId = 'user-1';
-      cacheUtil.get.mockResolvedValue(null);
-      userRepository.findOne.mockResolvedValue(mockUser as User);
-      membershipRepository.find.mockResolvedValue([
-        {
-          ...mockMembership,
-          tenant: mockTenant,
-          permissions: [{ getFullName: () => 'users:read' }],
-        },
-      ] as any);
 
       // Act
       const result = await service.getUserTenantMemberships(userId);
@@ -220,373 +271,128 @@ describe('TenantSwitchingService', () => {
       // Assert
       expect(result.memberships).toHaveLength(1);
       expect(result.currentTenantId).toBe('tenant-1');
-      expect(cacheUtil.set).toHaveBeenCalled();
-    });
-
-    it('should throw NotFoundException if user not found', async () => {
-      // Arrange
-      const userId = 'non-existent-user';
-      cacheUtil.get.mockResolvedValue(null);
-      userRepository.findOne.mockResolvedValue(null);
-
-      // Act & Assert
-      await expect(service.getUserTenantMemberships(userId)).rejects.toThrow(
-        NotFoundException
-      );
-    });
-  });
-
-  describe('switchTenant', () => {
-    it('should successfully switch tenant', async () => {
-      // Arrange
-      const userId = 'user-1';
-      const switchDto = {
-        tenantId: 'tenant-2',
-        reason: 'Testing switch',
-      };
-
-      const mockManager = {
-        findOne: jest.fn(),
-        update: jest.fn(),
-        save: jest.fn(),
-      };
-
-      dataSource.transaction.mockImplementation(async (callback: any) => {
-        return await callback(mockManager);
-      });
-
-      mockManager.findOne
-        .mockResolvedValueOnce({
-          ...mockMembership,
-          tenantId: 'tenant-2',
-          tenant: { ...mockTenant, id: 'tenant-2' },
-          permissions: [],
-        })
-        .mockResolvedValueOnce(mockUser);
-
-      jwtService.generateAccessToken = jest
-        .fn()
-        .mockResolvedValue('new-jwt-token');
-
-      // Act
-      const result = await service.switchTenant(userId, switchDto);
-
-      // Assert
-      expect(result.success).toBe(true);
-      expect(result.accessToken).toBe('new-jwt-token');
-      expect(mockManager.update).toHaveBeenCalledWith(
-        User,
-        { id: userId },
-        { tenantId: switchDto.tenantId }
-      );
-      expect(auditService.logTenantSwitchEvent).toHaveBeenCalledWith({
-        eventType: AuditEventType.TENANT_SWITCHED,
-        userId,
-        userEmail: mockUser.email,
-        fromTenantId: mockUser.tenantId,
-        toTenantId: switchDto.tenantId,
-        membershipId: mockMembership.id,
-        reason: switchDto.reason,
-      });
-    });
-
-    it('should throw ForbiddenException if user has no access to tenant', async () => {
-      // Arrange
-      const userId = 'user-1';
-      const switchDto = {
-        tenantId: 'unauthorized-tenant',
-      };
-
-      const mockManager = {
-        findOne: jest.fn(),
-      };
-
-      dataSource.transaction.mockImplementation(async (callback: any) => {
-        return await callback(mockManager);
-      });
-
-      mockManager.findOne.mockResolvedValue(null);
-
-      // Act & Assert
-      await expect(service.switchTenant(userId, switchDto)).rejects.toThrow(
-        ForbiddenException
-      );
-    });
-
-    it('should throw ForbiddenException if membership is not active', async () => {
-      // Arrange
-      const userId = 'user-1';
-      const switchDto = {
-        tenantId: 'tenant-2',
-      };
-
-      const inactiveMembership = {
-        ...mockMembership,
-        status: MembershipStatus.SUSPENDED,
-        isActive: false,
-      };
-
-      const mockManager = {
-        findOne: jest.fn(),
-      };
-
-      dataSource.transaction.mockImplementation(async (callback: any) => {
-        return await callback(mockManager);
-      });
-
-      mockManager.findOne.mockResolvedValue(inactiveMembership);
-
-      // Act & Assert
-      await expect(service.switchTenant(userId, switchDto)).rejects.toThrow(
-        ForbiddenException
+      expect(result.totalCount).toBe(1);
+      expect(result.activeCount).toBe(1);
+      expect(result.pendingCount).toBe(0);
+      expect(membershipService.getUserTenantMemberships).toHaveBeenCalledWith(
+        userId
       );
     });
   });
 
   describe('verifyTenantAccess', () => {
-    it('should return cached access result if available', async () => {
+    it('should verify tenant access', async () => {
       // Arrange
       const userId = 'user-1';
       const verificationDto = {
         tenantId: 'tenant-1',
+        permissions: ['users:read'],
       };
-      const cachedResponse = {
+      const mockResponse = {
         hasAccess: true,
-        role: 'member',
-        status: 'active',
         permissions: ['users:read'],
+        reason: 'Access granted',
       };
 
-      cacheUtil.get.mockResolvedValue(cachedResponse);
+      accessVerification.verifyTenantAccess.mockResolvedValue(mockResponse);
 
       // Act
       const result = await service.verifyTenantAccess(userId, verificationDto);
 
       // Assert
-      expect(result).toEqual(cachedResponse);
-      expect(membershipRepository.findOne).not.toHaveBeenCalled();
-    });
-
-    it('should verify access and cache result', async () => {
-      // Arrange
-      const userId = 'user-1';
-      const verificationDto = {
-        tenantId: 'tenant-1',
-        permissions: ['users:read'],
-      };
-
-      cacheUtil.get.mockResolvedValue(null);
-      membershipRepository.findOne.mockResolvedValue({
-        ...mockMembership,
-        tenant: mockTenant,
-        permissions: [{ getFullName: () => 'users:read' }],
-      } as any);
-
-      permissionService.getPermissionScopes = jest
-        .fn()
-        .mockResolvedValue([{ getFullName: () => 'basic:access' }] as any);
-
-      // Act
-      const result = await service.verifyTenantAccess(userId, verificationDto);
-
-      // Assert
-      expect(result.hasAccess).toBe(true);
-      expect(result.role).toBe(UserRole.MEMBER);
-      expect(result.permissions).toContain('users:read');
-      expect(result.permissions).toContain('basic:access');
-      expect(cacheUtil.set).toHaveBeenCalled();
-    });
-
-    it('should deny access if user is not a member', async () => {
-      // Arrange
-      const userId = 'user-1';
-      const verificationDto = {
-        tenantId: 'unauthorized-tenant',
-      };
-
-      cacheUtil.get.mockResolvedValue(null);
-      membershipRepository.findOne.mockResolvedValue(null);
-
-      // Act
-      const result = await service.verifyTenantAccess(userId, verificationDto);
-
-      // Assert
-      expect(result.hasAccess).toBe(false);
-      expect(result.reason).toBe('User is not a member of this tenant');
-      expect(auditService.logTenantSwitchEvent).toHaveBeenCalledWith({
-        eventType: AuditEventType.TENANT_ACCESS_DENIED,
+      expect(result).toEqual(mockResponse);
+      expect(accessVerification.verifyTenantAccess).toHaveBeenCalledWith(
         userId,
-        toTenantId: verificationDto.tenantId,
-        reason: 'User is not a member of this tenant',
-      });
-    });
-
-    it('should deny access if membership is not active', async () => {
-      // Arrange
-      const userId = 'user-1';
-      const verificationDto = {
-        tenantId: 'tenant-1',
-      };
-
-      const inactiveMembership = {
-        ...mockMembership,
-        status: MembershipStatus.SUSPENDED,
-        isActive: false,
-      };
-
-      cacheUtil.get.mockResolvedValue(null);
-      membershipRepository.findOne.mockResolvedValue(inactiveMembership as any);
-
-      // Act
-      const result = await service.verifyTenantAccess(userId, verificationDto);
-
-      // Assert
-      expect(result.hasAccess).toBe(false);
-      expect(result.reason).toBe(
-        `Membership status is ${MembershipStatus.SUSPENDED}`
+        verificationDto
       );
-      expect(auditService.logTenantSwitchEvent).toHaveBeenCalledWith({
-        eventType: AuditEventType.TENANT_ACCESS_DENIED,
+    });
+  });
+
+  describe('bulkVerifyTenantAccess', () => {
+    it('should bulk verify tenant access', async () => {
+      // Arrange
+      const userId = 'user-1';
+      const bulkDto = {
+        tenantIds: ['tenant-1', 'tenant-2'],
+        permissions: ['users:read'],
+      };
+      const mockResponse = {
+        results: {
+          'tenant-1': { hasAccess: true, permissions: ['users:read'] },
+          'tenant-2': { hasAccess: false, permissions: [] },
+        },
+        summary: {
+          totalChecked: 2,
+          accessGranted: 1,
+          accessDenied: 1,
+        },
+      };
+
+      accessVerification.bulkVerifyTenantAccess.mockResolvedValue(mockResponse);
+
+      // Act
+      const result = await service.bulkVerifyTenantAccess(userId, bulkDto);
+
+      // Assert
+      expect(result).toEqual(mockResponse);
+      expect(accessVerification.bulkVerifyTenantAccess).toHaveBeenCalledWith(
         userId,
-        toTenantId: verificationDto.tenantId,
-        membershipId: inactiveMembership.id,
-        reason: `Membership status is ${MembershipStatus.SUSPENDED}`,
-      });
+        bulkDto
+      );
     });
   });
 
   describe('addUserToTenant', () => {
-    it('should successfully add user to tenant', async () => {
+    it('should add user to tenant', async () => {
       // Arrange
       const userId = 'user-1';
       const tenantId = 'tenant-1';
       const role = UserRole.MEMBER;
+      const invitedBy = 'admin-1';
 
-      membershipRepository.findOne.mockResolvedValue(null);
-      tenantRepository.findOne.mockResolvedValue(mockTenant as Tenant);
-      membershipRepository.create.mockReturnValue(mockMembership as any);
-      membershipRepository.save.mockResolvedValue(mockMembership as any);
+      membershipService.addUserToTenant.mockResolvedValue(
+        mockMembership as UserTenantMembership
+      );
 
       // Act
-      const result = await service.addUserToTenant(userId, tenantId, role);
-
-      // Assert
-      expect(result).toEqual(mockMembership);
-      expect(membershipRepository.create).toHaveBeenCalledWith({
+      const result = await service.addUserToTenant(
         userId,
         tenantId,
         role,
-        status: MembershipStatus.ACTIVE,
-        joinedAt: expect.any(Date),
-        invitedBy: undefined,
-      });
-      expect(auditService.logTenantSwitchEvent).toHaveBeenCalledWith({
-        eventType: AuditEventType.TENANT_MEMBERSHIP_CREATED,
+        invitedBy
+      );
+
+      // Assert
+      expect(result).toEqual(mockMembership);
+      expect(membershipService.addUserToTenant).toHaveBeenCalledWith(
         userId,
-        toTenantId: tenantId,
-        membershipId: mockMembership.id,
-        reason: `Added with role: ${role}`,
-      });
-    });
-
-    it('should throw BadRequestException if user is already a member', async () => {
-      // Arrange
-      const userId = 'user-1';
-      const tenantId = 'tenant-1';
-      const role = UserRole.MEMBER;
-
-      membershipRepository.findOne.mockResolvedValue(mockMembership as any);
-
-      // Act & Assert
-      await expect(
-        service.addUserToTenant(userId, tenantId, role)
-      ).rejects.toThrow(BadRequestException);
-    });
-
-    it('should throw NotFoundException if tenant not found', async () => {
-      // Arrange
-      const userId = 'user-1';
-      const tenantId = 'non-existent-tenant';
-      const role = UserRole.MEMBER;
-
-      membershipRepository.findOne.mockResolvedValue(null);
-      tenantRepository.findOne.mockResolvedValue(null);
-
-      // Act & Assert
-      await expect(
-        service.addUserToTenant(userId, tenantId, role)
-      ).rejects.toThrow(NotFoundException);
+        tenantId,
+        role,
+        invitedBy
+      );
     });
   });
 
   describe('removeUserFromTenant', () => {
-    it('should successfully remove user from tenant', async () => {
+    it('should remove user from tenant', async () => {
       // Arrange
       const userId = 'user-1';
       const tenantId = 'tenant-1';
 
-      membershipRepository.findOne.mockResolvedValue(mockMembership as any);
-      userRepository.findOne.mockResolvedValue({
-        ...mockUser,
-        tenantId: 'other-tenant',
-      } as User);
+      membershipService.removeUserFromTenant.mockResolvedValue(undefined);
 
       // Act
       await service.removeUserFromTenant(userId, tenantId);
 
       // Assert
-      expect(membershipRepository.softDelete).toHaveBeenCalledWith(
-        mockMembership.id
-      );
-      expect(auditService.logTenantSwitchEvent).toHaveBeenCalledWith({
-        eventType: AuditEventType.TENANT_MEMBERSHIP_DELETED,
+      expect(membershipService.removeUserFromTenant).toHaveBeenCalledWith(
         userId,
-        toTenantId: tenantId,
-        membershipId: mockMembership.id,
-        reason: 'Membership removed',
-      });
-    });
-
-    it('should switch to another tenant if removing current tenant', async () => {
-      // Arrange
-      const userId = 'user-1';
-      const tenantId = 'tenant-1';
-
-      const otherMembership = {
-        ...mockMembership,
-        tenantId: 'other-tenant',
-      };
-
-      membershipRepository.findOne
-        .mockResolvedValueOnce(mockMembership as any)
-        .mockResolvedValueOnce(otherMembership as any);
-
-      userRepository.findOne.mockResolvedValue({
-        ...mockUser,
-        tenantId: tenantId, // Current tenant is the one being removed
-      } as User);
-
-      // Act
-      await service.removeUserFromTenant(userId, tenantId);
-
-      // Assert
-      expect(userRepository.update).toHaveBeenCalledWith(
-        { id: userId },
-        { tenantId: 'other-tenant' }
+        tenantId
       );
-    });
-
-    it('should throw NotFoundException if membership not found', async () => {
-      // Arrange
-      const userId = 'user-1';
-      const tenantId = 'tenant-1';
-
-      membershipRepository.findOne.mockResolvedValue(null);
-
-      // Act & Assert
-      await expect(
-        service.removeUserFromTenant(userId, tenantId)
-      ).rejects.toThrow(NotFoundException);
+      expect(membershipService.removeUserFromTenant).toHaveBeenCalledWith(
+        userId,
+        tenantId
+      );
     });
   });
 
@@ -595,50 +401,13 @@ describe('TenantSwitchingService', () => {
       // Arrange
       const userId = 'user-1';
 
+      cacheService.clearUserCache.mockResolvedValue(undefined);
+
       // Act
       await service.clearUserCache(userId);
 
       // Assert
-      expect(cacheUtil.clearUserCache).toHaveBeenCalledWith(userId);
-    });
-  });
-
-  describe('bulkVerifyTenantAccess', () => {
-    it('should verify access to multiple tenants', async () => {
-      // Arrange
-      const userId = 'user-1';
-      const bulkDto = {
-        tenantIds: ['tenant-1', 'tenant-2'],
-        permissions: ['users:read'],
-      };
-
-      // Mock verifyTenantAccess to return different results
-      const verifyTenantAccessSpy = jest
-        .spyOn(service, 'verifyTenantAccess')
-        .mockResolvedValueOnce({
-          hasAccess: true,
-          role: 'member',
-          status: 'active',
-          permissions: ['users:read'],
-        })
-        .mockResolvedValueOnce({
-          hasAccess: false,
-          permissions: [],
-          reason: 'User is not a member of this tenant',
-        });
-
-      // Act
-      const result = await service.bulkVerifyTenantAccess(userId, bulkDto);
-
-      // Assert
-      expect(result.results?.['tenant-1']?.hasAccess).toBe(true);
-      expect(result.results?.['tenant-2']?.hasAccess).toBe(false);
-      expect(result.summary.totalChecked).toBe(2);
-      expect(result.summary.accessGranted).toBe(1);
-      expect(result.summary.accessDenied).toBe(1);
-      expect(verifyTenantAccessSpy).toHaveBeenCalledTimes(2);
-
-      verifyTenantAccessSpy.mockRestore();
+      expect(cacheService.clearUserCache).toHaveBeenCalledWith(userId);
     });
   });
 });

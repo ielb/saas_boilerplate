@@ -16,7 +16,17 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "clean": "rm -rf dist coverage"
+    "clean": "rm -rf dist coverage",
+    "db:reset": "ts-node scripts/reset-database.ts",
+    "db:reset:test": "ts-node scripts/reset-database.ts --test",
+    "db:migrate": "typeorm-ts-node-commonjs migration:run -d src/database/data-source.ts",
+    "db:migrate:test": "typeorm-ts-node-commonjs migration:run -d src/database/test-data-source.ts",
+    "db:create": "PGPASSWORD=saas_password createdb -h localhost -U saas_user saas_boilerplate",
+    "db:create:test": "PGPASSWORD=saas_password createdb -h localhost -U saas_user test_db",
+    "db:drop": "PGPASSWORD=saas_password dropdb -h localhost -U saas_user saas_boilerplate",
+    "db:drop:test": "PGPASSWORD=saas_password dropdb -h localhost -U saas_user test_db",
+    "test:setup": "npm run db:reset:test",
+    "test:cleanup": "npm run db:drop:test"
   },
   "dependencies": {
     "@app/config": "workspace:*",
@@ -39,6 +49,7 @@
     "@nestjs/websockets": "^10.0.0",
     "argon2": "^0.31.0",
     "aws-sdk": "^2.1450.0",
+    "axios": "^1.11.0",
     "bcrypt": "^5.1.0",
     "bull": "^4.11.0",
     "cache-manager": "^7.1.1",
@@ -118,6 +129,7 @@
     "testEnvironment": "node",
     "setupFilesAfterEnv": [
       "../jest.setup.ts"
-    ]
+    ],
+    "maxWorkers": 1
   }
 }

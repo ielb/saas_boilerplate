@@ -1,20 +1,33 @@
 # Postman Collections for SaaS Boilerplate API
 
-This directory contains comprehensive Postman collections for testing the SaaS Boilerplate API.
+This directory contains comprehensive Postman collections for testing the SaaS Boilerplate API, including the newly refactored Tenant Branding Service with SOLID principles.
 
-## 📁 Files Structure
+## 📁 Collections Overview
 
-```
-postman/
-├── collections/
-│   ├── SaaS-Boilerplate-API.postman_collection.json
-│   └── SaaS-Boilerplate-Tests.postman_collection.json
-├── environments/
-│   ├── Development.postman_environment.json
-│   ├── Staging.postman_environment.json
-│   └── Production.postman_environment.json
-└── README.md
-```
+### 1. **SaaS-Boilerplate-API.postman_collection.json**
+
+Complete API collection covering all endpoints including:
+
+- Authentication & Authorization
+- User Management
+- Tenant Management
+- Tenant Switching
+- **Tenant Branding** (ENHANCED - SOLID refactored)
+- Health Checks
+
+### 2. **Tenant-Branding-API.postman_collection.json**
+
+Dedicated collection for Tenant Branding features with comprehensive testing:
+
+- Core Branding Operations
+- Validation Operations
+- Preview Operations
+- Export/Import Operations
+- Template Operations
+- Health & Monitoring
+- Error Scenarios
+- Accessibility Testing
+- Performance Testing
 
 ## 🚀 Quick Start
 
@@ -22,373 +35,529 @@ postman/
 
 1. Open Postman
 2. Click "Import" button
-3. Import the following files:
-   - `collections/SaaS-Boilerplate-API.postman_collection.json`
-   - `collections/SaaS-Boilerplate-Tests.postman_collection.json`
+3. Select the collection files from this directory
+4. Import both collections
 
-### 2. Import Environment
+### 2. Set Up Environment
 
-1. Import `environments/Development.postman_environment.json`
-2. Select the "Development" environment from the dropdown
+1. Create a new environment in Postman
+2. Add the following variables:
 
-### 3. Run Tests
-
-1. Open the "SaaS Boilerplate Tests" collection
-2. Click "Run collection" to execute all tests
-3. Or run individual test folders
-
-## 📋 Collections Overview
-
-### SaaS-Boilerplate-API Collection
-
-**Purpose**: Manual API testing and exploration
-
-**Features**:
-
-- All API endpoints organized by module
-- Pre-configured request bodies with examples
-- Environment variable integration
-- Bearer token authentication
-- Comprehensive documentation
-
-**Modules**:
-
-- 🔐 Authentication
-- 👥 User Management
-- 🏢 Tenant Management
-- 🔄 Tenant Switching
-- 💳 Billing & Subscriptions
-- 📧 Email & Notifications
-- 📁 File Management
-- 🔌 WebSocket Connections
-- 📊 Analytics & Reporting
-
-### SaaS-Boilerplate-Tests Collection
-
-**Purpose**: Automated testing and CI/CD integration
-
-**Features**:
-
-- Comprehensive test scripts for each endpoint
-- Environment variable management
-- Token rotation testing
-- Error scenario coverage
-- Performance testing
-- Security testing
-
-**Test Categories**:
-
-- ✅ Authentication Tests (15 tests)
-- ✅ Multi-Factor Authentication Tests (9 tests)
-- ✅ Session Management Tests (12 tests)
-- ✅ RBAC Permission Management Tests (5 tests)
-- ✅ RBAC Role Management Tests (5 tests)
-- ✅ RBAC User Role Management Tests (5 tests)
-- ✅ RBAC Cleanup Tests (3 tests)
-- ✅ Health Check Tests (1 test)
-- ✅ Tenant Switching Tests (10 tests)
-- 🔄 User Management Tests (Coming soon)
-- 🏢 Tenant Management Tests (Coming soon)
-- 💳 Billing Tests (Coming soon)
-
-## 🔧 Environment Variables
-
-### Required Variables
-
-| Variable         | Description                 | Example                         |
-| ---------------- | --------------------------- | ------------------------------- |
-| `baseUrl`        | API base URL                | `http://localhost:3001/api`     |
-| `accessToken`    | JWT access token            | Auto-populated after login      |
-| `refreshToken`   | JWT refresh token           | Auto-populated after login      |
-| `userId`         | Current user ID             | Auto-populated after login      |
-| `tenantId`       | Current tenant ID           | Auto-populated after login      |
-| `targetTenantId` | Target tenant for switching | Auto-populated from memberships |
-| `membershipId`   | User membership ID          | Auto-populated from memberships |
-
-### Test Variables
-
-| Variable       | Description        | Example              |
-| -------------- | ------------------ | -------------------- |
-| `testEmail`    | Test user email    | `test@example.com`   |
-| `testPassword` | Test user password | `SecurePassword123!` |
-
-## 🧪 Test Scenarios
-
-### Authentication Flow
-
-1. **Register User** - Creates new user and tenant
-2. **Login User** - Authenticates and gets tokens
-3. **Get Profile** - Tests authenticated endpoint
-4. **Refresh Token** - Tests token rotation
-5. **Logout** - Tests token revocation
-
-### Error Scenarios
-
-- Invalid email format
-- Weak password
-- Invalid credentials
-- Expired tokens
-- Unauthorized access
-- Missing required fields
-
-### Security Tests
-
-- Token validation
-- Token rotation
-- Token revocation
-- Unauthorized access
-- Invalid tokens
-
-### RBAC Tests
-
-- Permission creation and management
-- Role creation and management
-- User role assignment and removal
-- Permission checking and validation
-- Resource-level access control
-- Permission inheritance (manage permissions)
-- Custom permission conditions
-- Role hierarchy and inheritance
-
-## 🚀 Running Tests
-
-### Manual Testing
-
-1. **Setup Environment**:
-
-   ```bash
-   # Start the API server
-   cd apps/api
-   npm run start:dev
-   ```
-
-2. **Import Collections**:
-   - Import both collections into Postman
-   - Select "Development" environment
-
-3. **Run Authentication Flow**:
-   - Execute "Register User" request
-   - Execute "Login User" request
-   - Test other endpoints with generated tokens
-
-### Automated Testing
-
-1. **Run All Tests**:
-
-   ```bash
-   # Using Newman CLI
-   newman run collections/SaaS-Boilerplate-Tests.postman_collection.json \
-     -e environments/Development.postman_environment.json \
-     --reporters cli,json \
-     --reporter-json-export results.json
-   ```
-
-2. **Run Specific Test Folder**:
-   ```bash
-   newman run collections/SaaS-Boilerplate-Tests.postman_collection.json \
-     -e environments/Development.postman_environment.json \
-     --folder "Authentication Tests"
-   ```
-
-## 📊 Test Reports
-
-### Newman CLI Reports
-
-```bash
-# Generate HTML report
-newman run collections/SaaS-Boilerplate-Tests.postman_collection.json \
-  -e environments/Development.postman_environment.json \
-  --reporters cli,html \
-  --reporter-html-export reports/test-report.html
+```json
+{
+  "baseUrl": "http://localhost:3001/api",
+  "accessToken": "",
+  "refreshToken": "",
+  "userId": "",
+  "tenantId": "",
+  "adminToken": "",
+  "brandingId": "",
+  "exportId": ""
+}
 ```
 
-### CI/CD Integration
+### 3. Authentication Setup
 
-```yaml
-# GitHub Actions example
-- name: Run API Tests
-  run: |
-    npm install -g newman
-    newman run postman/collections/SaaS-Boilerplate-Tests.postman_collection.json \
-      -e postman/environments/Development.postman_environment.json \
-      --reporters cli,junit \
-      --reporter-junit-export test-results.xml
+1. Run the "Login" request from the Authentication folder
+2. Copy the `accessToken` from the response
+3. Set the `accessToken` environment variable
+4. For admin operations, use the `adminToken` variable
+
+## 🎨 Tenant Branding API Features
+
+### **Core Operations**
+
+#### **Get Tenant Branding**
+
+```http
+GET {{baseUrl}}/tenants/branding
+Authorization: Bearer {{accessToken}}
 ```
 
-## 🔐 Security Testing
+**Response:**
 
-### Token Management
+```json
+{
+  "success": true,
+  "branding": {
+    "theme": "light",
+    "colorScheme": {
+      "primary": "#3B82F6",
+      "secondary": "#6B7280",
+      "accent": "#10B981",
+      "background": "#FFFFFF",
+      "text": "#1F2937"
+    },
+    "typography": {
+      "fontFamily": "Inter, system-ui, sans-serif",
+      "fontSize": "16px",
+      "lineHeight": "1.5"
+    },
+    "logo": {
+      "url": "https://example.com/logo.png",
+      "type": "image",
+      "altText": "Company Logo"
+    },
+    "customCss": ""
+  },
+  "tenant": {
+    "id": "tenant-123",
+    "name": "Example Company"
+  },
+  "updatedAt": "2024-01-15T10:30:00.000Z"
+}
+```
 
-- **Access Token**: Short-lived (15 minutes)
-- **Refresh Token**: Long-lived (7 days) with rotation
-- **Token Storage**: Hashed in database
-- **Token Revocation**: Immediate or bulk
+#### **Update Tenant Branding (Admin Only)**
 
-### Test Scenarios
+```http
+PUT {{baseUrl}}/tenants/branding
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
 
-1. **Valid Token Access**: ✅ Should succeed
-2. **Invalid Token Access**: ❌ Should fail (401)
-3. **Expired Token Access**: ❌ Should fail (401)
-4. **Token Rotation**: ✅ Should return new tokens
-5. **Token Reuse**: ❌ Should fail (401)
+{
+  "theme": "dark",
+  "colorScheme": {
+    "primary": "#FF5733",
+    "secondary": "#33FF57",
+    "accent": "#3357FF",
+    "background": "#1A1A1A",
+    "text": "#FFFFFF"
+  },
+  "typography": {
+    "fontFamily": "Roboto, sans-serif",
+    "fontSize": "16px",
+    "lineHeight": "1.6"
+  },
+  "logo": {
+    "url": "https://example.com/logo.png",
+    "type": "image",
+    "altText": "Company Logo"
+  },
+  "customCss": ".custom-button { border-radius: 8px; }"
+}
+```
 
-## 📈 Performance Testing
+### **Validation Operations**
 
-### Response Time Tests
+#### **Validate Branding Configuration**
+
+```http
+POST {{baseUrl}}/tenants/branding/validate
+Content-Type: application/json
+
+{
+  "theme": "light",
+  "colorScheme": {
+    "primary": "#3B82F6",
+    "secondary": "#6B7280"
+  },
+  "typography": {
+    "fontFamily": "Inter, sans-serif",
+    "fontSize": "16px"
+  }
+}
+```
+
+**Response:**
+
+```json
+{
+  "isValid": true,
+  "errors": [],
+  "warnings": ["Secondary color is recommended"],
+  "previewUrl": "/api/tenants/branding/preview?theme=light&primaryColor=%233B82F6"
+}
+```
+
+### **Preview Operations**
+
+#### **Get Branding Preview**
+
+```http
+GET {{baseUrl}}/tenants/branding/preview
+Authorization: Bearer {{accessToken}}
+```
+
+#### **Generate Branding CSS**
+
+```http
+GET {{baseUrl}}/tenants/branding/css
+Authorization: Bearer {{accessToken}}
+```
+
+**Response:**
+
+```json
+{
+  "css": ":root {\n  --brand-primary: #3B82F6;\n  --brand-secondary: #6B7280;\n  --brand-accent: #10B981;\n  --brand-background: #FFFFFF;\n  --brand-text: #1F2937;\n  --brand-font-family: Inter, system-ui, sans-serif;\n  --brand-font-size: 16px;\n  --brand-line-height: 1.5;\n}\n\n.custom-button { background-color: var(--brand-primary); color: white; padding: 12px 24px; border-radius: 6px; }"
+}
+```
+
+### **Export/Import Operations**
+
+#### **Export Branding Configuration**
+
+```http
+GET {{baseUrl}}/tenants/branding/export
+Authorization: Bearer {{accessToken}}
+```
+
+**Response:**
+
+```json
+{
+  "configuration": {
+    "version": "1.0",
+    "exportDate": "2024-01-15T10:30:00.000Z",
+    "tenant": {
+      "id": "tenant-123",
+      "name": "Example Company"
+    },
+    "branding": {
+      "theme": "light",
+      "colorScheme": {
+        "primary": "#3B82F6"
+      }
+    }
+  },
+  "exportDate": "2024-01-15T10:30:00.000Z"
+}
+```
+
+#### **Import Branding Configuration (Admin Only)**
+
+```http
+POST {{baseUrl}}/tenants/branding/import
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "version": "1.0",
+  "exportDate": "2024-01-15T10:30:00.000Z",
+  "tenant": {
+    "id": "tenant-123",
+    "name": "Example Company"
+  },
+  "branding": {
+    "theme": "dark",
+    "colorScheme": {
+      "primary": "#FF5733"
+    }
+  }
+}
+```
+
+## 🧪 Testing Features
+
+### **Comprehensive Test Scripts**
+
+Each request includes detailed test scripts that verify:
+
+#### **Response Structure Tests**
 
 ```javascript
-pm.test('Response time is less than 200ms', function () {
-  pm.expect(pm.response.responseTime).to.be.below(200);
+pm.test('Response has required fields', function () {
+  const response = pm.response.json();
+  pm.expect(response).to.have.property('success');
+  pm.expect(response).to.have.property('branding');
+  pm.expect(response).to.have.property('tenant');
 });
 ```
 
-### Load Testing
+#### **Data Validation Tests**
 
-```bash
-# Run with multiple iterations
-newman run collections/SaaS-Boilerplate-Tests.postman_collection.json \
-  -e environments/Development.postman_environment.json \
-  --iteration-count 100 \
-  --delay-request 100
+```javascript
+pm.test('Branding configuration is valid', function () {
+  const response = pm.response.json();
+  pm.expect(response.success).to.be.true;
+  pm.expect(response.branding).to.have.property('theme');
+  pm.expect(response.branding).to.have.property('colorScheme');
+});
 ```
 
-## 🛠️ Customization
+#### **Performance Tests**
 
-### Adding New Endpoints
+```javascript
+pm.test('Response time is acceptable', function () {
+  pm.expect(pm.response.responseTime).to.be.below(1000);
+});
+```
 
-1. **Create Request**:
-   - Add to appropriate folder in collection
-   - Configure headers and authentication
-   - Add example request body
+#### **Cache Header Tests**
 
-2. **Add Tests**:
-   - Create corresponding test in test collection
-   - Add validation scripts
-   - Test error scenarios
+```javascript
+pm.test('Cache headers are present', function () {
+  pm.expect(pm.response.headers.get('Cache-Control')).to.exist;
+  pm.expect(pm.response.headers.get('ETag')).to.exist;
+});
+```
 
-3. **Update Documentation**:
-   - Update this README
-   - Add endpoint documentation
-   - Update environment variables
+### **Error Scenario Testing**
 
-### Environment Setup
+#### **Unauthorized Access**
 
-1. **Development**:
-   - `baseUrl`: `http://localhost:3001/api`
-   - Database: Local PostgreSQL
-   - Email: Mailhog
+```javascript
+pm.test('Status code is 401', function () {
+  pm.response.to.have.status(401);
+});
 
-2. **Staging**:
-   - `baseUrl`: `https://staging-api.example.com/api`
-   - Database: Staging PostgreSQL
-   - Email: SendGrid
+pm.test('Error message is clear', function () {
+  const response = pm.response.json();
+  pm.expect(response.message).to.equal('Unauthorized');
+});
+```
 
-3. **Production**:
-   - `baseUrl`: `https://api.example.com/api`
-   - Database: Production PostgreSQL
-   - Email: Production SendGrid
+#### **Forbidden Access (Non-Admin)**
 
-## 📚 API Documentation
+```javascript
+pm.test('Status code is 403', function () {
+  pm.response.to.have.status(403);
+});
 
-### Authentication Endpoints
+pm.test('Error message indicates admin requirement', function () {
+  const response = pm.response.json();
+  pm.expect(response.message).to.include('Admin access required');
+});
+```
 
-| Method | Endpoint                | Description                   |
-| ------ | ----------------------- | ----------------------------- |
-| POST   | `/auth/register`        | Register new user and tenant  |
-| POST   | `/auth/login`           | Login with email and password |
-| POST   | `/auth/refresh`         | Refresh access token          |
-| POST   | `/auth/logout`          | Logout and revoke tokens      |
-| GET    | `/auth/profile`         | Get user profile              |
-| POST   | `/auth/verify-email`    | Verify email address          |
-| POST   | `/auth/forgot-password` | Request password reset        |
-| POST   | `/auth/reset-password`  | Reset password                |
+### **Accessibility Testing**
 
-### RBAC Endpoints
+#### **Low Contrast Warning**
 
-| Method | Endpoint                             | Description              |
-| ------ | ------------------------------------ | ------------------------ |
-| POST   | `/permissions`                       | Create custom permission |
-| GET    | `/permissions`                       | Get all permissions      |
-| GET    | `/permissions/:id`                   | Get permission by ID     |
-| PUT    | `/permissions/:id`                   | Update permission        |
-| DELETE | `/permissions/:id`                   | Delete permission        |
-| POST   | `/roles`                             | Create custom role       |
-| GET    | `/roles`                             | Get all roles            |
-| GET    | `/roles/:id`                         | Get role by ID           |
-| PUT    | `/roles/:id`                         | Update role              |
-| DELETE | `/roles/:id`                         | Delete role              |
-| POST   | `/roles/users/:id/roles`             | Assign role to user      |
-| GET    | `/roles/users/:id/roles`             | Get user roles           |
-| DELETE | `/roles/users/:id/roles/:roleId`     | Remove role from user    |
-| GET    | `/roles/users/:id/permissions`       | Get user permissions     |
-| POST   | `/roles/users/:id/permissions/check` | Check user permission    |
+```javascript
+pm.test('Accessibility warning provided', function () {
+  const response = pm.response.json();
+  pm.expect(response.isValid).to.be.true;
+  pm.expect(response.warnings).to.include(
+    'Text and background colors may not provide sufficient contrast'
+  );
+});
+```
 
-### Tenant Switching Endpoints
+#### **Color Blindness Warning**
 
-| Method | Endpoint                                              | Description                      |
-| ------ | ----------------------------------------------------- | -------------------------------- |
-| GET    | `/tenants/user/memberships`                           | Get user tenant memberships      |
-| GET    | `/tenants/current`                                    | Get current tenant context       |
-| POST   | `/tenants/switch`                                     | Switch to different tenant       |
-| POST   | `/tenants/:tenantId/verify-access`                    | Verify access to specific tenant |
-| POST   | `/tenants/verify-access/bulk`                         | Bulk verify access to tenants    |
-| POST   | `/tenants/cache/clear`                                | Clear user tenant cache          |
-| POST   | `/tenants/admin/memberships`                          | Add user to tenant (Admin)       |
-| POST   | `/tenants/admin/memberships/:userId/:tenantId/remove` | Remove user from tenant (Admin)  |
-| GET    | `/tenants/health`                                     | Tenant switching health check    |
-| GET    | `/tenants/memberships/:membershipId`                  | Get membership details           |
+```javascript
+pm.test('Color blindness warning provided', function () {
+  const response = pm.response.json();
+  pm.expect(response.isValid).to.be.true;
+  pm.expect(response.warnings).to.include(
+    'Primary and secondary colors may not be distinguishable for color-blind users'
+  );
+});
+```
 
-### Health Check Endpoints
+## 🔧 Environment Variables
 
-| Method | Endpoint  | Description       |
-| ------ | --------- | ----------------- |
-| GET    | `/health` | API health status |
+### **Required Variables**
+
+- `baseUrl`: API base URL (e.g., `http://localhost:3001/api`)
+- `accessToken`: User authentication token
+- `adminToken`: Admin authentication token
+- `tenantId`: Current tenant ID
+
+### **Optional Variables**
+
+- `brandingId`: Branding configuration ID
+- `exportId`: Export configuration ID
+- `refreshToken`: Token refresh token
+
+### **Variable Usage Examples**
+
+#### **Setting Variables from Responses**
+
+```javascript
+// Store tenant ID for subsequent requests
+if (pm.response.code === 200) {
+  const response = pm.response.json();
+  pm.environment.set('tenantId', response.tenant.id);
+}
+```
+
+#### **Using Variables in Requests**
+
+```http
+GET {{baseUrl}}/tenants/{{tenantId}}/branding
+Authorization: Bearer {{accessToken}}
+```
+
+## 📊 Test Categories
+
+### **1. Core Branding Operations**
+
+- Get Tenant Branding
+- Update Tenant Branding (Admin Only)
+- Reset Tenant Branding (Admin Only)
+
+### **2. Validation Operations**
+
+- Validate Branding Configuration
+- Validate Invalid Branding Configuration
+- Validate Partial Branding Configuration
+
+### **3. Preview Operations**
+
+- Get Branding Preview
+- Generate Branding CSS
+
+### **4. Export/Import Operations**
+
+- Export Branding Configuration
+- Import Branding Configuration (Admin Only)
+- Import Invalid Configuration (Admin Only)
+
+### **5. Template Operations**
+
+- Get Default Branding Configuration
+
+### **6. Health & Monitoring**
+
+- Branding Service Health Check
+
+### **7. Error Scenarios**
+
+- Unauthorized Access
+- Forbidden Access (Non-Admin)
+- Invalid Branding Configuration
+- Tenant Not Found
+
+### **8. Accessibility Testing**
+
+- Low Contrast Colors Warning
+- Color Blindness Warning
+- Font Size Accessibility Warning
+
+### **9. Performance Testing**
+
+- Concurrent Branding Requests
+- Large CSS Generation
+
+## 🚀 Running Tests
+
+### **Individual Request Testing**
+
+1. Select a request from the collection
+2. Set up environment variables
+3. Click "Send"
+4. Review test results in the "Test Results" tab
+
+### **Collection Testing**
+
+1. Right-click on a collection folder
+2. Select "Run collection"
+3. Choose environment
+4. Configure iteration settings
+5. Click "Run"
+
+### **Automated Testing with Newman**
+
+```bash
+# Install Newman
+npm install -g newman
+
+# Run main collection
+newman run postman/collections/SaaS-Boilerplate-API.postman_collection.json \
+  --environment postman/environments/Development.postman_environment.json \
+  --reporters cli,json \
+  --reporter-json-export results.json
+
+# Run dedicated branding collection
+newman run postman/collections/Tenant-Branding-API.postman_collection.json \
+  --environment postman/environments/Development.postman_environment.json \
+  --reporters cli,json \
+  --reporter-json-export branding-results.json
+```
+
+## 📈 Test Coverage
+
+### **API Endpoint Coverage**
+
+- ✅ GET /tenants/branding
+- ✅ PUT /tenants/branding
+- ✅ DELETE /tenants/branding
+- ✅ POST /tenants/branding/validate
+- ✅ GET /tenants/branding/preview
+- ✅ GET /tenants/branding/css
+- ✅ GET /tenants/branding/export
+- ✅ POST /tenants/branding/import
+- ✅ GET /tenants/branding/default
+- ✅ GET /tenants/branding/health
+
+### **Test Scenario Coverage**
+
+- ✅ Happy path scenarios
+- ✅ Error handling scenarios
+- ✅ Authentication scenarios
+- ✅ Authorization scenarios
+- ✅ Validation scenarios
+- ✅ Performance scenarios
+- ✅ Accessibility scenarios
 
 ## 🔍 Troubleshooting
 
-### Common Issues
+### **Common Issues**
 
-1. **Connection Refused**:
-   - Ensure API server is running
-   - Check `baseUrl` in environment
-   - Verify port configuration
+#### **401 Unauthorized**
 
-2. **Authentication Errors**:
-   - Check token expiration
-   - Verify token format
-   - Ensure proper Authorization header
+- Ensure `accessToken` is set in environment
+- Verify token is not expired
+- Check token format: `Bearer <token>`
 
-3. **Test Failures**:
-   - Check environment variables
-   - Verify test data
-   - Review error messages
+#### **403 Forbidden**
 
-### Debug Mode
+- Use `adminToken` for admin operations
+- Verify user has required permissions
+- Check tenant access rights
 
-```bash
-# Enable verbose logging
-newman run collections/SaaS-Boilerplate-Tests.postman_collection.json \
-  -e environments/Development.postman_environment.json \
-  --verbose
-```
+#### **404 Not Found**
 
-## 📞 Support
+- Verify `tenantId` is correct
+- Check if tenant exists
+- Ensure proper URL path
 
-For issues with the Postman collections:
+#### **400 Bad Request**
 
-1. Check the API server logs
-2. Verify environment configuration
-3. Review test scripts for syntax errors
-4. Ensure all required services are running
+- Validate request body format
+- Check required fields
+- Verify data types
 
-## 🚀 Next Steps
+### **Debug Tips**
 
-- [x] ✅ RBAC Tests (Complete)
-- [x] ✅ Tenant Switching Tests (Complete)
-- [ ] Add User Management tests
-- [ ] Add Tenant Management tests
-- [ ] Add Billing & Subscription tests
-- [ ] Add File Management tests
-- [ ] Add WebSocket connection tests
-- [ ] Add Performance load tests
-- [ ] Add Security penetration tests
+1. Check request headers and body
+2. Review response status and body
+3. Examine test results for specific failures
+4. Verify environment variables
+5. Check console logs for additional details
+
+## 📚 Additional Resources
+
+### **Documentation**
+
+- [SOLID Principles Refactoring Guide](../docs/tenant-branding-solid-refactoring.md)
+- [API Documentation](../docs/architecture.md)
+- [Testing Guidelines](../docs/testing.md)
+
+### **Related Collections**
+
+- [SaaS-Boilerplate-API.postman_collection.json](./SaaS-Boilerplate-API.postman_collection.json) - **Enhanced with comprehensive branding endpoints**
+- [Tenant-Branding-API.postman_collection.json](./Tenant-Branding-API.postman_collection.json) - **Dedicated branding collection for detailed testing**
+
+### **Environment Files**
+
+- [Development.postman_environment.json](./environments/Development.postman_environment.json)
+- [Staging.postman_environment.json](./environments/Staging.postman_environment.json)
+- [Production.postman_environment.json](./environments/Production.postman_environment.json)
+
+## 🤝 Contributing
+
+When adding new endpoints or modifying existing ones:
+
+1. **Update Collections**: Add new requests to appropriate folders
+2. **Add Test Scripts**: Include comprehensive test scripts
+3. **Update Documentation**: Modify this README with new features
+4. **Test Thoroughly**: Ensure all scenarios are covered
+5. **Follow Patterns**: Maintain consistency with existing structure
+
+## 📄 License
+
+This project is part of the SaaS Boilerplate and follows the same licensing terms.

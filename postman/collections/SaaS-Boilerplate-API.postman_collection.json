@@ -94,6 +94,16 @@
       "key": "adminUserId",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "brandingId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "exportId",
+      "value": "",
+      "type": "string"
     }
   ],
   "auth": {
@@ -3507,6 +3517,473 @@
                   "host": ["{{baseUrl}}"],
                   "path": ["tenants", "memberships", "{{membershipId}}"]
                 }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tenant Branding",
+      "item": [
+        {
+          "name": "Get Tenant Branding",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tenants/branding",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "branding"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has required fields', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('success');",
+                  "    pm.expect(response).to.have.property('branding');",
+                  "    pm.expect(response).to.have.property('tenant');",
+                  "    pm.expect(response).to.have.property('updatedAt');",
+                  "});",
+                  "",
+                  "pm.test('Branding configuration is valid', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.success).to.be.true;",
+                  "    pm.expect(response.branding).to.have.property('theme');",
+                  "    pm.expect(response.branding).to.have.property('colorScheme');",
+                  "    pm.expect(response.branding).to.have.property('typography');",
+                  "    pm.expect(response.branding).to.have.property('logo');",
+                  "    pm.expect(response.tenant).to.have.property('id');",
+                  "    pm.expect(response.tenant).to.have.property('name');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Tenant Branding (Admin Only)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"theme\": \"dark\",\n  \"colorScheme\": {\n    \"primary\": \"#FF5733\",\n    \"secondary\": \"#33FF57\",\n    \"accent\": \"#3357FF\",\n    \"background\": \"#1A1A1A\",\n    \"text\": \"#FFFFFF\",\n    \"success\": \"#28A745\",\n    \"warning\": \"#FFC107\",\n    \"error\": \"#DC3545\"\n  },\n  \"typography\": {\n    \"fontFamily\": \"Roboto, sans-serif\",\n    \"fontSize\": \"16px\",\n    \"lineHeight\": \"1.6\",\n    \"headingFontFamily\": \"Poppins, sans-serif\",\n    \"headingFontSize\": \"24px\",\n    \"headingLineHeight\": \"1.25\"\n  },\n  \"logo\": {\n    \"url\": \"https://example.com/logo.png\",\n    \"type\": \"image\",\n    \"altText\": \"Company Logo\",\n    \"width\": \"200\",\n    \"height\": \"60\"\n  },\n  \"customCss\": \".custom-button { border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tenants/branding",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "branding"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Branding updated successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.success).to.be.true;",
+                  "    pm.expect(response.message).to.include('updated successfully');",
+                  "    pm.expect(response.branding.theme).to.equal('dark');",
+                  "    pm.expect(response.branding.colorScheme.primary).to.equal('#FF5733');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Validate Branding Configuration",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"theme\": \"light\",\n  \"colorScheme\": {\n    \"primary\": \"#3B82F6\",\n    \"secondary\": \"#6B7280\",\n    \"accent\": \"#10B981\",\n    \"background\": \"#FFFFFF\",\n    \"text\": \"#1F2937\",\n    \"success\": \"#10B981\",\n    \"warning\": \"#F59E0B\",\n    \"error\": \"#EF4444\"\n  },\n  \"typography\": {\n    \"fontFamily\": \"Inter, system-ui, sans-serif\",\n    \"fontSize\": \"16px\",\n    \"lineHeight\": \"1.5\",\n    \"headingFontFamily\": \"Inter, system-ui, sans-serif\",\n    \"headingFontSize\": \"24px\",\n    \"headingLineHeight\": \"1.25\"\n  },\n  \"logo\": {\n    \"url\": \"https://example.com/logo.png\",\n    \"type\": \"image\",\n    \"altText\": \"Company Logo\",\n    \"width\": \"200\",\n    \"height\": \"60\"\n  },\n  \"customCss\": \".brand-button { background-color: var(--brand-primary); color: white; padding: 12px 24px; border-radius: 6px; }\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tenants/branding/validate",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "branding", "validate"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Validation completed successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('isValid');",
+                  "    pm.expect(response).to.have.property('errors');",
+                  "    pm.expect(response).to.have.property('warnings');",
+                  "    pm.expect(response.isValid).to.be.true;",
+                  "    pm.expect(response.errors).to.be.an('array');",
+                  "    pm.expect(response.warnings).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Branding Preview",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tenants/branding/preview",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "branding", "preview"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Preview URL generated', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('previewUrl');",
+                  "    pm.expect(response.previewUrl).to.include('/api/tenants/branding/preview');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Generate Branding CSS",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tenants/branding/css",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "branding", "css"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('CSS generated successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('css');",
+                  "    pm.expect(response.css).to.be.a('string');",
+                  "    pm.expect(response.css).to.include(':root');",
+                  "    pm.expect(response.css).to.include('--brand-');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Export Branding Configuration",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tenants/branding/export",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "branding", "export"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Configuration exported successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('configuration');",
+                  "    pm.expect(response).to.have.property('exportDate');",
+                  "    pm.expect(response.configuration).to.have.property('version');",
+                  "    pm.expect(response.configuration).to.have.property('tenant');",
+                  "    pm.expect(response.configuration).to.have.property('branding');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Default Branding Configuration",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tenants/branding/default",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "branding", "default"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Default configuration returned', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.theme).to.equal('light');",
+                  "    pm.expect(response.colorScheme.primary).to.equal('#3B82F6');",
+                  "    pm.expect(response.typography.fontFamily).to.equal('Inter, system-ui, sans-serif');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reset Tenant Branding (Admin Only)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/tenants/branding",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "branding"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Branding reset successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.success).to.be.true;",
+                  "    pm.expect(response.message).to.include('reset to default');",
+                  "    pm.expect(response.branding.theme).to.equal('light');",
+                  "    pm.expect(response.branding.colorScheme.primary).to.equal('#3B82F6');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Import Branding Configuration (Admin Only)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"version\": \"1.0\",\n  \"exportDate\": \"2024-01-15T10:30:00.000Z\",\n  \"tenant\": {\n    \"id\": \"{{tenantId}}\",\n    \"name\": \"Test Company\"\n  },\n  \"branding\": {\n    \"theme\": \"dark\",\n    \"colorScheme\": {\n      \"primary\": \"#FF5733\",\n      \"secondary\": \"#33FF57\",\n      \"accent\": \"#3357FF\",\n      \"background\": \"#1A1A1A\",\n      \"text\": \"#FFFFFF\",\n      \"success\": \"#28A745\",\n      \"warning\": \"#FFC107\",\n      \"error\": \"#DC3545\"\n    },\n    \"typography\": {\n      \"fontFamily\": \"Arial, sans-serif\",\n      \"fontSize\": \"18px\",\n      \"lineHeight\": \"1.7\",\n      \"headingFontFamily\": \"Georgia, serif\",\n      \"headingFontSize\": \"28px\",\n      \"headingLineHeight\": \"1.2\"\n    },\n    \"logo\": {\n      \"url\": \"https://example.com/new-logo.png\",\n      \"type\": \"image\",\n      \"altText\": \"New Company Logo\",\n      \"width\": \"250\",\n      \"height\": \"80\"\n    },\n    \"customCss\": \".imported-style { background: linear-gradient(45deg, var(--brand-primary), var(--brand-secondary)); }\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tenants/branding/import",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "branding", "import"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Configuration imported successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.success).to.be.true;",
+                  "    pm.expect(response.message).to.include('imported successfully');",
+                  "    pm.expect(response.branding.theme).to.equal('dark');",
+                  "    pm.expect(response.branding.colorScheme.primary).to.equal('#FF5733');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Validate Invalid Branding Configuration",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"colorScheme\": {\n    \"primary\": \"invalid-color\",\n    \"secondary\": \"another-invalid\",\n    \"accent\": \"#invalid\"\n  },\n  \"typography\": {\n    \"fontSize\": \"invalid-size\",\n    \"lineHeight\": \"invalid-height\"\n  },\n  \"customCss\": \"expression(alert('xss')); background-image: url('javascript:alert(1)');\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tenants/branding/validate",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "branding", "validate"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Validation detects errors', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.isValid).to.be.false;",
+                  "    pm.expect(response.errors).to.be.an('array');",
+                  "    pm.expect(response.errors.length).to.be.greaterThan(0);",
+                  "    pm.expect(response.errors).to.include('Primary color must be a valid hex color');",
+                  "    pm.expect(response.errors).to.include('Custom CSS contains potentially dangerous content');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Branding Service Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tenants/branding/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["tenants", "branding", "health"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Health check successful', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.status).to.equal('ok');",
+                  "    pm.expect(response.service).to.equal('tenant-branding');",
+                  "    pm.expect(response.version).to.equal('2.0.0');",
+                  "    pm.expect(response.timestamp).to.be.a('string');",
+                  "});"
+                ],
+                "type": "text/javascript"
               }
             }
           ]

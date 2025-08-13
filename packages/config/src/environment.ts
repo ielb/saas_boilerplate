@@ -19,6 +19,9 @@ const envSchema = z.object({
   POSTGRES_HOST: z.string().default('localhost'),
   POSTGRES_PORT: z.string().transform(Number).default('5432'),
 
+  // Test Database Configuration
+  POSTGRES_TEST_DB: z.string().default('test_db'),
+
   // Redis Configuration
   REDIS_URL: z.string().url().default('redis://localhost:6379'),
   REDIS_HOST: z.string().default('localhost'),
