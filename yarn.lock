@@ -124,6 +124,7 @@ __metadata:
     "@types/uuid": "npm:^9.0.2"
     argon2: "npm:^0.31.0"
     aws-sdk: "npm:^2.1450.0"
+    axios: "npm:^1.11.0"
     bcrypt: "npm:^5.1.0"
     bull: "npm:^4.11.0"
     cache-manager: "npm:^7.1.1"
@@ -6790,7 +6791,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:^1.6.0":
+"axios@npm:^1.11.0, axios@npm:^1.6.0":
   version: 1.11.0
   resolution: "axios@npm:1.11.0"
   dependencies:

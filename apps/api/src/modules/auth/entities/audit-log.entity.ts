@@ -66,6 +66,12 @@ export enum AuditEventType {
   TENANT_MEMBERSHIP_DELETED = 'tenant_membership_deleted',
   TENANT_MEMBERSHIP_SUSPENDED = 'tenant_membership_suspended',
   TENANT_MEMBERSHIP_ACTIVATED = 'tenant_membership_activated',
+
+  // Tenant Branding Events
+  TENANT_BRANDING_UPDATED = 'tenant_branding_updated',
+  TENANT_BRANDING_RESET = 'tenant_branding_reset',
+  TENANT_BRANDING_IMPORTED = 'tenant_branding_imported',
+  TENANT_BRANDING_EXPORTED = 'tenant_branding_exported',
 }
 
 export enum AuditEventStatus {

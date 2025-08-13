@@ -2,8 +2,8 @@ import {
   MigrationInterface,
   QueryRunner,
   Table,
-  Index,
-  ForeignKey,
+  TableIndex,
+  TableForeignKey,
 } from 'typeorm';
 
 export class CreateUserTenantMemberships1700000000009
@@ -110,7 +110,7 @@ export class CreateUserTenantMemberships1700000000009
     // Create unique index on userId + tenantId
     await queryRunner.createIndex(
       'user_tenant_memberships',
-      Index({
+      new TableIndex({
         name: 'IDX_user_tenant_unique',
         columnNames: ['userId', 'tenantId'],
         isUnique: true,
@@ -120,7 +120,7 @@ export class CreateUserTenantMemberships1700000000009
     // Create indexes for performance
     await queryRunner.createIndex(
       'user_tenant_memberships',
-      Index({
+      new TableIndex({
         name: 'IDX_user_tenant_memberships_userId',
         columnNames: ['userId'],
       })
@@ -128,7 +128,7 @@ export class CreateUserTenantMemberships1700000000009
 
     await queryRunner.createIndex(
       'user_tenant_memberships',
-      Index({
+      new TableIndex({
         name: 'IDX_user_tenant_memberships_tenantId',
         columnNames: ['tenantId'],
       })
@@ -136,7 +136,7 @@ export class CreateUserTenantMemberships1700000000009
 
     await queryRunner.createIndex(
       'user_tenant_memberships',
-      Index({
+      new TableIndex({
         name: 'IDX_user_tenant_memberships_status',
         columnNames: ['status'],
       })
@@ -144,7 +144,7 @@ export class CreateUserTenantMemberships1700000000009
 
     await queryRunner.createIndex(
       'user_tenant_memberships',
-      Index({
+      new TableIndex({
         name: 'IDX_user_tenant_memberships_role',
         columnNames: ['role'],
       })
@@ -153,7 +153,7 @@ export class CreateUserTenantMemberships1700000000009
     // Create foreign key constraints
     await queryRunner.createForeignKey(
       'user_tenant_memberships',
-      ForeignKey({
+      new TableForeignKey({
         name: 'FK_user_tenant_memberships_userId',
         columnNames: ['userId'],
         referencedTableName: 'users',
@@ -165,7 +165,7 @@ export class CreateUserTenantMemberships1700000000009
 
     await queryRunner.createForeignKey(
       'user_tenant_memberships',
-      ForeignKey({
+      new TableForeignKey({
         name: 'FK_user_tenant_memberships_tenantId',
         columnNames: ['tenantId'],
         referencedTableName: 'tenants',
@@ -177,7 +177,7 @@ export class CreateUserTenantMemberships1700000000009
 
     await queryRunner.createForeignKey(
       'user_tenant_memberships',
-      ForeignKey({
+      new TableForeignKey({
         name: 'FK_user_tenant_memberships_invitedBy',
         columnNames: ['invitedBy'],
         referencedTableName: 'users',
@@ -210,7 +210,7 @@ export class CreateUserTenantMemberships1700000000009
     // Create foreign keys for junction table
     await queryRunner.createForeignKey(
       'user_membership_permissions',
-      ForeignKey({
+      new TableForeignKey({
         name: 'FK_user_membership_permissions_membershipId',
         columnNames: ['membershipId'],
         referencedTableName: 'user_tenant_memberships',
@@ -222,7 +222,7 @@ export class CreateUserTenantMemberships1700000000009
 
     await queryRunner.createForeignKey(
       'user_membership_permissions',
-      ForeignKey({
+      new TableForeignKey({
         name: 'FK_user_membership_permissions_permissionId',
         columnNames: ['permissionId'],
         referencedTableName: 'permissions',
