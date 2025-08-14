@@ -6,7 +6,6 @@ export * from './tenant-membership.dto';
 export * from './tenant-access.dto';
 export * from './update-usage.dto';
 export * from './update-feature-flag.dto';
-export * from './bulk-update-feature-flags.dto';
 export * from './pagination-response.dto';
 export * from './tenant-onboarding.dto';
 export * from './tenant-branding.dto';

@@ -4,16 +4,40 @@ import { TenantFeature } from '../../auth/entities/tenant-feature-flag.entity';
  * Convert feature names to enum values
  */
 export function convertFeatureToEnum(feature: string): TenantFeature | null {
-  // Handle null/undefined inputs
-  if (!feature) {
-    return null;
-  }
-  
-  // Normalize the input to lowercase for case-insensitive matching
-  const normalizedFeature = feature.toLowerCase();
-
   const featureMap: Record<string, TenantFeature> = {
-    // snake_case format (normalized to lowercase)
+    // Enum keys to values
+    MFA_ENFORCEMENT: TenantFeature.MFA_ENFORCEMENT,
+    SSO_INTEGRATION: TenantFeature.SSO_INTEGRATION,
+    PASSWORD_POLICY: TenantFeature.PASSWORD_POLICY,
+    BULK_USER_IMPORT: TenantFeature.BULK_USER_IMPORT,
+    USER_PROVISIONING: TenantFeature.USER_PROVISIONING,
+    ADVANCED_ROLES: TenantFeature.ADVANCED_ROLES,
+    EMAIL_TEMPLATES: TenantFeature.EMAIL_TEMPLATES,
+    SMS_NOTIFICATIONS: TenantFeature.SMS_NOTIFICATIONS,
+    PUSH_NOTIFICATIONS: TenantFeature.PUSH_NOTIFICATIONS,
+    ADVANCED_FILE_MANAGEMENT: TenantFeature.ADVANCED_FILE_MANAGEMENT,
+    FILE_VERSIONING: TenantFeature.FILE_VERSIONING,
+    FILE_ENCRYPTION: TenantFeature.FILE_ENCRYPTION,
+    ADVANCED_ANALYTICS: TenantFeature.ADVANCED_ANALYTICS,
+    CUSTOM_REPORTS: TenantFeature.CUSTOM_REPORTS,
+    EXPORT_CAPABILITIES: TenantFeature.EXPORT_CAPABILITIES,
+    API_WEBHOOKS: TenantFeature.API_WEBHOOKS,
+    THIRD_PARTY_INTEGRATIONS: TenantFeature.THIRD_PARTY_INTEGRATIONS,
+    CUSTOM_INTEGRATIONS: TenantFeature.CUSTOM_INTEGRATIONS,
+    ADVANCED_SECURITY: TenantFeature.ADVANCED_SECURITY,
+    AUDIT_LOGGING: TenantFeature.AUDIT_LOGGING,
+    COMPLIANCE_REPORTING: TenantFeature.COMPLIANCE_REPORTING,
+    USAGE_BASED_BILLING: TenantFeature.USAGE_BASED_BILLING,
+    ADVANCED_BILLING: TenantFeature.ADVANCED_BILLING,
+    INVOICE_CUSTOMIZATION: TenantFeature.INVOICE_CUSTOMIZATION,
+    WEBSOCKET_FEATURES: TenantFeature.WEBSOCKET_FEATURES,
+    REAL_TIME_COLLABORATION: TenantFeature.REAL_TIME_COLLABORATION,
+    LIVE_CHAT: TenantFeature.LIVE_CHAT,
+    ADMIN_DASHBOARD: TenantFeature.ADMIN_DASHBOARD,
+    SYSTEM_MONITORING: TenantFeature.SYSTEM_MONITORING,
+    BACKUP_RESTORE: TenantFeature.BACKUP_RESTORE,
+
+    // Direct enum values
     mfa_enforcement: TenantFeature.MFA_ENFORCEMENT,
     sso_integration: TenantFeature.SSO_INTEGRATION,
     password_policy: TenantFeature.PASSWORD_POLICY,
@@ -46,7 +70,7 @@ export function convertFeatureToEnum(feature: string): TenantFeature | null {
     backup_restore: TenantFeature.BACKUP_RESTORE,
   };
 
-  return featureMap[normalizedFeature] || null;
+  return featureMap[feature] || null;
 }
 
 /**
