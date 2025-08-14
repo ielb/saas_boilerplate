@@ -112,15 +112,15 @@ export class CreateRefreshTokens1700000000000 implements MigrationInterface {
 
     // Create indexes using raw SQL
     await queryRunner.query(
-      'CREATE INDEX IDX_REFRESH_TOKENS_TOKEN_ID ON refresh_tokens (token_id)'
+      'CREATE INDEX IDX_REFRESH_TOKENS_TOKEN_ID ON refresh_tokens ("tokenId")'
     );
 
     await queryRunner.query(
-      'CREATE INDEX IDX_REFRESH_TOKENS_USER_REVOKED ON refresh_tokens (user_id, is_revoked)'
+      'CREATE INDEX IDX_REFRESH_TOKENS_USER_REVOKED ON refresh_tokens (user_id, "isRevoked")'
     );
 
     await queryRunner.query(
-      'CREATE INDEX IDX_REFRESH_TOKENS_EXPIRES_AT ON refresh_tokens (expires_at)'
+      'CREATE INDEX IDX_REFRESH_TOKENS_EXPIRES_AT ON refresh_tokens ("expiresAt")'
     );
   }
 

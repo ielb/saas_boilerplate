@@ -178,7 +178,16 @@ Based on PRD: `docs/prd.md`
   - [x] 3.4 Set up tenant onboarding workflow (#20)
   - [x] 3.5 Create tenant switching functionality (#21) ✅
   - [x] 3.6 Implement tenant branding customization (#30) ✅
-  - [ ] 3.7 Set up feature flags per tenant (#31)
+  - [x] 3.7 Set up feature flags per tenant (#31)
+  - [x] 3.7.1 Create comprehensive unit tests for feature flags
+  - [x] 3.7.2 Create unit tests for feature flag repository
+  - [x] 3.7.3 Create unit tests for feature converter utility
+  - [x] 3.7.4 Create integration tests for feature flags endpoints
+  - [x] 3.7.5 Add bulk operations endpoints for feature flags
+  - [x] 3.7.6 Add feature flags statistics endpoint
+  - [x] 3.7.7 Create Postman collection for feature flags testing
+  - [x] 3.7.8 Fix case sensitivity issues in feature converter
+  - [x] 3.7.9 Add proper error handling and validation
   - [ ] 3.8 Create user lifecycle management (registration, activation, suspension) (#32)
   - [ ] 3.9 Implement user profile management with avatar upload (#33)
   - [ ] 3.10 Create team collaboration with role hierarchy (#34)
