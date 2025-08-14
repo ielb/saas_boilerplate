@@ -2,6 +2,50 @@
 
 This directory contains utility scripts for managing the SaaS Boilerplate project.
 
+## 🌱 Database Seeding
+
+Database seeding scripts have been moved to the API folder for better organization and to resolve import path issues.
+
+### Quick Start
+
+```bash
+# Run the comprehensive database seeding script
+cd apps/api && ./scripts/seed.sh
+```
+
+This will create:
+
+- ✅ All permissions based on PermissionResource and PermissionAction enums
+- ✅ All system roles with proper hierarchy
+- ✅ Role-permission relationships
+- ✅ Test users with different roles
+- ✅ Two tenants: System (Super Admin) and Acmac (all other users)
+- ✅ User-tenant memberships
+
+### Test Users Created
+
+| Email                    | Password         | Role        | Tenant | Description           |
+| ------------------------ | ---------------- | ----------- | ------ | --------------------- |
+| `superadmin@example.com` | `SuperAdmin123!` | Super Admin | System | Full system access    |
+| `admin@example.com`      | `Admin123!`      | Admin       | Acmac  | Administrative access |
+| `manager@example.com`    | `Manager123!`    | Manager     | Acmac  | Team management       |
+| `member@example.com`     | `Member123!`     | Member      | Acmac  | Basic operations      |
+| `viewer@example.com`     | `Viewer123!`     | Viewer      | Acmac  | Read-only access      |
+
+### Testing the Seeding
+
+```bash
+# Test that seeding worked correctly
+cd apps/api && yarn db:test-seeding
+
+# Test login with created users
+curl -X POST http://localhost:3001/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"superadmin@example.com","password":"SuperAdmin123!"}'
+```
+
+For detailed information about the seeding process, see [apps/api/scripts/README.md](./apps/api/scripts/README.md).
+
 ## 🐳 Docker Service Management
 
 ### Quick Commands

@@ -26,7 +26,9 @@
     "db:drop": "PGPASSWORD=saas_password dropdb -h localhost -U saas_user saas_boilerplate",
     "db:drop:test": "PGPASSWORD=saas_password dropdb -h localhost -U saas_user test_db",
     "test:setup": "npm run db:reset:test",
-    "test:cleanup": "npm run db:drop:test"
+    "test:cleanup": "npm run db:drop:test",
+    "db:seed": "ts-node scripts/seed-database.ts",
+    "db:test-seeding": "ts-node scripts/test-seeding.ts"
   },
   "dependencies": {
     "@app/config": "workspace:*",
@@ -47,7 +49,7 @@
     "@nestjs/throttler": "^5.0.0",
     "@nestjs/typeorm": "^10.0.0",
     "@nestjs/websockets": "^10.0.0",
-    "argon2": "^0.31.0",
+    "argon2": "^0.44.0",
     "aws-sdk": "^2.1450.0",
     "axios": "^1.11.0",
     "bcrypt": "^5.1.0",
@@ -84,7 +86,7 @@
     "stripe": "^13.0.0",
     "twilio": "^4.10.0",
     "typeorm": "^0.3.17",
-    "uuid": "^9.0.0",
+    "uuid": "^11.1.0",
     "webpack": "^5.101.1"
   },
   "devDependencies": {
@@ -105,12 +107,12 @@
     "@types/qrcode": "^1.5.5",
     "@types/speakeasy": "^2.0.10",
     "@types/supertest": "^2.0.12",
-    "@types/uuid": "^9.0.2",
+    "@types/uuid": "^10.0.0",
     "jest": "^29.5.0",
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.0",
     "ts-loader": "^9.4.3",
-    "ts-node": "^10.9.1",
+    "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.1.3"
   },

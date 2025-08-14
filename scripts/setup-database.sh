@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # ====================================================================
-# SUPER ADMIN SETUP SCRIPT
-# Comprehensive script to set up Super Admin permissions
+# DATABASE SETUP SCRIPT
+# Comprehensive script to set up database with roles and permissions
 # ====================================================================
 
 # Colors for output
@@ -15,8 +15,8 @@ CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # Header
-echo -e "${PURPLE}🔐 SUPER ADMIN SETUP SCRIPT${NC}"
-echo -e "${PURPLE}=============================${NC}"
+echo -e "${PURPLE}🗄️ DATABASE SETUP SCRIPT${NC}"
+echo -e "${PURPLE}========================${NC}"
 echo ""
 
 # Check if Docker is running
@@ -43,13 +43,20 @@ else
     exit 1
 fi
 
-echo -e "${BLUE}📋 Step 2: Running Super Admin Permissions Manager${NC}"
-if docker exec -i saas-postgres psql -U saas_user -d saas_boilerplate < scripts/super-admin-permissions-manager.sql; then
-    echo -e "${GREEN}✅ Super Admin permissions setup completed${NC}"
+echo -e "${BLUE}📋 Step 2: Running Database Seeding${NC}"
+echo -e "${YELLOW}💡 Using the new TypeScript-based seeding system...${NC}"
+
+# Change to API directory and run seeding
+cd apps/api
+if yarn db:seed; then
+    echo -e "${GREEN}✅ Database seeding completed successfully${NC}"
 else
-    echo -e "${RED}❌ Failed to set up Super Admin permissions${NC}"
+    echo -e "${RED}❌ Failed to seed database${NC}"
     exit 1
 fi
+
+# Go back to root directory
+cd ../..
 
 echo ""
 echo -e "${BLUE}📋 Step 3: Verification${NC}"
@@ -58,11 +65,17 @@ echo -e "${BLUE}📋 Step 3: Verification${NC}"
 if curl -s http://localhost:3001/health > /dev/null 2>&1; then
     echo -e "${GREEN}✅ API server is running${NC}"
     
-    echo -e "${BLUE}📋 Step 4: Testing Super Admin Permissions${NC}"
-    if [ -f "./scripts/test-super-admin-permissions.sh" ]; then
-        ./scripts/test-super-admin-permissions.sh
+        echo -e "${BLUE}📋 Step 4: Testing Database Setup${NC}"
+    echo -e "${YELLOW}💡 Running seeding verification...${NC}"
+    
+    # Change to API directory and run verification
+    cd apps/api
+    if yarn db:test-seeding; then
+        echo -e "${GREEN}✅ Database seeding verification completed${NC}"
+        cd ../..
     else
-        echo -e "${YELLOW}⚠️  Test script not found, running manual test...${NC}"
+        echo -e "${YELLOW}⚠️  Verification failed, running manual test...${NC}"
+        cd ../..
         
         # Manual test
         LOGIN_RESPONSE=$(curl -s -X POST http://localhost:3001/api/auth/login \
@@ -95,19 +108,20 @@ else
 fi
 
 echo ""
-echo -e "${PURPLE}🎉 SUPER ADMIN SETUP COMPLETED! 🎉${NC}"
-echo -e "${PURPLE}====================================${NC}"
+echo -e "${PURPLE}🎉 DATABASE SETUP COMPLETED! 🎉${NC}"
+echo -e "${PURPLE}================================${NC}"
 echo ""
 echo -e "${BLUE}📊 Summary:${NC}"
 echo -e "   ✅ Database setup: Complete"
-echo -e "   ✅ Super Admin role: Created/Updated"
-echo -e "   ✅ Owner role: Updated with all permissions"
-echo -e "   ✅ User assignments: Complete"
-echo -e "   ✅ Permissions: All 132+ permissions assigned"
+echo -e "   ✅ Role hierarchy: Created (6 roles)"
+echo -e "   ✅ Permissions: All 231 permissions assigned"
+echo -e "   ✅ Test users: 5 users created"
+echo -e "   ✅ Tenants: System and Acmac tenants created"
+echo -e "   ✅ User-tenant memberships: All linked"
 echo ""
 echo -e "${BLUE}🚀 Next Steps:${NC}"
-echo -e "   1. Start API server: ${CYAN}cd apps/api && npm run start:dev${NC}"
-echo -e "   2. Test permissions: ${CYAN}./scripts/test-super-admin-permissions.sh${NC}"
-echo -e "   3. Login as Super Admin: ${CYAN}superadmin@example.com / SuperAdmin123!${NC}"
+echo -e "   1. Start API server: ${CYAN}cd apps/api && yarn start:dev${NC}"
+echo -e "   2. Test login: ${CYAN}superadmin@example.com / SuperAdmin123!${NC}"
+echo -e "   3. Re-seed if needed: ${CYAN}cd apps/api && ./scripts/seed.sh${NC}"
 echo ""
 echo -e "${GREEN}✨ Your Super Admin is ready to use! ✨${NC}"
