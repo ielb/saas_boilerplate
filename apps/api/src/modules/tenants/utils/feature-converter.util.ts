@@ -4,6 +4,13 @@ import { TenantFeature } from '../../auth/entities/tenant-feature-flag.entity';
  * Convert feature names to enum values
  */
 export function convertFeatureToEnum(feature: string): TenantFeature | null {
+  // Handle null/undefined inputs
+  if (!feature) {
+    return null;
+  }
+
+  // Normalize the input to lowercase for case-insensitive matching
+  const normalizedFeature = feature.toLowerCase();
   const featureMap: Record<string, TenantFeature> = {
     // Enum keys to values
     MFA_ENFORCEMENT: TenantFeature.MFA_ENFORCEMENT,
@@ -70,7 +77,7 @@ export function convertFeatureToEnum(feature: string): TenantFeature | null {
     backup_restore: TenantFeature.BACKUP_RESTORE,
   };
 
-  return featureMap[feature] || null;
+  return featureMap[normalizedFeature] || null;
 }
 
 /**

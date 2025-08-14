@@ -59,6 +59,7 @@
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "expo-server-sdk": "^3.7.0",
+    "express": "^5.1.0",
     "express-rate-limit": "^6.10.0",
     "express-slow-down": "^2.1.0",
     "express-validator": "^7.0.1",
@@ -66,6 +67,7 @@
     "handlebars": "^4.7.8",
     "helmet": "^7.0.0",
     "jsonwebtoken": "^9.0.2",
+    "keyv": "^5.5.0",
     "mjml": "^4.13.0",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.0",
@@ -82,7 +84,8 @@
     "stripe": "^13.0.0",
     "twilio": "^4.10.0",
     "typeorm": "^0.3.17",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "webpack": "^5.101.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

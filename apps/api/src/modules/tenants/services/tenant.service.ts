@@ -749,6 +749,66 @@ export class TenantService {
   }
 
   /**
+   * Bulk update feature flags for a tenant
+   */
+  async bulkUpdateFeatureFlags(
+    tenantId: string,
+    updates: Array<{
+      feature: TenantFeature;
+      isEnabled: boolean;
+      config?: Record<string, any>;
+    }>
+  ): Promise<TenantFeatureFlag[]> {
+    try {
+      await this.getTenantById(tenantId); // Verify tenant exists
+
+      const updatedFlags: TenantFeatureFlag[] = [];
+
+      for (const update of updates) {
+        const featureFlag = await this.updateFeatureFlag(
+          tenantId,
+          update.feature,
+          update.isEnabled,
+          update.config
+        );
+        updatedFlags.push(featureFlag);
+      }
+
+      return updatedFlags;
+    } catch (error: any) {
+      this.logger.error(
+        `Failed to bulk update feature flags for tenant ${tenantId}:`,
+        error
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Get feature flags statistics for a tenant
+   */
+  async getFeatureFlagsStats(tenantId: string): Promise<{
+    total: number;
+    enabled: number;
+    disabled: number;
+  }> {
+    await this.getTenantById(tenantId); // Verify tenant exists
+
+    const [total, enabled] = await Promise.all([
+      this.tenantFeatureFlagRepository.count({ where: { tenantId } }),
+      this.tenantFeatureFlagRepository.count({
+        where: { tenantId, isEnabled: true },
+      }),
+    ]);
+
+    return {
+      total,
+      enabled,
+      disabled: total - enabled,
+    };
+  }
+
+  /**
    * Initialize default feature flags for a new tenant
    */
   private async initializeDefaultFeatureFlags(tenantId: string): Promise<void> {

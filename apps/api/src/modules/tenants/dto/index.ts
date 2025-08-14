@@ -9,3 +9,4 @@ export * from './update-feature-flag.dto';
 export * from './pagination-response.dto';
 export * from './tenant-onboarding.dto';
 export * from './tenant-branding.dto';
+export * from './bulk-update-feature-flags.dto';
