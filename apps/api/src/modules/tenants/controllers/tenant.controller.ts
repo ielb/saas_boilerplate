@@ -28,6 +28,7 @@ import {
   TenantQueryDto,
   UpdateUsageDto,
   UpdateFeatureFlagDto,
+  BulkUpdateFeatureFlagsDto,
   PaginationResponseDto,
 } from '../dto';
 import {
@@ -441,5 +442,74 @@ export class TenantController {
       body.enabled,
       body.config
     );
+  }
+
+  @Put(':id/features/bulk')
+  @UseInterceptors(AuditInterceptor)
+  @AuditEvent(AuditConfigs.FEATURE_FLAG_UPDATED)
+  @Roles(UserRole.ADMIN, UserRole.OWNER)
+  @ApiOperation({ summary: 'Bulk update tenant feature flags' })
+  @ApiParam({ name: 'id', description: 'Tenant ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Feature flags updated successfully',
+    type: [TenantFeatureFlag],
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid feature values or request body',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Tenant not found',
+  })
+  async bulkUpdateFeatureFlags(
+    @Param('id') id: string,
+    @Body() body: BulkUpdateFeatureFlagsDto
+  ): Promise<TenantFeatureFlag[]> {
+    // Convert and validate all feature parameters
+    const updates = body.updates.map(update => {
+      const enumFeature = convertFeatureToEnum(update.feature);
+      if (!enumFeature) {
+        throw new BadRequestException(
+          `Invalid feature: "${update.feature}". Valid features are: ${getValidFeatures().join(', ')}`
+        );
+      }
+      return {
+        feature: enumFeature,
+        isEnabled: update.enabled,
+        ...(update.config && { config: update.config }),
+      };
+    });
+
+    return await this.tenantService.bulkUpdateFeatureFlags(id, updates);
+  }
+
+  @Get(':id/features/stats')
+  @Roles(UserRole.ADMIN, UserRole.OWNER)
+  @ApiOperation({ summary: 'Get tenant feature flags statistics' })
+  @ApiParam({ name: 'id', description: 'Tenant ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Feature flags statistics retrieved successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        total: { type: 'number' },
+        enabled: { type: 'number' },
+        disabled: { type: 'number' },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Tenant not found',
+  })
+  async getFeatureFlagsStats(@Param('id') id: string): Promise<{
+    total: number;
+    enabled: number;
+    disabled: number;
+  }> {
+    return await this.tenantService.getFeatureFlagsStats(id);
   }
 }
