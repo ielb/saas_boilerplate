@@ -13,6 +13,7 @@
     "build": "yarn workspaces run build",
     "test": "yarn workspaces run test",
     "test:api": "yarn workspace @app/api test",
+    "seed:db": "cd apps/api && yarn db:seed",
     "test:unit": "yarn workspaces run test:unit",
     "test:e2e": "yarn workspaces run test:e2e",
     "test:coverage": "yarn workspaces run test:coverage",

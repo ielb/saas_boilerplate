@@ -1,215 +1,210 @@
-# Database Management Scripts
+# API Scripts
 
-This directory contains scripts for managing the database in development and testing environments.
+This directory contains utility scripts for the API application.
 
-## 📋 Available Commands
+## Database Seeding Scripts
 
-### Database Reset Commands
+### Quick Start
 
-```bash
-# Reset main database (development/production)
-npm run db:reset
-
-# Reset test database
-npm run db:reset:test
-
-# Create main database
-npm run db:create
-
-# Create test database
-npm run db:create:test
-
-# Drop main database
-npm run db:drop
-
-# Drop test database
-npm run db:drop:test
-```
-
-### Migration Commands
+To seed your database with test data, run:
 
 ```bash
-# Run migrations on main database
-npm run db:migrate
-
-# Run migrations on test database
-npm run db:migrate:test
+cd apps/api
+./scripts/seed.sh
 ```
 
-### Test Setup Commands
+Or use the npm scripts:
 
 ```bash
-# Setup test environment (create + reset test database)
-npm run test:setup
-
-# Cleanup test environment (drop test database)
-npm run test:cleanup
+cd apps/api
+yarn db:seed        # Run seeding only
+yarn db:test-seeding # Run verification only
 ```
 
-## 🗄️ Database Configuration
+### Available Scripts
 
-### Main Database
+#### `seed-database.ts`
 
-- **Database**: `saas_boilerplate`
-- **User**: `saas_user`
-- **Password**: `saas_password`
-- **Host**: `localhost`
-- **Port**: `5432`
+Comprehensive database seeding script that:
 
-### Test Database
+- Creates all permissions based on `PermissionResource` and `PermissionAction` enums
+- Creates system roles with proper hierarchy
+- Assigns permissions to roles
+- Creates test users with different roles
+- Creates tenants and user-tenant memberships
 
-- **Database**: `test_db`
-- **User**: `saas_user` (same as main database)
-- **Password**: `saas_password` (same as main database)
-- **Host**: `localhost`
-- **Port**: `5432`
+#### `test-seeding.ts`
 
-## 🧪 Test Database Setup
+Verification script that:
 
-The test database is automatically configured when running tests:
+- Checks the count of permissions, roles, users, and tenants
+- Verifies role-permission relationships
+- Tests user authentication
+- Validates data integrity
 
-1. **Jest Setup**: `jest.setup.ts` automatically initializes the test database
-2. **Test Isolation**: Each test run gets a fresh database schema
-3. **Data Cleanup**: All data is cleared between test runs
-4. **Transaction Support**: Tests can use transactions for data isolation
+#### `seed.sh`
 
-### Test Database Features
+Shell script wrapper that:
 
-- ✅ **Automatic Setup**: Database is created and migrated automatically
-- ✅ **Data Isolation**: Each test gets a clean database state
-- ✅ **Transaction Support**: Tests can use database transactions
-- ✅ **Test Utilities**: Helper functions for creating test data
-- ✅ **Automatic Cleanup**: Database is cleaned up after tests
+- Checks database connectivity
+- Runs the seeding script
+- Runs the verification script
+- Provides a summary of created data
 
-## 🔧 Environment Variables
+### Test Users Created
 
-### Required for Main Database
+The seeding process creates the following test users:
 
-```bash
-DATABASE_URL=postgresql://saas_user:saas_password@localhost:5432/saas_boilerplate
-POSTGRES_DB=saas_boilerplate
-POSTGRES_USER=saas_user
-POSTGRES_PASSWORD=saas_password
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
-```
+| Email                  | Password       | Role        | Tenant |
+| ---------------------- | -------------- | ----------- | ------ |
+| superadmin@example.com | SuperAdmin123! | Super Admin | System |
+| admin@example.com      | Admin123!      | Admin       | Acmac  |
+| manager@example.com    | Manager123!    | Manager     | Acmac  |
+| member@example.com     | Member123!     | Member      | Acmac  |
+| viewer@example.com     | Viewer123!     | Viewer      | Acmac  |
 
-### Required for Test Database
+### Prerequisites
 
-```bash
-POSTGRES_TEST_DB=test_db
-```
-
-## 📝 Usage Examples
-
-### Development Workflow
-
-```bash
-# 1. Start fresh development database
-npm run db:drop
-npm run db:create
-npm run db:reset
-
-# 2. Run development server
-npm run start:dev
-```
-
-### Testing Workflow
-
-```bash
-# 1. Setup test environment
-npm run test:setup
-
-# 2. Run tests
-npm run test
-
-# 3. Cleanup (optional)
-npm run test:cleanup
-```
-
-### Database Reset Workflow
-
-```bash
-# Reset main database (drops all data and runs migrations)
-npm run db:reset
-
-# Reset test database
-npm run db:reset:test
-```
-
-## 🛠️ Manual Database Operations
-
-### Using psql
-
-```bash
-# Connect to main database
-psql -h localhost -U saas_user -d saas_boilerplate
-
-# Connect to test database
-psql -h localhost -U test_user -d test_db
-```
-
-### Using createdb/dropdb
-
-```bash
-# Create databases
-createdb -h localhost -U saas_user saas_boilerplate
-createdb -h localhost -U test_user test_db
-
-# Drop databases
-dropdb -h localhost -U saas_user saas_boilerplate
-dropdb -h localhost -U test_user test_db
-```
-
-## 🔍 Troubleshooting
-
-### Common Issues
-
-1. **Connection Refused**
+1. **Database Running**: Ensure PostgreSQL is running
 
    ```bash
-   # Check if PostgreSQL is running
-   brew services list | grep postgresql
-   # or
-   sudo systemctl status postgresql
+   docker-compose up -d postgres
    ```
 
-2. **Permission Denied**
+2. **Dependencies Installed**: Install API dependencies
 
    ```bash
-   # Create user if it doesn't exist
-   createuser -h localhost -U postgres saas_user
-   createuser -h localhost -U postgres test_user
+   cd apps/api
+   yarn install
    ```
 
-3. **Database Doesn't Exist**
-
+3. **Environment Variables**: Set up database connection (optional, defaults provided)
    ```bash
-   # Create databases
-   npm run db:create
-   npm run db:create:test
+   export DB_HOST=localhost
+   export DB_PORT=5432
+   export DB_USERNAME=saas_user
+   export DB_PASSWORD=saas_password
+   export DB_DATABASE=saas_boilerplate
    ```
 
-4. **Migration Errors**
-   ```bash
-   # Reset and run migrations
-   npm run db:reset
-   npm run db:reset:test
-   ```
+### Usage Examples
 
-### Debug Mode
+#### Run Complete Seeding Process
 
 ```bash
-# Run reset with verbose logging
-DEBUG=* npm run db:reset
-
-# Run tests with database logging
-npm run test -- --verbose
+cd apps/api
+./scripts/seed.sh
 ```
 
-## 📚 Additional Resources
+#### Run Individual Scripts
 
-- [TypeORM Documentation](https://typeorm.io/)
-- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
-- [Jest Testing Framework](https://jestjs.io/)
-- [NestJS Testing](https://docs.nestjs.com/fundamentals/testing)
+```bash
+cd apps/api
+
+# Seed database only
+yarn db:seed
+
+# Verify seeding only
+yarn db:test-seeding
+```
+
+#### Test API with Created Users
+
+```bash
+# SuperAdmin login
+curl -X POST http://localhost:3001/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"superadmin@example.com","password":"SuperAdmin123!"}'
+
+# Admin login
+curl -X POST http://localhost:3001/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@example.com","password":"Admin123!"}'
+```
+
+### What Gets Created
+
+#### Permissions
+
+- All combinations of `PermissionResource` × `PermissionAction`
+- Proper scope assignment (GLOBAL vs TENANT)
+- Unique permission names
+
+#### Roles
+
+- Super Admin (all permissions)
+- Owner (all permissions)
+- Admin (tenant permissions only)
+- Manager (user/team management)
+- Member (basic operations)
+- Viewer (read-only access)
+
+#### Users
+
+- 5 test users with different roles
+- Properly hashed passwords using Argon2
+- Email verification completed
+- Active status
+
+#### Tenants
+
+- **System**: System administration tenant for Super Admin
+- **Acmac**: Main tenant for all other users (Admin, Manager, Member, Viewer)
+- Proper configuration and settings
+- Active status
+
+#### Memberships
+
+- User-tenant relationships
+- Active membership status
+- Proper role assignments
+
+### Troubleshooting
+
+#### Import Errors
+
+If you encounter import errors, ensure you're running from the API directory:
+
+```bash
+cd apps/api
+yarn db:seed
+```
+
+#### Database Connection Issues
+
+Check if the database is running:
+
+```bash
+docker-compose ps postgres
+```
+
+#### Permission Denied
+
+Make the script executable:
+
+```bash
+chmod +x apps/api/scripts/seed.sh
+```
+
+### Re-running Seeding
+
+The scripts are idempotent - you can run them multiple times safely:
+
+- Existing records will be skipped
+- New records will be created
+- Relationships will be updated
+
+### Customization
+
+To modify the seeding data, edit the constants in the scripts:
+
+- `TEST_USERS` in `seed-database.ts`
+- `EXPECTED_ROLES` and `EXPECTED_USERS` in `test-seeding.ts`
+
+### Notes
+
+- Scripts use TypeORM repositories for database operations
+- Passwords are hashed using Argon2
+- All created data is marked as active and verified
+- Scripts include comprehensive error handling and logging
+- Verification script provides detailed feedback on data integrity
