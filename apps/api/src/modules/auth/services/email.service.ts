@@ -202,7 +202,11 @@ export class EmailService {
       | 'account-recovery'
       | 'account-recovery-completed'
       | 'tenant-onboarding-verification'
-      | 'tenant-onboarding-welcome';
+      | 'tenant-onboarding-welcome'
+      | 'user-activation'
+      | 'user-suspension'
+      | 'user-reactivation'
+      | 'user-deletion';
 
     const templates: Record<TemplateType, { html: string; text: string }> = {
       'email-verification': {
@@ -390,6 +394,113 @@ export class EmailService {
           Welcome aboard!
         `,
       },
+      'user-activation': {
+        html: `
+          <h1>Your Account Has Been Activated</h1>
+          <p>Hello {{name}},</p>
+          <p>Great news! Your account has been activated and you can now access our platform.</p>
+          <p>You can log in to your account using the link below:</p>
+          <a href="{{loginUrl}}" style="display: inline-block; padding: 12px 24px; background-color: #28a745; color: white; text-decoration: none; border-radius: 4px;">Login to Your Account</a>
+          <p>If you have any questions or need assistance, please don't hesitate to contact our support team.</p>
+          <p>Welcome to our platform!</p>
+        `,
+        text: `
+          Your Account Has Been Activated
+          
+          Hello {{name}},
+          
+          Great news! Your account has been activated and you can now access our platform.
+          
+          You can log in to your account using the link below:
+          {{loginUrl}}
+          
+          If you have any questions or need assistance, please don't hesitate to contact our support team.
+          
+          Welcome to our platform!
+        `,
+      },
+      'user-suspension': {
+        html: `
+          <h1>Your Account Has Been Suspended</h1>
+          <p>Hello {{name}},</p>
+          <p>We regret to inform you that your account has been suspended.</p>
+          <p><strong>Reason for suspension:</strong> {{reason}}</p>
+          <p><strong>Suspended on:</strong> {{suspendedAt}}</p>
+          {{#if isTemporary}}
+          <p><strong>This suspension will expire on:</strong> {{expiresAt}}</p>
+          <p>Your account will be automatically reactivated after this date.</p>
+          {{else}}
+          <p>This suspension is indefinite. Please contact our support team for more information.</p>
+          {{/if}}
+          <p>If you believe this suspension was made in error or have any questions, please contact our support team at {{supportEmail}}.</p>
+          <p>We appreciate your understanding.</p>
+        `,
+        text: `
+          Your Account Has Been Suspended
+          
+          Hello {{name}},
+          
+          We regret to inform you that your account has been suspended.
+          
+          Reason for suspension: {{reason}}
+          Suspended on: {{suspendedAt}}
+          {{#if isTemporary}}
+          This suspension will expire on: {{expiresAt}}
+          Your account will be automatically reactivated after this date.
+          {{else}}
+          This suspension is indefinite. Please contact our support team for more information.
+          {{/if}}
+          
+          If you believe this suspension was made in error or have any questions, please contact our support team at {{supportEmail}}.
+          
+          We appreciate your understanding.
+        `,
+      },
+      'user-reactivation': {
+        html: `
+          <h1>Your Account Has Been Reactivated</h1>
+          <p>Hello {{name}},</p>
+          <p>Good news! Your account has been reactivated and you can now access our platform again.</p>
+          <p>You can log in to your account using the link below:</p>
+          <a href="{{loginUrl}}" style="display: inline-block; padding: 12px 24px; background-color: #28a745; color: white; text-decoration: none; border-radius: 4px;">Login to Your Account</a>
+          <p>If you have any questions or need assistance, please don't hesitate to contact our support team.</p>
+          <p>Welcome back!</p>
+        `,
+        text: `
+          Your Account Has Been Reactivated
+          
+          Hello {{name}},
+          
+          Good news! Your account has been reactivated and you can now access our platform again.
+          
+          You can log in to your account using the link below:
+          {{loginUrl}}
+          
+          If you have any questions or need assistance, please don't hesitate to contact our support team.
+          
+          Welcome back!
+        `,
+      },
+      'user-deletion': {
+        html: `
+          <h1>Your Account Has Been Deleted</h1>
+          <p>Hello {{name}},</p>
+          <p>We regret to inform you that your account has been deleted from our platform.</p>
+          <p>If you believe this deletion was made in error or have any questions, please contact our support team at {{supportEmail}}.</p>
+          <p>Thank you for using our platform.</p>
+        `,
+        text: `
+          Your Account Has Been Deleted
+          
+          Hello {{name}},
+          
+          We regret to inform you that your account has been deleted from our platform.
+          
+          If you believe this deletion was made in error or have any questions, please contact our support team at {{supportEmail}}.
+          
+          Thank you for using our platform.
+        `,
+      },
     };
 
     const template = templates[templateName as TemplateType];
@@ -505,6 +616,87 @@ export class EmailService {
         name: firstName,
         tenantName,
         loginUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login`,
+      },
+    };
+
+    await this.sendEmail(emailData);
+  }
+
+  /**
+   * Send user activation notification
+   */
+  async sendUserActivationNotification(user: User): Promise<void> {
+    const emailData = {
+      to: user.email,
+      subject: 'Your Account Has Been Activated',
+      template: 'user-activation',
+      context: {
+        name: user.firstName,
+        loginUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login`,
+      },
+    };
+
+    await this.sendEmail(emailData);
+  }
+
+  /**
+   * Send user suspension notification
+   */
+  async sendUserSuspensionNotification(
+    user: User,
+    suspensionData: {
+      suspendedAt: Date;
+      suspensionReason: string;
+      suspensionExpiresAt?: Date;
+    }
+  ): Promise<void> {
+    const emailData = {
+      to: user.email,
+      subject: 'Your Account Has Been Suspended',
+      template: 'user-suspension',
+      context: {
+        name: user.firstName,
+        reason: suspensionData.suspensionReason,
+        suspendedAt: suspensionData.suspendedAt.toISOString(),
+        expiresAt: suspensionData.suspensionExpiresAt?.toISOString(),
+        isTemporary: !!suspensionData.suspensionExpiresAt,
+        supportEmail:
+          process.env.SUPPORT_EMAIL || 'support@saas-boilerplate.com',
+      },
+    };
+
+    await this.sendEmail(emailData);
+  }
+
+  /**
+   * Send user reactivation notification
+   */
+  async sendUserReactivationNotification(user: User): Promise<void> {
+    const emailData = {
+      to: user.email,
+      subject: 'Your Account Has Been Reactivated',
+      template: 'user-reactivation',
+      context: {
+        name: user.firstName,
+        loginUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login`,
+      },
+    };
+
+    await this.sendEmail(emailData);
+  }
+
+  /**
+   * Send user deletion notification
+   */
+  async sendUserDeletionNotification(user: User): Promise<void> {
+    const emailData = {
+      to: user.email,
+      subject: 'Your Account Has Been Deleted',
+      template: 'user-deletion',
+      context: {
+        name: user.firstName,
+        supportEmail:
+          process.env.SUPPORT_EMAIL || 'support@saas-boilerplate.com',
       },
     };
 

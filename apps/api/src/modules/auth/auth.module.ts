@@ -8,6 +8,7 @@ import { SessionController } from './controllers/session.controller';
 import { RoleController } from './controllers/role.controller';
 import { PermissionController } from './controllers/permission.controller';
 import { AccountRecoveryController } from './controllers/account-recovery.controller';
+import { UserLifecycleController } from './controllers/user-lifecycle.controller';
 import { AuthService } from './services/auth.service';
 import { JwtService } from './services/jwt.service';
 import { RefreshTokenService } from './services/refresh-token.service';
@@ -18,6 +19,7 @@ import { RoleService } from './services/role.service';
 import { PermissionService } from './services/permission.service';
 import { AccountRecoveryService } from './services/account-recovery.service';
 import { AuditService } from './services/audit.service';
+import { UserLifecycleService } from './services/user-lifecycle.service';
 import { AuditInterceptor } from './interceptors/audit.interceptor';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { PermissionsGuard } from './guards/permissions.guard';
@@ -75,6 +77,7 @@ import { env } from '@app/config';
     RoleController,
     PermissionController,
     AccountRecoveryController,
+    UserLifecycleController,
   ],
   providers: [
     AuthService,
@@ -87,6 +90,7 @@ import { env } from '@app/config';
     PermissionService,
     AccountRecoveryService,
     AuditService,
+    UserLifecycleService,
     AuditInterceptor,
     JwtAuthGuard,
     PermissionsGuard,
@@ -111,6 +115,7 @@ import { env } from '@app/config';
     PermissionService,
     AccountRecoveryService,
     AuditService,
+    UserLifecycleService,
     AuditInterceptor,
     JwtAuthGuard,
     PermissionsGuard,

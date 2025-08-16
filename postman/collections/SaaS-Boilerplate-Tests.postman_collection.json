@@ -64,6 +64,10 @@
     {
       "key": "parentRoleId",
       "value": ""
+    },
+    {
+      "key": "newUserId",
+      "value": ""
     }
   ],
   "item": [
@@ -4188,6 +4192,704 @@
               "path": ["tenants", "user", "memberships"]
             }
           }
+        }
+      ]
+    },
+    {
+      "name": "User Lifecycle Management Tests",
+      "item": [
+        {
+          "name": "User Registration Tests",
+          "item": [
+            {
+              "name": "Register New User - Success",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"SecurePassword123!\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"tenantId\": \"{{tenantId}}\",\n  \"role\": \"member\",\n  \"sendEmailVerification\": true,\n  \"sendWelcomeEmail\": true\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users"]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 201', function () {",
+                      "    pm.response.to.have.status(201);",
+                      "});",
+                      "",
+                      "pm.test('User created successfully', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response).to.have.property('id');",
+                      "    pm.expect(response).to.have.property('email');",
+                      "    pm.expect(response).to.have.property('firstName');",
+                      "    pm.expect(response).to.have.property('lastName');",
+                      "    pm.expect(response).to.have.property('status');",
+                      "    pm.expect(response.status).to.equal('pending');",
+                      "    pm.expect(response.emailVerified).to.be.false;",
+                      "});",
+                      "",
+                      "pm.test('User ID is valid format', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.id).to.be.a('string');",
+                      "    pm.expect(response.id.length).to.be.greaterThan(0);",
+                      "});",
+                      "",
+                      "// Store user ID for subsequent tests",
+                      "if (pm.response.code === 201) {",
+                      "    const response = pm.response.json();",
+                      "    pm.environment.set('newUserId', response.id);",
+                      "}"
+                    ],
+                    "type": "text/javascript"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Register User - Duplicate Email",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"existinguser@example.com\",\n  \"password\": \"SecurePassword123!\",\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Smith\",\n  \"tenantId\": \"{{tenantId}}\",\n  \"role\": \"member\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users"]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 400', function () {",
+                      "    pm.response.to.have.status(400);",
+                      "});",
+                      "",
+                      "pm.test('Duplicate email error', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.message).to.include('already exists');",
+                      "});"
+                    ],
+                    "type": "text-javascript"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "User Activation Tests",
+          "item": [
+            {
+              "name": "Activate User - Success",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"skipEmailVerification\": false,\n  \"auditEvent\": \"user.activated_by_admin\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users/{{newUserId}}/activate",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "{{newUserId}}", "activate"]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('User activated successfully', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.status).to.equal('active');",
+                      "    pm.expect(response.emailVerified).to.be.true;",
+                      "});",
+                      "",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                      "});"
+                    ],
+                    "type": "text-javascript"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Activate User - Already Active",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"skipEmailVerification\": false\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users/{{userId}}/activate",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "{{userId}}", "activate"]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 400', function () {",
+                      "    pm.response.to.have.status(400);",
+                      "});",
+                      "",
+                      "pm.test('Already active error', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.message).to.include('already active');",
+                      "});"
+                    ],
+                    "type": "text-javascript"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "User Suspension Tests",
+          "item": [
+            {
+              "name": "Suspend User - Success",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"Violation of terms of service\",\n  \"duration\": 30,\n  \"auditEvent\": \"user.suspended_by_admin\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users/{{userId}}/suspend",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "{{userId}}", "suspend"]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('User suspended successfully', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.status).to.equal('suspended');",
+                      "});",
+                      "",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                      "});"
+                    ],
+                    "type": "text-javascript"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Suspend User - Indefinite",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"Security violation\",\n  \"auditEvent\": \"user.suspended_indefinitely\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users/{{newUserId}}/suspend",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "{{newUserId}}", "suspend"]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('User suspended indefinitely', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.status).to.equal('suspended');",
+                      "});"
+                    ],
+                    "type": "text-javascript"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "User Reactivation Tests",
+          "item": [
+            {
+              "name": "Reactivate User - Success",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"auditEvent\": \"user.reactivated_by_admin\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users/{{newUserId}}/reactivate",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "{{newUserId}}", "reactivate"]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('User reactivated successfully', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.status).to.equal('active');",
+                      "});",
+                      "",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                      "});"
+                    ],
+                    "type": "text-javascript"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "User Lifecycle Information Tests",
+          "item": [
+            {
+              "name": "Get User Lifecycle Info - Success",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/users/{{userId}}/lifecycle",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "{{userId}}", "lifecycle"]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Lifecycle info retrieved', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response).to.have.property('isActive');",
+                      "    pm.expect(response).to.have.property('isSuspended');",
+                      "    pm.expect(response).to.have.property('isDeleted');",
+                      "    pm.expect(response).to.have.property('user');",
+                      "});",
+                      "",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(500);",
+                      "});"
+                    ],
+                    "type": "text-javascript"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get User Lifecycle Info - Not Found",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/users/non-existent-user-id/lifecycle",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "non-existent-user-id", "lifecycle"]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 404', function () {",
+                      "    pm.response.to.have.status(404);",
+                      "});",
+                      "",
+                      "pm.test('Error message is clear', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response.message).to.include('not found');",
+                      "});"
+                    ],
+                    "type": "text-javascript"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "User Deletion Tests",
+          "item": [
+            {
+              "name": "Delete User - Success",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"auditEvent\": \"user.deleted_by_admin\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users/{{newUserId}}",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "{{newUserId}}"]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 204', function () {",
+                      "    pm.response.to.have.status(204);",
+                      "});",
+                      "",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                      "});"
+                    ],
+                    "type": "text-javascript"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Bulk Operations Tests",
+          "item": [
+            {
+              "name": "Bulk Activate Users - Success",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userIds\": [\"{{userId}}\"],\n  \"auditEvent\": \"users.bulk_activated_by_admin\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users/bulk/activate",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "bulk", "activate"]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Bulk activation successful', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response).to.have.property('successCount');",
+                      "    pm.expect(response).to.have.property('failureCount');",
+                      "    pm.expect(response).to.have.property('successfulUserIds');",
+                      "    pm.expect(response).to.have.property('errors');",
+                      "});",
+                      "",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ],
+                    "type": "text-javascript"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Bulk Suspend Users - Success",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userIds\": [\"{{userId}}\"],\n  \"auditEvent\": \"users.bulk_suspended_by_admin\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users/bulk/suspend",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "bulk", "suspend"]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Bulk suspension successful', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response).to.have.property('successCount');",
+                      "    pm.expect(response).to.have.property('failureCount');",
+                      "});",
+                      "",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ],
+                    "type": "text-javascript"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Bulk Reactivate Users - Success",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userIds\": [\"{{userId}}\"],\n  \"auditEvent\": \"users.bulk_reactivated_by_admin\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users/bulk/reactivate",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "bulk", "reactivate"]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Bulk reactivation successful', function () {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response).to.have.property('successCount');",
+                      "    pm.expect(response).to.have.property('failureCount');",
+                      "});",
+                      "",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ],
+                    "type": "text-javascript"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Bulk Delete Users - Success",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{accessToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"userIds\": [\"{{userId}}\"],\n  \"auditEvent\": \"users.bulk_deleted_by_admin\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/users/bulk/delete",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["users", "bulk", "delete"]
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('Bulk deletion successful', function () {",
+                      "    pm.expect(response).to.have.property('successCount');",
+                      "    pm.expect(response).to.have.property('failureCount');",
+                      "});",
+                      "",
+                      "pm.test('Response time is acceptable', function () {",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                      "});"
+                    ],
+                    "type": "text-javascript"
+                  }
+                }
+              ]
+            }
+          ]
         }
       ]
     }

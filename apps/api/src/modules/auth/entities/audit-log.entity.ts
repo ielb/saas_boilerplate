@@ -72,6 +72,16 @@ export enum AuditEventType {
   TENANT_BRANDING_RESET = 'tenant_branding_reset',
   TENANT_BRANDING_IMPORTED = 'tenant_branding_imported',
   TENANT_BRANDING_EXPORTED = 'tenant_branding_exported',
+
+  // User Lifecycle Events
+  USER_ACTIVATED = 'user_activated',
+  USER_SUSPENDED = 'user_suspended',
+  USER_REACTIVATED = 'user_reactivated',
+  USER_DELETED = 'user_deleted',
+  USER_BULK_ACTIVATED = 'user_bulk_activated',
+  USER_BULK_SUSPENDED = 'user_bulk_suspended',
+  USER_BULK_REACTIVATED = 'user_bulk_reactivated',
+  USER_BULK_DELETED = 'user_bulk_deleted',
 }
 
 export enum AuditEventStatus {
