@@ -13,7 +13,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { TenantsModule } from './modules/tenants/tenants.module';
 // import { BillingModule } from './modules/billing/billing.module';
 // import { NotificationsModule } from './modules/notifications/notifications.module';
-// import { FilesModule } from './modules/files/files.module';
+import { FilesModule } from './modules/files/files.module';
 // import { AdminModule } from './modules/admin/admin.module';
 import { TenantMiddlewareModule } from './common/middleware/tenant-middleware.module';
 import { TenantIsolationMiddleware } from './common/middleware/tenant-isolation.middleware';
@@ -83,7 +83,7 @@ import { TenantIsolationMiddleware } from './common/middleware/tenant-isolation.
     TenantMiddlewareModule,
     // BillingModule,
     // NotificationsModule,
-    // FilesModule,
+    FilesModule,
     // AdminModule,
   ],
   controllers: [],
