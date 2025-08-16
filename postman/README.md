@@ -1,6 +1,6 @@
 # Postman Collections for SaaS Boilerplate API
 
-This directory contains comprehensive Postman collections for testing the SaaS Boilerplate API, including the newly refactored Tenant Branding Service with SOLID principles.
+This directory contains comprehensive Postman collections for testing the SaaS Boilerplate API, including the newly refactored Tenant Branding Service with SOLID principles and the complete User Lifecycle Management system.
 
 ## 📁 Collections Overview
 
@@ -10,6 +10,7 @@ Complete API collection covering all endpoints including:
 
 - Authentication & Authorization
 - User Management
+- **User Lifecycle Management** (NEW - Complete lifecycle operations)
 - Tenant Management
 - Tenant Switching
 - **Tenant Branding** (ENHANCED - SOLID refactored)
@@ -62,6 +63,320 @@ Dedicated collection for Tenant Branding features with comprehensive testing:
 2. Copy the `accessToken` from the response
 3. Set the `accessToken` environment variable
 4. For admin operations, use the `adminToken` variable
+
+## 👤 User Lifecycle Management API Features
+
+### **Core Operations**
+
+#### **Register New User**
+
+```http
+POST {{baseUrl}}/users
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "email": "newuser@example.com",
+  "password": "SecurePassword123!",
+  "firstName": "John",
+  "lastName": "Doe",
+  "tenantId": "{{tenantId}}",
+  "role": "member",
+  "sendEmailVerification": true,
+  "sendWelcomeEmail": true
+}
+```
+
+**Response:**
+
+```json
+{
+  "id": "user-123",
+  "email": "newuser@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
+  "fullName": "John Doe",
+  "role": "member",
+  "status": "pending",
+  "tenantId": "{{tenantId}}",
+  "emailVerified": false,
+  "createdAt": "2024-01-15T10:30:00.000Z",
+  "updatedAt": "2024-01-15T10:30:00.000Z"
+}
+```
+
+#### **Activate User**
+
+```http
+PUT {{baseUrl}}/users/{{newUserId}}/activate
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "skipEmailVerification": false,
+  "auditEvent": "user.activated_by_admin"
+}
+```
+
+**Response:**
+
+```json
+{
+  "id": "user-123",
+  "email": "newuser@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
+  "fullName": "John Doe",
+  "role": "member",
+  "status": "active",
+  "tenantId": "{{tenantId}}",
+  "emailVerified": true,
+  "createdAt": "2024-01-15T10:30:00.000Z",
+  "updatedAt": "2024-01-15T10:35:00.000Z"
+}
+```
+
+#### **Suspend User**
+
+```http
+PUT {{baseUrl}}/users/{{userId}}/suspend
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "reason": "Violation of terms of service",
+  "duration": 30,
+  "auditEvent": "user.suspended_by_admin"
+}
+```
+
+**Response:**
+
+```json
+{
+  "id": "user-123",
+  "email": "user@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
+  "fullName": "John Doe",
+  "role": "member",
+  "status": "suspended",
+  "tenantId": "{{tenantId}}",
+  "emailVerified": true,
+  "createdAt": "2024-01-15T10:30:00.000Z",
+  "updatedAt": "2024-01-15T10:40:00.000Z"
+}
+```
+
+#### **Reactivate User**
+
+```http
+PUT {{baseUrl}}/users/{{userId}}/reactivate
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "auditEvent": "user.reactivated_by_admin"
+}
+```
+
+**Response:**
+
+```json
+{
+  "id": "user-123",
+  "email": "user@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
+  "fullName": "John Doe",
+  "role": "member",
+  "status": "active",
+  "tenantId": "{{tenantId}}",
+  "emailVerified": true,
+  "createdAt": "2024-01-15T10:30:00.000Z",
+  "updatedAt": "2024-01-15T10:45:00.000Z"
+}
+```
+
+#### **Get User Lifecycle Information**
+
+```http
+GET {{baseUrl}}/users/{{userId}}/lifecycle
+Authorization: Bearer {{accessToken}}
+```
+
+**Response:**
+
+```json
+{
+  "id": "user-123",
+  "email": "user@example.com",
+  "firstName": "John",
+  "lastName": "Doe",
+  "fullName": "John Doe",
+  "role": "member",
+  "status": "suspended",
+  "tenantId": "{{tenantId}}",
+  "emailVerified": true,
+  "createdAt": "2024-01-15T10:30:00.000Z",
+  "updatedAt": "2024-01-15T10:40:00.000Z",
+  "isActive": false,
+  "isSuspended": true,
+  "isDeleted": false,
+  "suspensionInfo": {
+    "suspendedAt": "2024-01-15T10:40:00.000Z",
+    "reason": "Violation of terms of service",
+    "expiresAt": "2024-02-14T10:40:00.000Z",
+    "isExpired": false
+  }
+}
+```
+
+#### **Delete User**
+
+```http
+DELETE {{baseUrl}}/users/{{userId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "auditEvent": "user.deleted_by_admin"
+}
+```
+
+**Response:**
+
+```http
+204 No Content
+```
+
+### **Bulk Operations**
+
+#### **Bulk Activate Users**
+
+```http
+POST {{baseUrl}}/users/bulk/activate
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "userIds": ["user-123", "user-456"],
+  "auditEvent": "users.bulk_activated_by_admin"
+}
+```
+
+**Response:**
+
+```json
+{
+  "successCount": 2,
+  "failureCount": 0,
+  "successfulUserIds": ["user-123", "user-456"],
+  "errors": []
+}
+```
+
+#### **Bulk Suspend Users**
+
+```http
+POST {{baseUrl}}/users/bulk/suspend
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "userIds": ["user-123", "user-456"],
+  "auditEvent": "users.bulk_suspended_by_admin"
+}
+```
+
+**Response:**
+
+```json
+{
+  "successCount": 1,
+  "failureCount": 1,
+  "successfulUserIds": ["user-123"],
+  "errors": [
+    {
+      "userId": "user-456",
+      "error": "Cannot suspend tenant owner"
+    }
+  ]
+}
+```
+
+### **Error Scenarios**
+
+#### **Duplicate Email Registration**
+
+```http
+POST {{baseUrl}}/users
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "email": "existinguser@example.com",
+  "password": "SecurePassword123!",
+  "firstName": "Jane",
+  "lastName": "Smith",
+  "tenantId": "{{tenantId}}",
+  "role": "member"
+}
+```
+
+**Response:**
+
+```json
+{
+  "statusCode": 400,
+  "message": "User already exists with this email",
+  "error": "Bad Request"
+}
+```
+
+#### **Activate Already Active User**
+
+```http
+PUT {{baseUrl}}/users/{{userId}}/activate
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "skipEmailVerification": false
+}
+```
+
+**Response:**
+
+```json
+{
+  "statusCode": 400,
+  "message": "User is already active",
+  "error": "Bad Request"
+}
+```
+
+#### **Suspend Tenant Owner**
+
+```http
+PUT {{baseUrl}}/users/{{ownerUserId}}/suspend
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "reason": "Test suspension"
+}
+```
+
+**Response:**
+
+```json
+{
+  "statusCode": 400,
+  "message": "Cannot suspend tenant owner",
+  "error": "Bad Request"
+}
+```
 
 ## 🎨 Tenant Branding API Features
 
