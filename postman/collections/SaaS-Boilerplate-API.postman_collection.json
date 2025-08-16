@@ -101,6 +101,31 @@
       "type": "string"
     },
     {
+      "key": "fileKey",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "fileUrl",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "signedUrl",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "copiedFileKey",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "movedFileKey",
+      "value": "",
+      "type": "string"
+    },
+    {
       "key": "brandingId",
       "value": "",
       "type": "string"
@@ -4772,6 +4797,572 @@
                   }
                 }
               ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "File Storage Management",
+      "item": [
+        {
+          "name": "Upload File",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "key",
+                  "value": "uploads/{{$timestamp}}/{{$randomUUID}}",
+                  "type": "text"
+                },
+                {
+                  "key": "metadata",
+                  "value": "{\"category\":\"document\",\"uploadedBy\":\"{{userId}}\"}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/files/upload",
+              "host": ["{{baseUrl}}"],
+              "path": ["files", "upload"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('File uploaded successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('key');",
+                  "    pm.expect(response).to.have.property('url');",
+                  "    pm.expect(response).to.have.property('size');",
+                  "    pm.expect(response).to.have.property('mimeType');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('fileKey', response.key);",
+                  "    pm.environment.set('fileUrl', response.url);",
+                  "}"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Download File",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/files/download/{{fileKey}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["files", "download", "{{fileKey}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('File downloaded successfully', function () {",
+                  "    pm.expect(pm.response.body).to.not.be.empty;",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get File Metadata",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/files/metadata/{{fileKey}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["files", "metadata", "{{fileKey}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('File metadata retrieved', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('key');",
+                  "    pm.expect(response).to.have.property('size');",
+                  "    pm.expect(response).to.have.property('mimeType');",
+                  "    pm.expect(response).to.have.property('lastModified');",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get File Stream",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/files/stream/{{fileKey}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["files", "stream", "{{fileKey}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('File stream retrieved', function () {",
+                  "    pm.expect(pm.response.body).to.not.be.empty;",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Generate Signed URL",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"key\": \"{{fileKey}}\",\n  \"expiresIn\": 3600\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/files/signed-url",
+              "host": ["{{baseUrl}}"],
+              "path": ["files", "signed-url"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Signed URL generated', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('signedUrl');",
+                  "    pm.expect(response.signedUrl).to.include('http');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('signedUrl', response.signedUrl);",
+                  "}"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Public URL",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/files/public-url/{{fileKey}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["files", "public-url", "{{fileKey}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Public URL retrieved', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('publicUrl');",
+                  "    pm.expect(response.publicUrl).to.include('http');",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Copy File",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceKey\": \"{{fileKey}}\",\n  \"destinationKey\": \"copies/{{$timestamp}}/{{$randomUUID}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/files/copy",
+              "host": ["{{baseUrl}}"],
+              "path": ["files", "copy"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('File copied successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('key');",
+                  "    pm.expect(response.key).to.not.equal('{{fileKey}}');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('copiedFileKey', response.key);",
+                  "}"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Move File",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceKey\": \"{{fileKey}}\",\n  \"destinationKey\": \"moved/{{$timestamp}}/{{$randomUUID}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/files/move",
+              "host": ["{{baseUrl}}"],
+              "path": ["files", "move"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('File moved successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('key');",
+                  "    pm.expect(response.key).to.not.equal('{{fileKey}}');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('movedFileKey', response.key);",
+                  "}"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Files",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/files/list?prefix=uploads&maxKeys=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["files", "list"],
+              "query": [
+                {
+                  "key": "prefix",
+                  "value": "uploads"
+                },
+                {
+                  "key": "maxKeys",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Files listed successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.be.an('array');",
+                  "    if (response.length > 0) {",
+                  "        pm.expect(response[0]).to.have.property('key');",
+                  "        pm.expect(response[0]).to.have.property('size');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Check File Exists",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/files/exists/{{fileKey}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["files", "exists", "{{fileKey}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('File existence checked', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('exists');",
+                  "    pm.expect(response.exists).to.be.a('boolean');",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete File",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/files/{{fileKey}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["files", "{{fileKey}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});",
+                  "",
+                  "pm.test('File deleted successfully', function () {",
+                  "    pm.expect(pm.response.body).to.be.empty;",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Storage Health Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/files/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["files", "health"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Storage health status retrieved', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.be.an('array');",
+                  "    if (response.length > 0) {",
+                  "        pm.expect(response[0]).to.have.property('provider');",
+                  "        pm.expect(response[0]).to.have.property('status');",
+                  "        pm.expect(response[0]).to.have.property('responseTime');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Available Providers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/files/providers",
+              "host": ["{{baseUrl}}"],
+              "path": ["files", "providers"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Available providers retrieved', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.be.an('array');",
+                  "    pm.expect(response).to.contain('local');",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
             }
           ]
         }

@@ -11,6 +11,7 @@ Complete API collection covering all endpoints including:
 - Authentication & Authorization
 - User Management
 - **User Lifecycle Management** (NEW - Complete lifecycle operations)
+- **File Storage Management** (NEW - Complete file operations)
 - Tenant Management
 - Tenant Switching
 - **Tenant Branding** (ENHANCED - SOLID refactored)
@@ -53,7 +54,12 @@ Dedicated collection for Tenant Branding features with comprehensive testing:
   "tenantId": "",
   "adminToken": "",
   "brandingId": "",
-  "exportId": ""
+  "exportId": "",
+  "fileKey": "",
+  "fileUrl": "",
+  "signedUrl": "",
+  "copiedFileKey": "",
+  "movedFileKey": ""
 }
 ```
 
@@ -378,6 +384,340 @@ Content-Type: application/json
 }
 ```
 
+## 📁 File Storage Management API Features
+
+### **Core Operations**
+
+#### **Upload File**
+
+```http
+POST {{baseUrl}}/files/upload
+Authorization: Bearer {{accessToken}}
+Content-Type: multipart/form-data
+
+Form Data:
+- file: [Select file]
+- key: uploads/{{$timestamp}}/{{$randomUUID}}
+- metadata: {"category":"document","uploadedBy":"{{userId}}"}
+```
+
+**Response:**
+
+```json
+{
+  "key": "uploads/1705123456789/abc123-def456-ghi789.txt",
+  "size": 1024,
+  "mimeType": "text/plain",
+  "lastModified": "2024-01-15T10:30:00.000Z",
+  "url": "http://localhost:3001/api/files/uploads/1705123456789/abc123-def456-ghi789.txt",
+  "etag": "abc123def456ghi789",
+  "metadata": {
+    "category": "document",
+    "uploadedBy": "user-123"
+  }
+}
+```
+
+#### **Download File**
+
+```http
+GET {{baseUrl}}/files/download/{{fileKey}}
+Authorization: Bearer {{accessToken}}
+```
+
+**Response:**
+
+```http
+200 OK
+Content-Type: text/plain
+Content-Length: 1024
+
+[File content as binary data]
+```
+
+#### **Get File Metadata**
+
+```http
+GET {{baseUrl}}/files/metadata/{{fileKey}}
+Authorization: Bearer {{accessToken}}
+```
+
+**Response:**
+
+```json
+{
+  "key": "uploads/1705123456789/abc123-def456-ghi789.txt",
+  "size": 1024,
+  "mimeType": "text/plain",
+  "lastModified": "2024-01-15T10:30:00.000Z",
+  "url": "http://localhost:3001/api/files/uploads/1705123456789/abc123-def456-ghi789.txt",
+  "etag": "abc123def456ghi789",
+  "metadata": {
+    "category": "document",
+    "uploadedBy": "user-123"
+  }
+}
+```
+
+#### **Get File Stream**
+
+```http
+GET {{baseUrl}}/files/stream/{{fileKey}}
+Authorization: Bearer {{accessToken}}
+```
+
+**Response:**
+
+```http
+200 OK
+Content-Type: text/plain
+Transfer-Encoding: chunked
+
+[File content as stream]
+```
+
+#### **Generate Signed URL**
+
+```http
+POST {{baseUrl}}/files/signed-url
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "key": "{{fileKey}}",
+  "expiresIn": 3600
+}
+```
+
+**Response:**
+
+```json
+{
+  "signedUrl": "https://storage.example.com/uploads/1705123456789/abc123-def456-ghi789.txt?signature=abc123&expires=1705123456789"
+}
+```
+
+#### **Get Public URL**
+
+```http
+GET {{baseUrl}}/files/public-url/{{fileKey}}
+Authorization: Bearer {{accessToken}}
+```
+
+**Response:**
+
+```json
+{
+  "publicUrl": "https://storage.example.com/uploads/1705123456789/abc123-def456-ghi789.txt"
+}
+```
+
+#### **Copy File**
+
+```http
+POST {{baseUrl}}/files/copy
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "sourceKey": "{{fileKey}}",
+  "destinationKey": "copies/{{$timestamp}}/{{$randomUUID}}"
+}
+```
+
+**Response:**
+
+```json
+{
+  "key": "copies/1705123456789/def456-ghi789-jkl012.txt",
+  "size": 1024,
+  "mimeType": "text/plain",
+  "lastModified": "2024-01-15T10:35:00.000Z",
+  "url": "http://localhost:3001/api/files/copies/1705123456789/def456-ghi789-jkl012.txt"
+}
+```
+
+#### **Move File**
+
+```http
+POST {{baseUrl}}/files/move
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "sourceKey": "{{fileKey}}",
+  "destinationKey": "moved/{{$timestamp}}/{{$randomUUID}}"
+}
+```
+
+**Response:**
+
+```json
+{
+  "key": "moved/1705123456789/ghi789-jkl012-mno345.txt",
+  "size": 1024,
+  "mimeType": "text/plain",
+  "lastModified": "2024-01-15T10:40:00.000Z",
+  "url": "http://localhost:3001/api/files/moved/1705123456789/ghi789-jkl012-mno345.txt"
+}
+```
+
+#### **List Files**
+
+```http
+GET {{baseUrl}}/files/list?prefix=uploads&maxKeys=10
+Authorization: Bearer {{accessToken}}
+```
+
+**Response:**
+
+```json
+[
+  {
+    "key": "uploads/1705123456789/abc123-def456-ghi789.txt",
+    "size": 1024,
+    "mimeType": "text/plain",
+    "lastModified": "2024-01-15T10:30:00.000Z",
+    "url": "http://localhost:3001/api/files/uploads/1705123456789/abc123-def456-ghi789.txt"
+  },
+  {
+    "key": "uploads/1705123456789/def456-ghi789-jkl012.txt",
+    "size": 2048,
+    "mimeType": "application/pdf",
+    "lastModified": "2024-01-15T10:35:00.000Z",
+    "url": "http://localhost:3001/api/files/uploads/1705123456789/def456-ghi789-jkl012.txt"
+  }
+]
+```
+
+#### **Check File Exists**
+
+```http
+GET {{baseUrl}}/files/exists/{{fileKey}}
+Authorization: Bearer {{accessToken}}
+```
+
+**Response:**
+
+```json
+{
+  "exists": true
+}
+```
+
+#### **Delete File**
+
+```http
+DELETE {{baseUrl}}/files/{{fileKey}}
+Authorization: Bearer {{accessToken}}
+```
+
+**Response:**
+
+```http
+204 No Content
+```
+
+### **Storage Management Operations**
+
+#### **Get Storage Health Status**
+
+```http
+GET {{baseUrl}}/files/health
+Authorization: Bearer {{accessToken}}
+```
+
+**Response:**
+
+```json
+[
+  {
+    "provider": "local",
+    "status": "healthy",
+    "responseTime": 100,
+    "lastChecked": "2024-01-15T10:30:00.000Z"
+  },
+  {
+    "provider": "s3",
+    "status": "unhealthy",
+    "responseTime": 0,
+    "lastChecked": "2024-01-15T10:30:00.000Z",
+    "error": "Connection timeout"
+  }
+]
+```
+
+#### **Get Available Providers**
+
+```http
+GET {{baseUrl}}/files/providers
+Authorization: Bearer {{accessToken}}
+```
+
+**Response:**
+
+```json
+["local", "s3", "gcs"]
+```
+
+### **Error Scenarios**
+
+#### **File Not Found**
+
+```http
+GET {{baseUrl}}/files/metadata/nonexistent-file.txt
+Authorization: Bearer {{accessToken}}
+```
+
+**Response:**
+
+```json
+{
+  "statusCode": 404,
+  "message": "File not found",
+  "error": "Not Found"
+}
+```
+
+#### **Invalid File Key**
+
+```http
+POST {{baseUrl}}/files/upload
+Authorization: Bearer {{accessToken}}
+Content-Type: multipart/form-data
+
+Form Data:
+- file: [Select file]
+- key: invalid/key/with/../path
+```
+
+**Response:**
+
+```json
+{
+  "statusCode": 400,
+  "message": "Invalid file key",
+  "error": "Bad Request"
+}
+```
+
+#### **Storage Provider Unavailable**
+
+```http
+GET {{baseUrl}}/files/health
+Authorization: Bearer {{accessToken}}
+```
+
+**Response:**
+
+```json
+{
+  "statusCode": 503,
+  "message": "No healthy storage providers available",
+  "error": "Service Unavailable"
+}
+```
+
 ## 🎨 Tenant Branding API Features
 
 ### **Core Operations**
@@ -698,7 +1038,26 @@ Authorization: Bearer {{accessToken}}
 
 ## 📊 Test Categories
 
-### **1. Core Branding Operations**
+### **1. File Storage Operations**
+
+- Upload File
+- Download File
+- Get File Metadata
+- Get File Stream
+- Generate Signed URL
+- Get Public URL
+- Copy File
+- Move File
+- List Files
+- Check File Exists
+- Delete File
+
+### **2. Storage Management Operations**
+
+- Get Storage Health Status
+- Get Available Providers
+
+### **3. Core Branding Operations**
 
 - Get Tenant Branding
 - Update Tenant Branding (Admin Only)
@@ -786,6 +1145,24 @@ newman run postman/collections/Tenant-Branding-API.postman_collection.json \
 ## 📈 Test Coverage
 
 ### **API Endpoint Coverage**
+
+#### **File Storage Endpoints**
+
+- ✅ POST /files/upload
+- ✅ GET /files/download/{key}
+- ✅ GET /files/metadata/{key}
+- ✅ GET /files/stream/{key}
+- ✅ POST /files/signed-url
+- ✅ GET /files/public-url/{key}
+- ✅ POST /files/copy
+- ✅ POST /files/move
+- ✅ GET /files/list
+- ✅ GET /files/exists/{key}
+- ✅ DELETE /files/{key}
+- ✅ GET /files/health
+- ✅ GET /files/providers
+
+#### **Tenant Branding Endpoints**
 
 - ✅ GET /tenants/branding
 - ✅ PUT /tenants/branding

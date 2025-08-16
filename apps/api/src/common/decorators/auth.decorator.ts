@@ -1,4 +1,8 @@
-import { SetMetadata } from '@nestjs/common';
+import {
+  createParamDecorator,
+  ExecutionContext,
+  SetMetadata,
+} from '@nestjs/common';
 import { UserRole } from '@app/shared';
 
 export const IS_PUBLIC_KEY = 'isPublic';
@@ -36,6 +40,13 @@ export const RequireTenant = () => SetMetadata(TENANT_REQUIRED_KEY, true);
  * Decorator to require MFA for the route
  */
 export const RequireMfa = () => SetMetadata(MFA_REQUIRED_KEY, true);
+
+export const CurrentUser = createParamDecorator(
+  (data: unknown, ctx: ExecutionContext): any => {
+    const request = ctx.switchToHttp().getRequest();
+    return request.user;
+  }
+);
 
 /**
  * Convenience decorators for common role requirements
