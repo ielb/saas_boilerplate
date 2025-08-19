@@ -785,14 +785,14 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
                   "});",
                   "",
                   "pm.test('Response has avatar data', function () {",
                   "    const response = pm.response.json();",
                   "    pm.expect(response).to.have.property('avatarUrl');",
-                  "    pm.expect(response).to.have.property('avatarKey');",
+                  "    pm.expect(response).to.have.property('avatarFileKey');",
                   "});"
                 ]
               }
@@ -867,14 +867,12 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test('Status code is 200', function () {",
-                  "    pm.response.to.have.status(200);",
+                  "pm.test('Status code is 204', function () {",
+                  "    pm.response.to.have.status(204);",
                   "});",
                   "",
-                  "pm.test('Response indicates profile deleted', function () {",
-                  "    const response = pm.response.json();",
-                  "    pm.expect(response).to.have.property('message');",
-                  "    pm.expect(response.message).to.include('deleted');",
+                  "pm.test('Response body is empty', function () {",
+                  "    pm.expect(pm.response.text()).to.be.empty;",
                   "});"
                 ]
               }
