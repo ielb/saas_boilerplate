@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { StorageProviderFactory } from './services/storage-provider.factory';
@@ -14,7 +14,11 @@ import { AuthModule } from '../auth/auth.module';
  * Files module configuration
  */
 @Module({
-  imports: [ConfigModule, TypeOrmModule.forFeature([File]), AuthModule],
+  imports: [
+    ConfigModule,
+    TypeOrmModule.forFeature([File]),
+    forwardRef(() => AuthModule),
+  ],
   controllers: [FilesController],
   providers: [
     StorageProviderFactory,
