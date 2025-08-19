@@ -810,7 +810,7 @@
               "mode": "formdata",
               "formdata": [
                 {
-                  "key": "avatar",
+                  "key": "file",
                   "type": "file",
                   "src": []
                 }
