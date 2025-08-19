@@ -134,6 +134,11 @@
       "key": "exportId",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "profileId",
+      "value": "",
+      "type": "string"
     }
   ],
   "auth": {
@@ -584,6 +589,309 @@
               "raw": "{{baseUrl}}/auth/mfa/backup-codes/regenerate",
               "host": ["{{baseUrl}}"],
               "path": ["auth", "mfa", "backup-codes", "regenerate"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Profile Management",
+      "item": [
+        {
+          "name": "Create Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has profile data', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('id');",
+                  "    pm.expect(response).to.have.property('firstName');",
+                  "    pm.expect(response).to.have.property('lastName');",
+                  "    pm.expect(response).to.have.property('userId');",
+                  "});",
+                  "",
+                  "pm.test('Profile data matches request', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.firstName).to.equal('John');",
+                  "    pm.expect(response.lastName).to.equal('Doe');",
+                  "    pm.expect(response.displayName).to.equal('John Doe');",
+                  "    pm.expect(response.bio).to.equal('Software Developer');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('profileId', response.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"displayName\": \"John Doe\",\n  \"bio\": \"Software Developer\",\n  \"jobTitle\": \"Developer\",\n  \"department\": \"Engineering\",\n  \"location\": \"New York\",\n  \"phone\": \"+1234567890\",\n  \"website\": \"https://johndoe.dev\",\n  \"socialLinks\": {\n    \"linkedin\": \"https://linkedin.com/in/johndoe\",\n    \"twitter\": \"https://twitter.com/johndoe\",\n    \"github\": \"https://github.com/johndoe\"\n  },\n  \"preferences\": {\n    \"emailNotifications\": true,\n    \"pushNotifications\": false,\n    \"timezone\": \"America/New_York\",\n    \"locale\": \"en-US\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profiles",
+              "host": ["{{baseUrl}}"],
+              "path": ["profiles"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has profile data', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('id');",
+                  "    pm.expect(response).to.have.property('firstName');",
+                  "    pm.expect(response).to.have.property('lastName');",
+                  "    pm.expect(response).to.have.property('userId');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profiles/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["profiles", "me"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update My Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has updated profile data', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('id');",
+                  "    pm.expect(response.firstName).to.equal('John Updated');",
+                  "    pm.expect(response.bio).to.equal('Updated bio');",
+                  "    pm.expect(response.jobTitle).to.equal('Senior Developer');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John Updated\",\n  \"bio\": \"Updated bio\",\n  \"jobTitle\": \"Senior Developer\",\n  \"department\": \"Engineering\",\n  \"location\": \"San Francisco\",\n  \"phone\": \"+1987654321\",\n  \"website\": \"https://johnupdated.dev\",\n  \"socialLinks\": {\n    \"linkedin\": \"https://linkedin.com/in/johnupdated\",\n    \"twitter\": \"https://twitter.com/johnupdated\",\n    \"github\": \"https://github.com/johnupdated\"\n  },\n  \"preferences\": {\n    \"emailNotifications\": true,\n    \"pushNotifications\": true,\n    \"timezone\": \"America/Los_Angeles\",\n    \"locale\": \"en-US\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profiles/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["profiles", "me"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Profile Completion Status",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has completion data', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('completionPercentage');",
+                  "    pm.expect(response).to.have.property('missingFields');",
+                  "    pm.expect(response).to.have.property('isComplete');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profiles/me/completion",
+              "host": ["{{baseUrl}}"],
+              "path": ["profiles", "me", "completion"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Avatar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has avatar data', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('avatarUrl');",
+                  "    pm.expect(response).to.have.property('avatarKey');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "avatar",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/profiles/me/avatar",
+              "host": ["{{baseUrl}}"],
+              "path": ["profiles", "me", "avatar"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Avatar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response indicates avatar deleted', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "    pm.expect(response.message).to.include('deleted');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profiles/me/avatar",
+              "host": ["{{baseUrl}}"],
+              "path": ["profiles", "me", "avatar"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete My Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response indicates profile deleted', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "    pm.expect(response.message).to.include('deleted');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/profiles/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["profiles", "me"]
             }
           },
           "response": []

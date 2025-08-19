@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 
@@ -9,6 +9,7 @@ import { RoleController } from './controllers/role.controller';
 import { PermissionController } from './controllers/permission.controller';
 import { AccountRecoveryController } from './controllers/account-recovery.controller';
 import { UserLifecycleController } from './controllers/user-lifecycle.controller';
+import { ProfileController } from './controllers/profile.controller';
 import { AuthService } from './services/auth.service';
 import { JwtService } from './services/jwt.service';
 import { RefreshTokenService } from './services/refresh-token.service';
@@ -20,6 +21,7 @@ import { PermissionService } from './services/permission.service';
 import { AccountRecoveryService } from './services/account-recovery.service';
 import { AuditService } from './services/audit.service';
 import { UserLifecycleService } from './services/user-lifecycle.service';
+import { ProfileService } from './services/profile.service';
 import { AuditInterceptor } from './interceptors/audit.interceptor';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { PermissionsGuard } from './guards/permissions.guard';
@@ -32,6 +34,7 @@ import {
   AuditLogRepository,
   TenantUsageRepository,
   TenantFeatureFlagRepository,
+  UserProfileRepository,
 } from './repositories';
 import {
   User,
@@ -44,8 +47,11 @@ import {
   AuditLog,
   TenantUsage,
   TenantFeatureFlag,
+  UserProfile,
 } from './entities';
 import { env } from '@app/config';
+import { FilesModule } from '../files/files.module';
+import { CommonModule } from '../../common/common.module';
 
 @Module({
   imports: [
@@ -60,6 +66,7 @@ import { env } from '@app/config';
       AuditLog,
       TenantUsage,
       TenantFeatureFlag,
+      UserProfile,
     ]),
     JwtModule.register({
       secret: env.JWT_SECRET,
@@ -69,6 +76,8 @@ import { env } from '@app/config';
         audience: 'saas-boilerplate-users',
       },
     }),
+    forwardRef(() => FilesModule),
+    CommonModule,
   ],
   controllers: [
     AuthController,
@@ -78,6 +87,7 @@ import { env } from '@app/config';
     PermissionController,
     AccountRecoveryController,
     UserLifecycleController,
+    ProfileController,
   ],
   providers: [
     AuthService,
@@ -91,6 +101,7 @@ import { env } from '@app/config';
     AccountRecoveryService,
     AuditService,
     UserLifecycleService,
+    ProfileService,
     AuditInterceptor,
     JwtAuthGuard,
     PermissionsGuard,
@@ -103,6 +114,7 @@ import { env } from '@app/config';
     AuditLogRepository,
     TenantUsageRepository,
     TenantFeatureFlagRepository,
+    UserProfileRepository,
   ],
   exports: [
     AuthService,
@@ -116,6 +128,7 @@ import { env } from '@app/config';
     AccountRecoveryService,
     AuditService,
     UserLifecycleService,
+    ProfileService,
     AuditInterceptor,
     JwtAuthGuard,
     PermissionsGuard,
@@ -127,6 +140,7 @@ import { env } from '@app/config';
     AuditLogRepository,
     TenantUsageRepository,
     TenantFeatureFlagRepository,
+    UserProfileRepository,
   ],
 })
 export class AuthModule {}
