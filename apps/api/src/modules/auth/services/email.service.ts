@@ -206,7 +206,8 @@ export class EmailService {
       | 'user-activation'
       | 'user-suspension'
       | 'user-reactivation'
-      | 'user-deletion';
+      | 'user-deletion'
+      | 'team-invitation';
 
     const templates: Record<TemplateType, { html: string; text: string }> = {
       'email-verification': {
@@ -501,6 +502,43 @@ export class EmailService {
           Thank you for using our platform.
         `,
       },
+      'team-invitation': {
+        html: `
+          <h1>You've Been Invited to Join {{teamName}}</h1>
+          <p>Hello there!</p>
+          <p>{{inviterName}} has invited you to join the team <strong>{{teamName}}</strong> as a <strong>{{roleName}}</strong>.</p>
+          {{#if message}}
+          <p><strong>Message from {{inviterName}}:</strong></p>
+          <p>{{message}}</p>
+          {{/if}}
+          <p>To accept this invitation, please click the link below:</p>
+          <a href="{{invitationUrl}}" style="display: inline-block; padding: 12px 24px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px;">Accept Invitation</a>
+          <p>This invitation will expire in {{expiresIn}}.</p>
+          <p>If you don't want to accept this invitation, you can safely ignore this email.</p>
+          <p>If you have any questions, please contact the team administrator.</p>
+        `,
+        text: `
+          You've Been Invited to Join {{teamName}}
+          
+          Hello there!
+          
+          {{inviterName}} has invited you to join the team {{teamName}} as a {{roleName}}.
+          
+          {{#if message}}
+          Message from {{inviterName}}:
+          {{message}}
+          {{/if}}
+          
+          To accept this invitation, please visit this link:
+          {{invitationUrl}}
+          
+          This invitation will expire in {{expiresIn}}.
+          
+          If you don't want to accept this invitation, you can safely ignore this email.
+          
+          If you have any questions, please contact the team administrator.
+        `,
+      },
     };
 
     const template = templates[templateName as TemplateType];
@@ -697,6 +735,34 @@ export class EmailService {
         name: user.firstName,
         supportEmail:
           process.env.SUPPORT_EMAIL || 'support@saas-boilerplate.com',
+      },
+    };
+
+    await this.sendEmail(emailData);
+  }
+
+  /**
+   * Send team invitation email
+   */
+  async sendTeamInvitation(invitationData: {
+    to: string;
+    teamName: string;
+    inviterName: string;
+    roleName: string;
+    invitationToken: string;
+    message?: string;
+  }): Promise<void> {
+    const emailData = {
+      to: invitationData.to,
+      subject: `You've been invited to join ${invitationData.teamName}`,
+      template: 'team-invitation',
+      context: {
+        teamName: invitationData.teamName,
+        inviterName: invitationData.inviterName,
+        roleName: invitationData.roleName,
+        invitationUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/teams/invite?token=${invitationData.invitationToken}`,
+        message: invitationData.message,
+        expiresIn: '7 days',
       },
     };
 

@@ -82,6 +82,17 @@ export enum AuditEventType {
   USER_BULK_SUSPENDED = 'user_bulk_suspended',
   USER_BULK_REACTIVATED = 'user_bulk_reactivated',
   USER_BULK_DELETED = 'user_bulk_deleted',
+
+  // Team Events
+  TEAM_CREATED = 'team_created',
+  TEAM_UPDATED = 'team_updated',
+  TEAM_DELETED = 'team_deleted',
+  TEAM_MEMBER_ADDED = 'team_member_added',
+  TEAM_MEMBER_REMOVED = 'team_member_removed',
+  TEAM_MEMBER_UPDATED = 'team_member_updated',
+  TEAM_INVITATION_SENT = 'team_invitation_sent',
+  TEAM_INVITATION_ACCEPTED = 'team_invitation_accepted',
+  TEAM_INVITATION_CANCELLED = 'team_invitation_cancelled',
 }
 
 export enum AuditEventStatus {

@@ -197,7 +197,7 @@ class DatabaseSeeder {
       await this.createUserTenantMemberships();
 
       logHeader('🎉 DATABASE SEEDING COMPLETED SUCCESSFULLY!');
-      this.printSummary();
+      await this.printSummary();
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'Unknown error';
@@ -419,9 +419,24 @@ class DatabaseSeeder {
         await Promise.all(insertPromises);
         assignmentCount++;
 
-        logSuccess(
-          `Assigned ${validPermissions.length} permissions to ${roleName}`
+        // Log team permissions specifically
+        const teamPermissions = validPermissions.filter((p: Permission) =>
+          p.name.startsWith('teams:')
         );
+
+        if (teamPermissions.length > 0) {
+          logSuccess(
+            `Assigned ${validPermissions.length} permissions to ${roleName} (including ${teamPermissions.length} team permissions)`
+          );
+          log(
+            `   Team permissions: ${teamPermissions.map((p: Permission) => p.name).join(', ')}`,
+            'cyan'
+          );
+        } else {
+          logSuccess(
+            `Assigned ${validPermissions.length} permissions to ${roleName}`
+          );
+        }
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : 'Unknown error';
@@ -462,15 +477,19 @@ class DatabaseSeeder {
       ),
       Member: allPermissionNames.filter(
         (name: string) =>
-          ['files:', 'notifications:', 'reports:', 'sessions:'].some(prefix =>
-            name.startsWith(prefix)
+          ['files:', 'notifications:', 'reports:', 'sessions:', 'teams:'].some(
+            prefix => name.startsWith(prefix)
           ) &&
           ['create', 'read', 'update', 'export'].some(action =>
             name.endsWith(`:${action}`)
           )
       ),
-      Viewer: allPermissionNames.filter((name: string) =>
-        ['read', 'export'].some(action => name.endsWith(`:${action}`))
+      Viewer: allPermissionNames.filter(
+        (name: string) =>
+          ['read', 'export'].some(action => name.endsWith(`:${action}`)) &&
+          ['files:', 'teams:', 'reports:'].some(prefix =>
+            name.startsWith(prefix)
+          )
       ),
     };
   }
@@ -680,7 +699,7 @@ class DatabaseSeeder {
     return roleName as UserRole;
   }
 
-  private printSummary() {
+  private async printSummary() {
     logHeader('📊 SEEDING SUMMARY');
 
     log('🔐 Test Users Created:', 'bright');
@@ -691,10 +710,37 @@ class DatabaseSeeder {
       );
     });
 
+    // Show team permissions for each role
+    log('\n👥 Team Permissions by Role:', 'bright');
+    const roles = await this.roleRepository.find({
+      relations: ['permissions'],
+    });
+
+    for (const role of roles) {
+      const teamPermissions =
+        role.permissions?.filter((p: Permission) =>
+          p.name.startsWith('teams:')
+        ) || [];
+
+      if (teamPermissions.length > 0) {
+        log(
+          `   ${role.name}: ${teamPermissions.length} team permissions`,
+          'green'
+        );
+        log(
+          `     ${teamPermissions.map((p: Permission) => p.name).join(', ')}`,
+          'cyan'
+        );
+      } else {
+        log(`   ${role.name}: No team permissions`, 'yellow');
+      }
+    }
+
     log('\n🎯 Next Steps:', 'bright');
     log('   1. Test login with any of the created users', 'cyan');
     log('   2. Verify permissions and role assignments', 'cyan');
     log('   3. Test API endpoints with different user roles', 'cyan');
+    log('   4. Test team functionality with admin and manager users', 'cyan');
 
     log('\n🔗 Quick Test Commands:', 'bright');
     log('   # SuperAdmin login', 'yellow');
@@ -710,6 +756,14 @@ class DatabaseSeeder {
     log('     -H "Content-Type: application/json" \\', 'cyan');
     log(
       '     -d \'{"email":"admin@example.com","password":"Admin123!"}\'',
+      'cyan'
+    );
+
+    log('\n   # Manager login (has team permissions)', 'yellow');
+    log('   curl -X POST http://localhost:3001/api/auth/login \\', 'cyan');
+    log('     -H "Content-Type: application/json" \\', 'cyan');
+    log(
+      '     -d \'{"email":"manager@example.com","password":"Manager123!"}\'',
       'cyan'
     );
   }

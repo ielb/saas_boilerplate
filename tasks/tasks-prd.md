@@ -189,8 +189,8 @@ Based on PRD: `docs/prd.md`
   - [x] 3.7.8 Fix case sensitivity issues in feature converter
   - [x] 3.7.9 Add proper error handling and validation
   - [x] 3.8 Create user lifecycle management (registration, activation, suspension) (#32) ✅
-  - [ ] 3.9 Implement user profile management with avatar upload (#33)
-  - [ ] 3.10 Create team collaboration with role hierarchy (#34)
+  - [x] 3.9 Implement user profile management with avatar upload (#33)
+  - [x] 3.10 Create team collaboration with role hierarchy (#34)
   - [ ] 3.11 Implement invitation system with email notifications (#35)
   - [ ] 3.12 Add bulk user import/export with CSV support (#36)
   - [ ] 3.13 Create team switching and multi-team membership (#37)

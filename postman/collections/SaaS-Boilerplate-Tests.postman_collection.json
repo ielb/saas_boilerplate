@@ -86,6 +86,22 @@
       "value": ""
     },
     {
+      "key": "teamId",
+      "value": ""
+    },
+    {
+      "key": "teamMembershipId",
+      "value": ""
+    },
+    {
+      "key": "teamInvitationId",
+      "value": ""
+    },
+    {
+      "key": "invitationToken",
+      "value": ""
+    },
+    {
       "key": "movedFileKey",
       "value": ""
     }
@@ -137,7 +153,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"{{$randomEmail}}\",\n  \"password\": \"SecurePassword123!\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"tenantName\": \"Test Company {{$randomInt}}\",\n  \"domain\": \"testcompany{{$randomInt}}.com\",\n  \"description\": \"Test tenant for automated testing\",\n  \"contactEmail\": \"admin@testcompany.com\",\n  \"contactPhone\": \"+1234567890\",\n  \"address\": \"123 Test Street\",\n  \"city\": \"Test City\",\n  \"state\": \"Test State\",\n  \"postalCode\": \"12345\",\n  \"country\": \"US\",\n  \"timezone\": \"America/New_York\",\n  \"locale\": \"en-US\",\n  \"currency\": \"USD\",\n  \"marketingConsent\": true,\n  \"acceptTerms\": true\n}"
+              "raw": "{\n  \"email\": \"{{$randomEmail}}\",\n  \"password\": \"SuperAdmin123!\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"tenantName\": \"Test Company {{$randomInt}}\",\n  \"domain\": \"testcompany{{$randomInt}}.com\",\n  \"description\": \"Test tenant for automated testing\",\n  \"contactEmail\": \"admin@testcompany.com\",\n  \"contactPhone\": \"+1234567890\",\n  \"address\": \"123 Test Street\",\n  \"city\": \"Test City\",\n  \"state\": \"Test State\",\n  \"postalCode\": \"12345\",\n  \"country\": \"US\",\n  \"timezone\": \"America/New_York\",\n  \"locale\": \"en-US\",\n  \"currency\": \"USD\",\n  \"marketingConsent\": true,\n  \"acceptTerms\": true\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/register",
@@ -176,7 +192,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"invalid-email\",\n  \"password\": \"SecurePassword123!\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"tenantName\": \"Test Company\",\n  \"acceptTerms\": true\n}"
+              "raw": "{\n  \"email\": \"invalid-email\",\n  \"password\": \"SuperAdmin123!\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"tenantName\": \"Test Company\",\n  \"acceptTerms\": true\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/register",
@@ -215,7 +231,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"123\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"tenantName\": \"Test Company\",\n  \"acceptTerms\": true\n}"
+              "raw": "{\n  \"email\": \"superadmin@example.com\",\n  \"password\": \"123\",\n  \"firstName\": \"Test\",\n  \"lastName\": \"User\",\n  \"tenantName\": \"Test Company\",\n  \"acceptTerms\": true\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/register",
@@ -293,7 +309,7 @@
           "response": []
         },
         {
-          "name": "5. Login User - Invalid Credentials",
+          "name": "16. Login User - Invalid Credentials",
           "event": [
             {
               "listen": "test",
@@ -332,7 +348,7 @@
           "response": []
         },
         {
-          "name": "6. Get Profile - Authenticated",
+          "name": "16. Get Profile - Authenticated",
           "event": [
             {
               "listen": "test",
@@ -375,7 +391,7 @@
           "response": []
         },
         {
-          "name": "7. Get Profile - Unauthenticated",
+          "name": "16. Get Profile - Unauthenticated",
           "event": [
             {
               "listen": "test",
@@ -400,7 +416,7 @@
           "response": []
         },
         {
-          "name": "8. Refresh Token - Success",
+          "name": "16. Refresh Token - Success",
           "event": [
             {
               "listen": "test",
@@ -460,7 +476,7 @@
           "response": []
         },
         {
-          "name": "9. Refresh Token - Invalid Token",
+          "name": "16. Refresh Token - Invalid Token",
           "event": [
             {
               "listen": "test",
@@ -499,7 +515,7 @@
           "response": []
         },
         {
-          "name": "10. Logout - Success",
+          "name": "16. Logout - Success",
           "event": [
             {
               "listen": "test",
@@ -524,7 +540,7 @@
           ]
         },
         {
-          "name": "11. Forgot Password - Success",
+          "name": "16. Forgot Password - Success",
           "event": [
             {
               "listen": "test",
@@ -564,7 +580,7 @@
           "response": []
         },
         {
-          "name": "12. Forgot Password - Invalid Email",
+          "name": "16. Forgot Password - Invalid Email",
           "event": [
             {
               "listen": "test",
@@ -603,7 +619,7 @@
           "response": []
         },
         {
-          "name": "13. Reset Password - Success",
+          "name": "16. Reset Password - Success",
           "event": [
             {
               "listen": "test",
@@ -634,7 +650,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"token\": \"valid-reset-token-here\",\n  \"newPassword\": \"NewSecurePassword123!\"\n}"
+              "raw": "{\n  \"token\": \"valid-reset-token-here\",\n  \"newPassword\": \"NewSuperAdmin123!\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/reset-password",
@@ -645,7 +661,7 @@
           "response": []
         },
         {
-          "name": "14. Reset Password - Invalid Token",
+          "name": "16. Reset Password - Invalid Token",
           "event": [
             {
               "listen": "test",
@@ -674,7 +690,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"token\": \"invalid-token\",\n  \"newPassword\": \"NewSecurePassword123!\"\n}"
+              "raw": "{\n  \"token\": \"invalid-token\",\n  \"newPassword\": \"NewSuperAdmin123!\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/reset-password",
@@ -685,7 +701,7 @@
           "response": []
         },
         {
-          "name": "15. Reset Password - Weak Password",
+          "name": "16. Reset Password - Weak Password",
           "event": [
             {
               "listen": "test",
@@ -724,7 +740,7 @@
           "response": []
         },
         {
-          "name": "11. Logout - Success",
+          "name": "16. Logout - Success",
           "event": [
             {
               "listen": "test",
@@ -962,7 +978,7 @@
           "response": []
         },
         {
-          "name": "5. Get MFA Status - Success",
+          "name": "16. Get MFA Status - Success",
           "event": [
             {
               "listen": "test",
@@ -1002,7 +1018,7 @@
           "response": []
         },
         {
-          "name": "6. Verify MFA - Success",
+          "name": "16. Verify MFA - Success",
           "event": [
             {
               "listen": "test",
@@ -1043,7 +1059,7 @@
           "response": []
         },
         {
-          "name": "7. Verify MFA - Invalid Token",
+          "name": "16. Verify MFA - Invalid Token",
           "event": [
             {
               "listen": "test",
@@ -1083,7 +1099,7 @@
           "response": []
         },
         {
-          "name": "8. Regenerate Backup Codes - Success",
+          "name": "16. Regenerate Backup Codes - Success",
           "event": [
             {
               "listen": "test",
@@ -1133,7 +1149,7 @@
           "response": []
         },
         {
-          "name": "9. Disable MFA - Success",
+          "name": "16. Disable MFA - Success",
           "event": [
             {
               "listen": "test",
@@ -1345,7 +1361,7 @@
           "response": []
         },
         {
-          "name": "5. Verify Account Recovery - Invalid Token",
+          "name": "16. Verify Account Recovery - Invalid Token",
           "event": [
             {
               "listen": "test",
@@ -1384,7 +1400,7 @@
           "response": []
         },
         {
-          "name": "6. Verify Account Recovery - Invalid Backup Code",
+          "name": "16. Verify Account Recovery - Invalid Backup Code",
           "event": [
             {
               "listen": "test",
@@ -1424,7 +1440,7 @@
           "response": []
         },
         {
-          "name": "7. Complete Account Recovery - Success",
+          "name": "16. Complete Account Recovery - Success",
           "event": [
             {
               "listen": "test",
@@ -1477,7 +1493,7 @@
           "response": []
         },
         {
-          "name": "8. Complete Account Recovery - Invalid Session Token",
+          "name": "16. Complete Account Recovery - Invalid Session Token",
           "event": [
             {
               "listen": "test",
@@ -1516,7 +1532,7 @@
           "response": []
         },
         {
-          "name": "9. Get Recovery Status - Success",
+          "name": "16. Get Recovery Status - Success",
           "event": [
             {
               "listen": "test",
@@ -1559,7 +1575,7 @@
           "response": []
         },
         {
-          "name": "10. Get Recovery Status - Invalid Session Token",
+          "name": "16. Get Recovery Status - Invalid Session Token",
           "event": [
             {
               "listen": "test",
@@ -1595,7 +1611,7 @@
           "response": []
         },
         {
-          "name": "11. Attempt Backup Code - Success",
+          "name": "16. Attempt Backup Code - Success",
           "event": [
             {
               "listen": "test",
@@ -1640,7 +1656,7 @@
           "response": []
         },
         {
-          "name": "12. Attempt Backup Code - Invalid Code",
+          "name": "16. Attempt Backup Code - Invalid Code",
           "event": [
             {
               "listen": "test",
@@ -1685,7 +1701,7 @@
           "response": []
         },
         {
-          "name": "13. Attempt Backup Code - Exceeded Attempts",
+          "name": "16. Attempt Backup Code - Exceeded Attempts",
           "event": [
             {
               "listen": "test",
@@ -1912,7 +1928,7 @@
           "response": []
         },
         {
-          "name": "5. Mark Device as Trusted - Success",
+          "name": "16. Mark Device as Trusted - Success",
           "event": [
             {
               "listen": "test",
@@ -1947,7 +1963,7 @@
           "response": []
         },
         {
-          "name": "6. Update Session Activity - Success",
+          "name": "16. Update Session Activity - Success",
           "event": [
             {
               "listen": "test",
@@ -1977,7 +1993,7 @@
           "response": []
         },
         {
-          "name": "7. Extend Session - Success",
+          "name": "16. Extend Session - Success",
           "event": [
             {
               "listen": "test",
@@ -2020,7 +2036,7 @@
           "response": []
         },
         {
-          "name": "8. Get Session Statistics - Success",
+          "name": "16. Get Session Statistics - Success",
           "event": [
             {
               "listen": "test",
@@ -2060,7 +2076,7 @@
           "response": []
         },
         {
-          "name": "9. Mark Session as Suspicious - Success",
+          "name": "16. Mark Session as Suspicious - Success",
           "event": [
             {
               "listen": "test",
@@ -2095,7 +2111,7 @@
           "response": []
         },
         {
-          "name": "10. Revoke Other Sessions - Success",
+          "name": "16. Revoke Other Sessions - Success",
           "event": [
             {
               "listen": "test",
@@ -2137,7 +2153,7 @@
           "response": []
         },
         {
-          "name": "11. Revoke Session - Success",
+          "name": "16. Revoke Session - Success",
           "event": [
             {
               "listen": "test",
@@ -2175,7 +2191,7 @@
           "response": []
         },
         {
-          "name": "12. Revoke All Sessions - Success",
+          "name": "16. Revoke All Sessions - Success",
           "event": [
             {
               "listen": "test",
@@ -2496,7 +2512,7 @@
           "response": []
         },
         {
-          "name": "5. Update Permission",
+          "name": "16. Update Permission",
           "event": [
             {
               "listen": "test",
@@ -2722,7 +2738,7 @@
           "response": []
         },
         {
-          "name": "5. Assign Additional Permissions to Role",
+          "name": "16. Assign Additional Permissions to Role",
           "event": [
             {
               "listen": "test",
@@ -2937,7 +2953,7 @@
           "response": []
         },
         {
-          "name": "5. Check User Permission - No Access",
+          "name": "16. Check User Permission - No Access",
           "event": [
             {
               "listen": "test",
@@ -3269,7 +3285,7 @@
           "response": []
         },
         {
-          "name": "5. Update Tenant",
+          "name": "16. Update Tenant",
           "event": [
             {
               "listen": "test",
@@ -3312,7 +3328,7 @@
           "response": []
         },
         {
-          "name": "6. Get Tenant Usage",
+          "name": "16. Get Tenant Usage",
           "event": [
             {
               "listen": "test",
@@ -3347,7 +3363,7 @@
           "response": []
         },
         {
-          "name": "7. Update Tenant Usage",
+          "name": "16. Update Tenant Usage",
           "event": [
             {
               "listen": "test",
@@ -3391,7 +3407,7 @@
           "response": []
         },
         {
-          "name": "8. Check Feature Enabled",
+          "name": "16. Check Feature Enabled",
           "event": [
             {
               "listen": "test",
@@ -3427,7 +3443,7 @@
           "response": []
         },
         {
-          "name": "9. Update Feature Flag",
+          "name": "16. Update Feature Flag",
           "event": [
             {
               "listen": "test",
@@ -3476,7 +3492,7 @@
           "response": []
         },
         {
-          "name": "10. Bulk Update Feature Flags",
+          "name": "16. Bulk Update Feature Flags",
           "event": [
             {
               "listen": "test",
@@ -3524,7 +3540,7 @@
           "response": []
         },
         {
-          "name": "11. Get Feature Flags Statistics",
+          "name": "16. Get Feature Flags Statistics",
           "event": [
             {
               "listen": "test",
@@ -3567,7 +3583,7 @@
           "response": []
         },
         {
-          "name": "12. Test Case Insensitive Feature Names",
+          "name": "16. Test Case Insensitive Feature Names",
           "event": [
             {
               "listen": "test",
@@ -3603,7 +3619,7 @@
           "response": []
         },
         {
-          "name": "13. Test Invalid Feature Name",
+          "name": "16. Test Invalid Feature Name",
           "event": [
             {
               "listen": "test",
@@ -3647,7 +3663,7 @@
           "response": []
         },
         {
-          "name": "14. Delete Tenant",
+          "name": "16. Delete Tenant",
           "event": [
             {
               "listen": "test",
@@ -4237,7 +4253,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"SecurePassword123!\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"tenantId\": \"{{tenantId}}\",\n  \"role\": \"member\",\n  \"sendEmailVerification\": true,\n  \"sendWelcomeEmail\": true\n}"
+                  "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"SuperAdmin123!\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"tenantId\": \"{{tenantId}}\",\n  \"role\": \"member\",\n  \"sendEmailVerification\": true,\n  \"sendWelcomeEmail\": true\n}"
                 },
                 "url": {
                   "raw": "{{baseUrl}}/users",
@@ -4299,7 +4315,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"email\": \"existinguser@example.com\",\n  \"password\": \"SecurePassword123!\",\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Smith\",\n  \"tenantId\": \"{{tenantId}}\",\n  \"role\": \"member\"\n}"
+                  "raw": "{\n  \"email\": \"existinguser@example.com\",\n  \"password\": \"SuperAdmin123!\",\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Smith\",\n  \"tenantId\": \"{{tenantId}}\",\n  \"role\": \"member\"\n}"
                 },
                 "url": {
                   "raw": "{{baseUrl}}/users",
@@ -5119,7 +5135,7 @@
           ]
         },
         {
-          "name": "5. Get Public URL - Success",
+          "name": "16. Get Public URL - Success",
           "request": {
             "method": "GET",
             "header": [
@@ -5156,7 +5172,7 @@
           ]
         },
         {
-          "name": "6. Copy File - Success",
+          "name": "16. Copy File - Success",
           "request": {
             "method": "POST",
             "header": [
@@ -5207,7 +5223,7 @@
           ]
         },
         {
-          "name": "7. Move File - Success",
+          "name": "16. Move File - Success",
           "request": {
             "method": "POST",
             "header": [
@@ -5258,7 +5274,7 @@
           ]
         },
         {
-          "name": "8. List Files - Success",
+          "name": "16. List Files - Success",
           "request": {
             "method": "GET",
             "header": [
@@ -5309,7 +5325,7 @@
           ]
         },
         {
-          "name": "9. Get Storage Health Status - Success",
+          "name": "16. Get Storage Health Status - Success",
           "request": {
             "method": "GET",
             "header": [
@@ -5351,7 +5367,7 @@
           ]
         },
         {
-          "name": "10. Get Available Providers - Success",
+          "name": "16. Get Available Providers - Success",
           "request": {
             "method": "GET",
             "header": [
@@ -5388,7 +5404,7 @@
           ]
         },
         {
-          "name": "11. Delete File - Success",
+          "name": "16. Delete File - Success",
           "request": {
             "method": "DELETE",
             "header": [
@@ -5423,7 +5439,7 @@
           ]
         },
         {
-          "name": "12. Check File Exists After Deletion - Success",
+          "name": "16. Check File Exists After Deletion - Success",
           "request": {
             "method": "GET",
             "header": [
@@ -5458,6 +5474,764 @@
               }
             }
           ]
+        }
+      ]
+    },
+    {
+      "name": "Teams Tests",
+      "item": [
+        {
+          "name": "1. Create Team - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Team created successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('id');",
+                  "    pm.expect(response).to.have.property('name');",
+                  "    pm.expect(response).to.have.property('description');",
+                  "    pm.expect(response).to.have.property('status');",
+                  "    pm.expect(response).to.have.property('createdAt');",
+                  "    pm.expect(response).to.have.property('updatedAt');",
+                  "    pm.expect(response.name).to.equal('Test Development Team');",
+                  "    pm.expect(response.description).to.equal('Test team for automated testing');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('teamId', response.id);",
+                  "}"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Development Team\",\n  \"description\": \"Test team for automated testing\",\n  \"managerId\": \"{{userId}}\",\n  \"settings\": {\n    \"allowMemberInvites\": true,\n    \"requireApproval\": false,\n    \"maxMembers\": 5\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teams",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2. Create Team - Validation Error",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Validation error returned', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "    pm.expect(response).to.have.property('errors');",
+                  "    pm.expect(response.errors).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\",\n  \"description\": \"Test team with invalid name\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teams",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3. Get All Teams - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Teams list retrieved', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('teams');",
+                  "    pm.expect(response).to.have.property('total');",
+                  "    pm.expect(response.teams).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4. Get My Teams - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('User teams retrieved', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams/my-teams",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "my-teams"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5. Get Team by ID - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Team details retrieved', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('id');",
+                  "    pm.expect(response).to.have.property('name');",
+                  "    pm.expect(response).to.have.property('description');",
+                  "    pm.expect(response).to.have.property('status');",
+                  "    pm.expect(response).to.have.property('createdAt');",
+                  "    pm.expect(response).to.have.property('updatedAt');",
+                  "    pm.expect(response.id).to.equal('{{teamId}}');",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "{{teamId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "6. Get Team by ID - Not Found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Team not found error', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "    pm.expect(response.message).to.include('not found');",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams/00000000-0000-0000-0000-000000000000",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "00000000-0000-0000-0000-000000000000"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "7. Update Team - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Team updated successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('id');",
+                  "    pm.expect(response).to.have.property('name');",
+                  "    pm.expect(response).to.have.property('description');",
+                  "    pm.expect(response.name).to.equal('Updated Test Team');",
+                  "    pm.expect(response.description).to.equal('Updated test team description');",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Test Team\",\n  \"description\": \"Updated test team description\",\n  \"settings\": {\n    \"allowMemberInvites\": false,\n    \"requireApproval\": true,\n    \"maxMembers\": 8\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "{{teamId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "8. Add Team Member - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Team member added successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('id');",
+                  "    pm.expect(response).to.have.property('userId');",
+                  "    pm.expect(response).to.have.property('teamId');",
+                  "    pm.expect(response).to.have.property('role');",
+                  "    pm.expect(response).to.have.property('joinedAt');",
+                  "    pm.expect(response.role).to.equal('member');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('teamMembershipId', response.id);",
+                  "}"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{newUserId}}\",\n  \"role\": \"member\",\n  \"permissions\": [\"read\", \"write\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}/members",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "{{teamId}}", "members"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "9. Get Team Members - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Team members retrieved', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('data');",
+                  "    pm.expect(response).to.have.property('pagination');",
+                  "    pm.expect(response.data).to.be.an('array');",
+                  "    if (response.data.length > 0) {",
+                  "        pm.expect(response.data[0]).to.have.property('id');",
+                  "        pm.expect(response.data[0]).to.have.property('userId');",
+                  "        pm.expect(response.data[0]).to.have.property('role');",
+                  "        pm.expect(response.data[0]).to.have.property('joinedAt');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}/members?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "{{teamId}}", "members"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "10. Update Team Member - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Team member updated successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('id');",
+                  "    pm.expect(response).to.have.property('role');",
+                  "    pm.expect(response.role).to.equal('admin');",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"admin\",\n  \"permissions\": [\"read\", \"write\", \"admin\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}/members/{{teamMembershipId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "auth",
+                "teams",
+                "{{teamId}}",
+                "members",
+                "{{teamMembershipId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "11. Invite Team Member - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Team invitation sent successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('id');",
+                  "    pm.expect(response).to.have.property('email');",
+                  "    pm.expect(response).to.have.property('role');",
+                  "    pm.expect(response).to.have.property('status');",
+                  "    pm.expect(response).to.have.property('expiresAt');",
+                  "    pm.expect(response.email).to.equal('invited@example.com');",
+                  "    pm.expect(response.role).to.equal('member');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('teamInvitationId', response.id);",
+                  "    pm.environment.set('invitationToken', response.token);",
+                  "}"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"invited@example.com\",\n  \"role\": \"member\",\n  \"message\": \"You are invited to join our test team\",\n  \"expiresIn\": 7\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}/invitations",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "{{teamId}}", "invitations"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "12. Get Team Invitations - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Team invitations retrieved', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('data');",
+                  "    pm.expect(response).to.have.property('pagination');",
+                  "    pm.expect(response.data).to.be.an('array');",
+                  "    if (response.data.length > 0) {",
+                  "        pm.expect(response.data[0]).to.have.property('id');",
+                  "        pm.expect(response.data[0]).to.have.property('email');",
+                  "        pm.expect(response.data[0]).to.have.property('status');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}/invitations?page=1&limit=10&status=pending",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "{{teamId}}", "invitations"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "pending"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "13. Accept Team Invitation - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Team invitation accepted successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "    pm.expect(response).to.have.property('membership');",
+                  "    pm.expect(response.membership).to.have.property('id');",
+                  "    pm.expect(response.membership).to.have.property('teamId');",
+                  "    pm.expect(response.membership).to.have.property('userId');",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{invitationToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teams/invitations/accept",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "invitations", "accept"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "14. Get Team Analytics - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Team analytics retrieved', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('totalMembers');",
+                  "    pm.expect(response).to.have.property('activeMembers');",
+                  "    pm.expect(response).to.have.property('pendingInvitations');",
+                  "    pm.expect(response).to.have.property('memberGrowth');",
+                  "    pm.expect(response).to.have.property('roleDistribution');",
+                  "    pm.expect(response.totalMembers).to.be.a('number');",
+                  "    pm.expect(response.activeMembers).to.be.a('number');",
+                  "    pm.expect(response.pendingInvitations).to.be.a('number');",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}/analytics",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "{{teamId}}", "analytics"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "15. Remove Team Member - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Team member removed successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "    pm.expect(response.message).to.include('removed');",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}/members/{{teamMembershipId}}",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "auth",
+                "teams",
+                "{{teamId}}",
+                "members",
+                "{{teamMembershipId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "16. Delete Team - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Team deleted successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "    pm.expect(response.message).to.include('deleted');",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "{{teamId}}"]
+            }
+          },
+          "response": []
         }
       ]
     }
