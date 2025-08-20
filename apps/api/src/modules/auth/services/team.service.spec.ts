@@ -14,6 +14,7 @@ import {
 } from '../entities/team.entity';
 import { User } from '../entities/user.entity';
 import { Role } from '../entities/role.entity';
+import { AuditEventType } from '../entities/audit-log.entity';
 
 describe('TeamService', () => {
   let service: TeamService;
@@ -84,6 +85,11 @@ describe('TeamService', () => {
       getTeamAnalytics: jest.fn(),
       checkUserTeamMembership: jest.fn(),
       getUserTeamRole: jest.fn(),
+      findInvitationById: jest.fn(),
+      generateInvitationToken: jest.fn(),
+      updateInvitationToken: jest.fn(),
+      findExpiredInvitations: jest.fn(),
+      getInvitationAnalytics: jest.fn(),
     };
 
     const mockUserRepository = {
@@ -887,6 +893,11 @@ describe('TeamService', () => {
 
   describe('getUserTeamRole', () => {
     it('should return user team role', async () => {
+      const mockMembership = {
+        id: 'membership-123',
+        role: mockRole,
+      };
+
       teamRepository.getUserTeamRole.mockResolvedValue(mockRole as Role);
 
       const result = await service.getUserTeamRole(
@@ -913,6 +924,322 @@ describe('TeamService', () => {
       );
 
       expect(result).toBeNull();
+    });
+  });
+
+  describe('resendTeamInvitation', () => {
+    const invitationId = 'invitation-123';
+
+    it('should resend team invitation successfully', async () => {
+      const mockInvitation: Partial<TeamInvitation> = {
+        id: invitationId,
+        teamId: mockTeamId,
+        email: 'invite@example.com',
+        roleId: mockRoleId,
+        invitedById: mockUserId,
+        status: 'pending',
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours from now
+        tenantId: mockTenantId,
+        team: mockTeam as Team,
+        role: mockRole as Role,
+        invitedBy: mockUser as User,
+      };
+
+      const updatedInvitation = {
+        ...mockInvitation,
+        token: 'new-token',
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+      };
+
+      teamRepository.findInvitationById.mockResolvedValue(
+        mockInvitation as TeamInvitation
+      );
+      teamRepository.generateInvitationToken.mockReturnValue('new-token');
+      teamRepository.updateInvitationToken.mockResolvedValue(
+        updatedInvitation as TeamInvitation
+      );
+      emailService.sendTeamInvitation.mockResolvedValue(undefined);
+      auditService.logEvent.mockResolvedValue(undefined as any);
+
+      const result = await service.resendTeamInvitation(
+        invitationId,
+        mockTenantId,
+        mockUserId
+      );
+
+      expect(teamRepository.findInvitationById).toHaveBeenCalledWith(
+        invitationId,
+        mockTenantId
+      );
+      expect(teamRepository.updateInvitationToken).toHaveBeenCalledWith(
+        invitationId,
+        'new-token',
+        expect.any(Date),
+        mockTenantId
+      );
+      expect(emailService.sendTeamInvitation).toHaveBeenCalledWith({
+        to: 'invite@example.com',
+        teamName: 'Test Team',
+        inviterName: 'Test User',
+        roleName: 'Manager',
+        invitationToken: 'new-token',
+        message: 'Your invitation has been resent',
+      });
+      expect(auditService.logEvent).toHaveBeenCalledWith({
+        eventType: AuditEventType.TEAM_INVITATION_RESENT,
+        userId: mockUserId,
+        tenantId: mockTenantId,
+        description: 'Team invitation resent',
+        metadata: {
+          teamId: mockTeamId,
+          teamName: 'Test Team',
+          invitedEmail: 'invite@example.com',
+          invitationId: invitationId,
+        },
+      });
+      expect(result).toEqual(
+        expect.objectContaining({
+          id: invitationId,
+          email: 'invite@example.com',
+          status: 'pending',
+        })
+      );
+    });
+
+    it('should throw NotFoundException if invitation not found', async () => {
+      teamRepository.findInvitationById.mockResolvedValue(null);
+
+      await expect(
+        service.resendTeamInvitation(invitationId, mockTenantId, mockUserId)
+      ).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw BadRequestException if invitation is not pending', async () => {
+      const mockInvitation = {
+        id: invitationId,
+        status: 'accepted',
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      };
+
+      teamRepository.findInvitationById.mockResolvedValue(
+        mockInvitation as TeamInvitation
+      );
+
+      await expect(
+        service.resendTeamInvitation(invitationId, mockTenantId, mockUserId)
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw BadRequestException if invitation has expired', async () => {
+      const mockInvitation = {
+        id: invitationId,
+        status: 'pending',
+        expiresAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // Expired 24 hours ago
+      };
+
+      teamRepository.findInvitationById.mockResolvedValue(
+        mockInvitation as TeamInvitation
+      );
+
+      await expect(
+        service.resendTeamInvitation(invitationId, mockTenantId, mockUserId)
+      ).rejects.toThrow(BadRequestException);
+    });
+  });
+
+  describe('bulkInviteTeamMembers', () => {
+    const bulkInviteDto = {
+      invitations: [
+        {
+          email: 'user1@example.com',
+          roleId: mockRoleId,
+          message: 'Welcome to the team!',
+        },
+        {
+          email: 'user2@example.com',
+          roleId: mockRoleId,
+        },
+      ],
+    };
+
+    it('should process bulk invitations successfully', async () => {
+      const mockInvitation1 = {
+        id: 'invitation-1',
+        teamId: mockTeamId,
+        email: 'user1@example.com',
+        roleId: mockRoleId,
+        invitedById: mockUserId,
+        token: 'token-1',
+        status: 'pending',
+        expiresAt: new Date(),
+        tenantId: mockTenantId,
+        invitedBy: mockUser as User,
+        role: mockRole as Role,
+      };
+
+      const mockInvitation2 = {
+        id: 'invitation-2',
+        teamId: mockTeamId,
+        email: 'user2@example.com',
+        roleId: mockRoleId,
+        invitedById: mockUserId,
+        token: 'token-2',
+        status: 'pending',
+        expiresAt: new Date(),
+        tenantId: mockTenantId,
+        invitedBy: mockUser as User,
+        role: mockRole as Role,
+      };
+
+      teamRepository.findOneByIdForTenant.mockResolvedValue(mockTeam as Team);
+      roleRepository.findOneByIdForTenant
+        .mockResolvedValueOnce(mockRole as Role)
+        .mockResolvedValueOnce(null); // Role not found for second invitation
+      userRepository.findByEmail.mockResolvedValue(null);
+      teamRepository.findInvitationByEmail.mockResolvedValue(null);
+      teamRepository.createTeamInvitation.mockResolvedValue({
+        id: 'invitation-1',
+        teamId: mockTeamId,
+        email: 'user1@example.com',
+        roleId: mockRoleId,
+        invitedById: mockUserId,
+        token: 'token-1',
+        status: 'pending',
+        expiresAt: new Date(),
+        tenantId: mockTenantId,
+        invitedBy: mockUser as User,
+        role: mockRole as Role,
+      } as TeamInvitation);
+      emailService.sendTeamInvitation.mockResolvedValue(undefined);
+      auditService.logEvent.mockResolvedValue(undefined as any);
+
+      const result = await service.bulkInviteTeamMembers(
+        mockTeamId,
+        bulkInviteDto,
+        mockTenantId,
+        mockUserId
+      );
+
+      expect(result.totalInvitations).toBe(2);
+      expect(result.successfulInvitations).toBe(1);
+      expect(result.failedInvitations).toBe(1);
+      expect(result.results[0]?.success).toBe(true);
+      expect(result.results[1]?.success).toBe(false);
+      expect(result.results[1]?.error).toBe('Role not found');
+    });
+  });
+
+  describe('cleanupExpiredInvitations', () => {
+    it('should cleanup expired invitations successfully', async () => {
+      const expiredInvitations = [
+        {
+          id: 'invitation-1',
+          teamId: mockTeamId,
+          email: 'user1@example.com',
+          invitedById: mockUserId,
+          team: mockTeam as Team,
+        },
+        {
+          id: 'invitation-2',
+          teamId: mockTeamId,
+          email: 'user2@example.com',
+          invitedById: mockUserId,
+          team: mockTeam as Team,
+        },
+      ];
+
+      teamRepository.findExpiredInvitations.mockResolvedValue(
+        expiredInvitations as TeamInvitation[]
+      );
+      teamRepository.updateInvitationStatus.mockResolvedValue(
+        {} as TeamInvitation
+      );
+      auditService.logEvent.mockResolvedValue(undefined as any);
+
+      const result = await service.cleanupExpiredInvitations(mockTenantId);
+
+      expect(teamRepository.findExpiredInvitations).toHaveBeenCalledWith(
+        mockTenantId
+      );
+      expect(teamRepository.updateInvitationStatus).toHaveBeenCalledTimes(2);
+      expect(auditService.logEvent).toHaveBeenCalledTimes(2);
+      expect(result).toBe(2);
+    });
+
+    it('should return 0 when no expired invitations found', async () => {
+      teamRepository.findExpiredInvitations.mockResolvedValue([]);
+
+      const result = await service.cleanupExpiredInvitations(mockTenantId);
+
+      expect(result).toBe(0);
+      expect(teamRepository.updateInvitationStatus).not.toHaveBeenCalled();
+      expect(auditService.logEvent).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('getInvitationAnalytics', () => {
+    it('should return invitation analytics successfully', async () => {
+      const mockAnalytics = {
+        total: 10,
+        pending: 3,
+        accepted: 5,
+        expired: 1,
+        cancelled: 1,
+        averageResponseTime: 24.5,
+        byRole: { Member: 8, Admin: 2 },
+        byDay: { '2024-01-01': 3, '2024-01-02': 7 },
+      };
+
+      teamRepository.getInvitationAnalytics.mockResolvedValue(mockAnalytics);
+
+      const result = await service.getInvitationAnalytics(
+        mockTeamId,
+        mockTenantId,
+        30
+      );
+
+      expect(teamRepository.getInvitationAnalytics).toHaveBeenCalledWith(
+        mockTeamId,
+        mockTenantId,
+        expect.any(Date)
+      );
+      expect(result.teamId).toBe(mockTeamId);
+      expect(result.period).toBe('30 days');
+      expect(result.totalInvitations).toBe(10);
+      expect(result.pendingInvitations).toBe(3);
+      expect(result.acceptedInvitations).toBe(5);
+      expect(result.expiredInvitations).toBe(1);
+      expect(result.cancelledInvitations).toBe(1);
+      expect(result.acceptanceRate).toBe(50); // 5/10 * 100
+      expect(result.averageResponseTime).toBe(24.5);
+      expect(result.invitationsByRole).toEqual({ Member: 8, Admin: 2 });
+      expect(result.invitationsByDay).toEqual({
+        '2024-01-01': 3,
+        '2024-01-02': 7,
+      });
+    });
+
+    it('should handle analytics with no invitations', async () => {
+      const mockAnalytics = {
+        total: 0,
+        pending: 0,
+        accepted: 0,
+        expired: 0,
+        cancelled: 0,
+        byRole: {} as Record<string, number>,
+        byDay: {} as Record<string, number>,
+      };
+
+      teamRepository.getInvitationAnalytics.mockResolvedValue(mockAnalytics);
+
+      const result = await service.getInvitationAnalytics(
+        mockTeamId,
+        mockTenantId,
+        30
+      );
+
+      expect(result.acceptanceRate).toBe(0);
+      expect(result.averageResponseTime).toBeUndefined();
     });
   });
 });

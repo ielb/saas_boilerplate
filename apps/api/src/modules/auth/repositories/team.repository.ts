@@ -244,12 +244,185 @@ export class TeamRepository extends TenantScopedRepository<Team> {
   }
 
   async findInvitationById(
-    invitationId: string
+    invitationId: string,
+    tenantId: string
   ): Promise<TeamInvitation | null> {
     return this.invitationRepository.findOne({
-      where: { id: invitationId },
-      relations: ['role', 'invitedBy'],
+      where: { id: invitationId, tenantId },
+      relations: ['team', 'role', 'invitedBy'],
     });
+  }
+
+  async updateInvitationToken(
+    invitationId: string,
+    token: string,
+    expiresAt: Date,
+    tenantId: string
+  ): Promise<TeamInvitation> {
+    await this.invitationRepository.update(
+      { id: invitationId, tenantId },
+      { token, expiresAt }
+    );
+
+    const updatedInvitation = await this.invitationRepository.findOne({
+      where: { id: invitationId, tenantId },
+      relations: ['team', 'role', 'invitedBy'],
+    });
+
+    if (!updatedInvitation) {
+      throw new Error('Invitation not found after update');
+    }
+
+    return updatedInvitation;
+  }
+
+  async findExpiredInvitations(tenantId: string): Promise<TeamInvitation[]> {
+    return this.invitationRepository
+      .createQueryBuilder('invitation')
+      .leftJoinAndSelect('invitation.team', 'team')
+      .leftJoinAndSelect('invitation.role', 'role')
+      .leftJoinAndSelect('invitation.invitedBy', 'invitedBy')
+      .where('invitation.tenantId = :tenantId', { tenantId })
+      .andWhere('invitation.status = :status', { status: 'pending' })
+      .andWhere('invitation.expiresAt < :now', { now: new Date() })
+      .getMany();
+  }
+
+  async getInvitationAnalytics(
+    teamId: string,
+    tenantId: string,
+    startDate: Date
+  ): Promise<{
+    total: number;
+    pending: number;
+    accepted: number;
+    expired: number;
+    cancelled: number;
+    averageResponseTime?: number;
+    byRole: Record<string, number>;
+    byDay: Record<string, number>;
+  }> {
+    // Get basic counts
+    const [total, pending, accepted, expired, cancelled] = await Promise.all([
+      this.invitationRepository.count({
+        where: { teamId, tenantId, createdAt: { $gte: startDate } as any },
+      }),
+      this.invitationRepository.count({
+        where: {
+          teamId,
+          tenantId,
+          status: 'pending',
+          createdAt: { $gte: startDate } as any,
+        },
+      }),
+      this.invitationRepository.count({
+        where: {
+          teamId,
+          tenantId,
+          status: 'accepted',
+          createdAt: { $gte: startDate } as any,
+        },
+      }),
+      this.invitationRepository.count({
+        where: {
+          teamId,
+          tenantId,
+          status: 'expired',
+          createdAt: { $gte: startDate } as any,
+        },
+      }),
+      this.invitationRepository.count({
+        where: {
+          teamId,
+          tenantId,
+          status: 'cancelled',
+          createdAt: { $gte: startDate } as any,
+        },
+      }),
+    ]);
+
+    // Get average response time for accepted invitations
+    const acceptedInvitations = await this.invitationRepository
+      .createQueryBuilder('invitation')
+      .select('invitation.createdAt', 'createdAt')
+      .addSelect('invitation.acceptedAt', 'acceptedAt')
+      .where(
+        'invitation.teamId = :teamId AND invitation.tenantId = :tenantId',
+        { teamId, tenantId }
+      )
+      .andWhere('invitation.status = :status', { status: 'accepted' })
+      .andWhere('invitation.createdAt >= :startDate', { startDate })
+      .andWhere('invitation.acceptedAt IS NOT NULL')
+      .getRawMany();
+
+    let averageResponseTime: number | undefined;
+    if (acceptedInvitations.length > 0) {
+      const totalResponseTime = acceptedInvitations.reduce(
+        (sum, invitation) => {
+          const created = new Date(invitation.createdAt);
+          const accepted = new Date(invitation.acceptedAt);
+          return sum + (accepted.getTime() - created.getTime());
+        },
+        0
+      );
+      averageResponseTime =
+        totalResponseTime / acceptedInvitations.length / (1000 * 60 * 60); // Convert to hours
+    }
+
+    // Get invitations by role
+    const byRole = await this.invitationRepository
+      .createQueryBuilder('invitation')
+      .leftJoinAndSelect('invitation.role', 'role')
+      .select('role.name', 'roleName')
+      .addSelect('COUNT(*)', 'count')
+      .where(
+        'invitation.teamId = :teamId AND invitation.tenantId = :tenantId',
+        { teamId, tenantId }
+      )
+      .andWhere('invitation.createdAt >= :startDate', { startDate })
+      .groupBy('role.name')
+      .getRawMany();
+
+    const roleCounts = byRole.reduce(
+      (acc, item) => {
+        acc[item.roleName] = parseInt(item.count);
+        return acc;
+      },
+      {} as Record<string, number>
+    );
+
+    // Get invitations by day
+    const byDay = await this.invitationRepository
+      .createQueryBuilder('invitation')
+      .select('DATE(invitation.createdAt)', 'day')
+      .addSelect('COUNT(*)', 'count')
+      .where(
+        'invitation.teamId = :teamId AND invitation.tenantId = :tenantId',
+        { teamId, tenantId }
+      )
+      .andWhere('invitation.createdAt >= :startDate', { startDate })
+      .groupBy('DATE(invitation.createdAt)')
+      .orderBy('day', 'ASC')
+      .getRawMany();
+
+    const dayCounts = byDay.reduce(
+      (acc, item) => {
+        acc[item.day] = parseInt(item.count);
+        return acc;
+      },
+      {} as Record<string, number>
+    );
+
+    return {
+      total,
+      pending,
+      accepted,
+      expired,
+      cancelled,
+      ...(averageResponseTime !== undefined && { averageResponseTime }),
+      byRole: roleCounts,
+      byDay: dayCounts,
+    };
   }
 
   async createTeam(teamData: Partial<Team>, tenantId: string): Promise<Team> {
@@ -394,7 +567,7 @@ export class TeamRepository extends TenantScopedRepository<Team> {
     };
   }
 
-  private generateInvitationToken(): string {
+  generateInvitationToken(): string {
     return (
       Math.random().toString(36).substring(2, 15) +
       Math.random().toString(36).substring(2, 15)

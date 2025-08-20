@@ -6105,7 +6105,7 @@
           "response": []
         },
         {
-          "name": "14. Get Team Analytics - Success",
+          "name": "14. Resend Team Invitation - Success",
           "event": [
             {
               "listen": "test",
@@ -6115,7 +6115,193 @@
                   "    pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "pm.test('Team analytics retrieved', function () {",
+                  "pm.test('Team invitation resent successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('id');",
+                  "    pm.expect(response).to.have.property('email');",
+                  "    pm.expect(response).to.have.property('status');",
+                  "    pm.expect(response).to.have.property('expiresAt');",
+                  "    pm.expect(response.status).to.equal('pending');",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}/invitations/{{teamInvitationId}}/resend",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "teams",
+                "{{teamId}}",
+                "invitations",
+                "{{teamInvitationId}}",
+                "resend"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "15. Bulk Invite Team Members - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Bulk invitations processed successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('totalInvitations');",
+                  "    pm.expect(response).to.have.property('successfulInvitations');",
+                  "    pm.expect(response).to.have.property('failedInvitations');",
+                  "    pm.expect(response).to.have.property('results');",
+                  "    pm.expect(response.results).to.be.an('array');",
+                  "    pm.expect(response.totalInvitations).to.be.at.least(1);",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"invitations\": [\n    {\n      \"email\": \"bulk1@example.com\",\n      \"roleId\": \"{{roleId}}\",\n      \"message\": \"Welcome to our team!\"\n    },\n    {\n      \"email\": \"bulk2@example.com\",\n      \"roleId\": \"{{roleId}}\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}/invitations/bulk",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "{{teamId}}", "invitations", "bulk"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "16. Cleanup Expired Invitations - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Expired invitations cleaned up successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('message');",
+                  "    pm.expect(response).to.have.property('cleanedUpCount');",
+                  "    pm.expect(response.cleanedUpCount).to.be.a('number');",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}/invitations/cleanup",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "{{teamId}}", "invitations", "cleanup"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "17. Get Invitation Analytics - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Invitation analytics retrieved successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('teamId');",
+                  "    pm.expect(response).to.have.property('period');",
+                  "    pm.expect(response).to.have.property('totalInvitations');",
+                  "    pm.expect(response).to.have.property('pendingInvitations');",
+                  "    pm.expect(response).to.have.property('acceptedInvitations');",
+                  "    pm.expect(response).to.have.property('expiredInvitations');",
+                  "    pm.expect(response).to.have.property('cancelledInvitations');",
+                  "    pm.expect(response).to.have.property('acceptanceRate');",
+                  "    pm.expect(response).to.have.property('invitationsByRole');",
+                  "    pm.expect(response).to.have.property('invitationsByDay');",
+                  "    pm.expect(response.totalInvitations).to.be.a('number');",
+                  "    pm.expect(response.acceptanceRate).to.be.a('number');",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}/invitations/analytics?days=30",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "{{teamId}}", "invitations", "analytics"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "30"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "18. Get Team Analytics - Success",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Team analytics retrieved successfully', function () {",
                   "    const response = pm.response.json();",
                   "    pm.expect(response).to.have.property('totalMembers');",
                   "    pm.expect(response).to.have.property('activeMembers');",

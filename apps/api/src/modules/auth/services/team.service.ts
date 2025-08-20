@@ -21,6 +21,9 @@ import {
   TeamInvitationResponseDto,
   AcceptTeamInvitationDto,
   TeamAnalyticsDto,
+  BulkInviteTeamMembersDto,
+  BulkInviteTeamMembersResponseDto,
+  InvitationAnalyticsDto,
 } from '../dto/team.dto';
 import {
   Team,
@@ -530,13 +533,15 @@ export class TeamService {
     tenantId: string,
     userId: string
   ): Promise<void> {
-    const invitation =
-      await this.teamRepository.findInvitationById(invitationId);
+    const invitation = await this.teamRepository.findInvitationById(
+      invitationId,
+      tenantId
+    );
     if (!invitation) {
       throw new NotFoundException('Invitation not found');
     }
 
-    if (invitation.status !== ('pending' as any)) {
+    if (invitation.status !== 'pending') {
       throw new BadRequestException('Invitation cannot be cancelled');
     }
 
@@ -553,11 +558,276 @@ export class TeamService {
       tenantId,
       description: `Team invitation cancelled`,
       metadata: {
-        teamId: (invitation as any).teamId,
-        invitedEmail: (invitation as any).email,
-        invitationId,
+        teamId: invitation.teamId,
+        teamName: invitation.team?.name,
+        invitedEmail: invitation.email,
+        invitationId: invitation.id,
       },
     });
+  }
+
+  /**
+   * Resend team invitation
+   */
+  async resendTeamInvitation(
+    invitationId: string,
+    tenantId: string,
+    userId: string
+  ): Promise<TeamInvitationResponseDto> {
+    const invitation = await this.teamRepository.findInvitationById(
+      invitationId,
+      tenantId
+    );
+    if (!invitation) {
+      throw new NotFoundException('Invitation not found');
+    }
+
+    if (invitation.status !== 'pending') {
+      throw new BadRequestException('Only pending invitations can be resent');
+    }
+
+    if (invitation.expiresAt < new Date()) {
+      throw new BadRequestException('Invitation has expired');
+    }
+
+    // Generate new token and extend expiration
+    const newToken = this.teamRepository.generateInvitationToken();
+    const newExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+
+    const updatedInvitation = await this.teamRepository.updateInvitationToken(
+      invitationId,
+      newToken,
+      newExpiresAt,
+      tenantId
+    );
+
+    // Send new invitation email
+    await this.emailService.sendTeamInvitation({
+      to: invitation.email,
+      teamName: invitation.team?.name || 'Team',
+      inviterName: `${invitation.invitedBy?.firstName} ${invitation.invitedBy?.lastName}`,
+      roleName: invitation.role?.name || 'Member',
+      invitationToken: newToken,
+      message: 'Your invitation has been resent',
+    });
+
+    // Audit log
+    await this.auditService.logEvent({
+      eventType: AuditEventType.TEAM_INVITATION_RESENT,
+      userId,
+      tenantId,
+      description: `Team invitation resent`,
+      metadata: {
+        teamId: invitation.teamId,
+        teamName: invitation.team?.name,
+        invitedEmail: invitation.email,
+        invitationId: invitation.id,
+      },
+    });
+
+    return this.mapInvitationToResponseDto(updatedInvitation);
+  }
+
+  /**
+   * Bulk invite team members
+   */
+  async bulkInviteTeamMembers(
+    teamId: string,
+    bulkInviteDto: BulkInviteTeamMembersDto,
+    tenantId: string,
+    userId: string
+  ): Promise<BulkInviteTeamMembersResponseDto> {
+    // Validate team exists
+    const team = await this.teamRepository.findOneByIdForTenant(teamId);
+    if (!team) {
+      throw new NotFoundException('Team not found');
+    }
+
+    const results: Array<{
+      email: string;
+      success: boolean;
+      invitationId?: string;
+      error?: string;
+    }> = [];
+
+    for (const inviteData of bulkInviteDto.invitations) {
+      try {
+        // Validate role exists
+        const role = await this.roleRepository.findOneByIdForTenant(
+          inviteData.roleId
+        );
+        if (!role) {
+          results.push({
+            email: inviteData.email,
+            success: false,
+            error: 'Role not found',
+          });
+          continue;
+        }
+
+        // Check if user already exists and is a member
+        const existingUser = await this.userRepository.findByEmail(
+          inviteData.email
+        );
+        if (existingUser) {
+          const existingMembership = await this.teamRepository.findTeamMember(
+            teamId,
+            existingUser.id,
+            tenantId
+          );
+          if (existingMembership) {
+            results.push({
+              email: inviteData.email,
+              success: false,
+              error: 'User is already a member of this team',
+            });
+            continue;
+          }
+        }
+
+        // Check for existing invitation
+        const existingInvitation =
+          await this.teamRepository.findInvitationByEmail(
+            inviteData.email,
+            teamId,
+            tenantId
+          );
+        if (existingInvitation && existingInvitation.status === 'pending') {
+          results.push({
+            email: inviteData.email,
+            success: false,
+            error: 'An invitation has already been sent to this email',
+          });
+          continue;
+        }
+
+        // Create invitation
+        const invitation = await this.teamRepository.createTeamInvitation(
+          {
+            teamId,
+            email: inviteData.email,
+            roleId: inviteData.roleId,
+            invitedById: userId,
+          },
+          tenantId
+        );
+
+        // Send invitation email
+        await this.emailService.sendTeamInvitation({
+          to: inviteData.email,
+          teamName: team.name,
+          inviterName: `${invitation.invitedBy?.firstName} ${invitation.invitedBy?.lastName}`,
+          roleName: role.name,
+          invitationToken: invitation.token,
+          ...(inviteData.message && { message: inviteData.message }),
+        });
+
+        // Audit log
+        await this.auditService.logEvent({
+          eventType: AuditEventType.TEAM_INVITATION_SENT,
+          userId,
+          tenantId,
+          description: `Team invitation sent via bulk operation`,
+          metadata: {
+            teamId,
+            teamName: team.name,
+            invitedEmail: inviteData.email,
+            invitationId: invitation.id,
+            bulkOperation: true,
+          },
+        });
+
+        results.push({
+          email: inviteData.email,
+          success: true,
+          invitationId: invitation.id,
+        });
+      } catch (error: any) {
+        results.push({
+          email: inviteData.email,
+          success: false,
+          error: error.message || 'Unknown error',
+        });
+      }
+    }
+
+    return {
+      totalInvitations: bulkInviteDto.invitations.length,
+      successfulInvitations: results.filter(r => r.success).length,
+      failedInvitations: results.filter(r => !r.success).length,
+      results,
+    };
+  }
+
+  /**
+   * Clean up expired invitations
+   */
+  async cleanupExpiredInvitations(tenantId: string): Promise<number> {
+    const expiredInvitations =
+      await this.teamRepository.findExpiredInvitations(tenantId);
+
+    for (const invitation of expiredInvitations) {
+      await this.teamRepository.updateInvitationStatus(
+        invitation.id,
+        'expired',
+        tenantId
+      );
+
+      // Audit log
+      await this.auditService.logEvent({
+        eventType: AuditEventType.TEAM_INVITATION_EXPIRED,
+        userId: invitation.invitedById,
+        tenantId,
+        description: `Team invitation expired automatically`,
+        metadata: {
+          teamId: invitation.teamId,
+          teamName: invitation.team?.name,
+          invitedEmail: invitation.email,
+          invitationId: invitation.id,
+          autoExpired: true,
+        },
+      });
+    }
+
+    return expiredInvitations.length;
+  }
+
+  /**
+   * Get invitation analytics
+   */
+  async getInvitationAnalytics(
+    teamId: string,
+    tenantId: string,
+    days: number = 30
+  ): Promise<InvitationAnalyticsDto> {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    const analytics = await this.teamRepository.getInvitationAnalytics(
+      teamId,
+      tenantId,
+      startDate
+    );
+
+    const result: InvitationAnalyticsDto = {
+      teamId,
+      period: `${days} days`,
+      totalInvitations: analytics.total,
+      pendingInvitations: analytics.pending,
+      acceptedInvitations: analytics.accepted,
+      expiredInvitations: analytics.expired,
+      cancelledInvitations: analytics.cancelled,
+      acceptanceRate:
+        analytics.total > 0 ? (analytics.accepted / analytics.total) * 100 : 0,
+      invitationsByRole: analytics.byRole,
+      invitationsByDay: analytics.byDay,
+    };
+
+    if (analytics.averageResponseTime !== undefined) {
+      result.averageResponseTime = analytics.averageResponseTime;
+    }
+
+    return result;
   }
 
   async findUserTeams(

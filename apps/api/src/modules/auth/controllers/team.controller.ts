@@ -39,6 +39,9 @@ import {
   TeamInvitationResponseDto,
   AcceptTeamInvitationDto,
   TeamAnalyticsDto,
+  BulkInviteTeamMembersDto,
+  BulkInviteTeamMembersResponseDto,
+  InvitationAnalyticsDto,
 } from '../dto/team.dto';
 import {
   PermissionAction,
@@ -494,6 +497,145 @@ export class TeamController {
       acceptDto.token,
       tenantId,
       req.user.sub
+    );
+  }
+
+  @Post(':id/invitations/:invitationId/resend')
+  @ApiOperation({ summary: 'Resend team invitation' })
+  @ApiResponse({
+    status: 200,
+    description: 'Invitation resent successfully',
+    type: TeamInvitationResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - insufficient permissions',
+  })
+  @ApiResponse({ status: 404, description: 'Team or invitation not found' })
+  @ApiParam({ name: 'id', description: 'Team ID' })
+  @ApiParam({ name: 'invitationId', description: 'Invitation ID' })
+  @RequirePermissions({
+    resource: PermissionResource.TEAMS,
+    action: PermissionAction.MANAGE,
+  })
+  async resendTeamInvitation(
+    @Param('id') teamId: string,
+    @Param('invitationId') invitationId: string,
+    @Request() req: any,
+    @TenantId() tenantId: string
+  ): Promise<TeamInvitationResponseDto> {
+    return this.teamService.resendTeamInvitation(
+      invitationId,
+      tenantId,
+      req.user.sub
+    );
+  }
+
+  @Post(':id/invitations/bulk')
+  @ApiOperation({ summary: 'Bulk invite team members' })
+  @ApiResponse({
+    status: 201,
+    description: 'Bulk invitations processed successfully',
+    type: BulkInviteTeamMembersResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - insufficient permissions',
+  })
+  @ApiResponse({ status: 404, description: 'Team not found' })
+  @ApiParam({ name: 'id', description: 'Team ID' })
+  @RequirePermissions({
+    resource: PermissionResource.TEAMS,
+    action: PermissionAction.MANAGE,
+  })
+  async bulkInviteTeamMembers(
+    @Param('id') teamId: string,
+    @Body() bulkInviteDto: BulkInviteTeamMembersDto,
+    @Request() req: any,
+    @TenantId() tenantId: string
+  ): Promise<BulkInviteTeamMembersResponseDto> {
+    return this.teamService.bulkInviteTeamMembers(
+      teamId,
+      bulkInviteDto,
+      tenantId,
+      req.user.sub
+    );
+  }
+
+  @Post(':id/invitations/cleanup')
+  @ApiOperation({ summary: 'Clean up expired invitations' })
+  @ApiResponse({
+    status: 200,
+    description: 'Expired invitations cleaned up successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string' },
+        cleanedUpCount: { type: 'number' },
+      },
+    },
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - insufficient permissions',
+  })
+  @ApiResponse({ status: 404, description: 'Team not found' })
+  @ApiParam({ name: 'id', description: 'Team ID' })
+  @RequirePermissions({
+    resource: PermissionResource.TEAMS,
+    action: PermissionAction.MANAGE,
+  })
+  async cleanupExpiredInvitations(
+    @Param('id') teamId: string,
+    @TenantId() tenantId: string
+  ): Promise<{ message: string; cleanedUpCount: number }> {
+    const cleanedUpCount =
+      await this.teamService.cleanupExpiredInvitations(tenantId);
+    return {
+      message: `Successfully cleaned up ${cleanedUpCount} expired invitations`,
+      cleanedUpCount,
+    };
+  }
+
+  @Get(':id/invitations/analytics')
+  @ApiOperation({ summary: 'Get team invitation analytics' })
+  @ApiResponse({
+    status: 200,
+    description: 'Invitation analytics retrieved successfully',
+    type: InvitationAnalyticsDto,
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - insufficient permissions',
+  })
+  @ApiResponse({ status: 404, description: 'Team not found' })
+  @ApiParam({ name: 'id', description: 'Team ID' })
+  @ApiQuery({
+    name: 'days',
+    required: false,
+    description: 'Number of days to analyze (default: 30)',
+    type: 'number',
+  })
+  @RequirePermissions({
+    resource: PermissionResource.TEAMS,
+    action: PermissionAction.READ,
+  })
+  async getInvitationAnalytics(
+    @Param('id') teamId: string,
+    @Query('days') days: string = '30',
+    @TenantId() tenantId: string
+  ): Promise<InvitationAnalyticsDto> {
+    const daysNumber = parseInt(days, 10) || 30;
+    return this.teamService.getInvitationAnalytics(
+      teamId,
+      tenantId,
+      daysNumber
     );
   }
 }

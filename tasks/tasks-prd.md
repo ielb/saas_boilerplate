@@ -191,7 +191,7 @@ Based on PRD: `docs/prd.md`
   - [x] 3.8 Create user lifecycle management (registration, activation, suspension) (#32) ✅
   - [x] 3.9 Implement user profile management with avatar upload (#33)
   - [x] 3.10 Create team collaboration with role hierarchy (#34)
-  - [ ] 3.11 Implement invitation system with email notifications (#35)
+  - [x] 3.11 Implement invitation system with email notifications (#35) - **COMPLETED**
   - [ ] 3.12 Add bulk user import/export with CSV support (#36)
   - [ ] 3.13 Create team switching and multi-team membership (#37)
   - [ ] 3.14 Implement access delegation and temporary permissions (#38)

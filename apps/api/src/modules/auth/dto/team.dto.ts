@@ -8,9 +8,11 @@ import {
   IsArray,
   IsEmail,
   IsNotEmpty,
+  ValidateNested,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { TeamStatus } from '../entities/team.entity';
+import { Type } from 'class-transformer';
 
 export class CreateTeamDto {
   @ApiProperty({ description: 'Team name', example: 'Engineering Team' })
@@ -290,6 +292,111 @@ export class AcceptTeamInvitationDto {
   @IsString()
   @IsNotEmpty()
   token!: string;
+}
+
+export class BulkInviteTeamMemberDto {
+  @ApiProperty({ description: 'Email address to invite' })
+  @IsEmail()
+  @IsNotEmpty()
+  email!: string;
+
+  @ApiProperty({ description: 'Role ID for the invited user' })
+  @IsUUID()
+  @IsNotEmpty()
+  roleId!: string;
+
+  @ApiPropertyOptional({ description: 'Custom invitation message' })
+  @IsOptional()
+  @IsString()
+  message?: string;
+}
+
+export class BulkInviteTeamMembersDto {
+  @ApiProperty({
+    description: 'Array of team member invitations',
+    type: [BulkInviteTeamMemberDto],
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => BulkInviteTeamMemberDto)
+  invitations!: BulkInviteTeamMemberDto[];
+}
+
+export class BulkInviteTeamMembersResponseDto {
+  @ApiProperty({ description: 'Total number of invitations processed' })
+  totalInvitations!: number;
+
+  @ApiProperty({ description: 'Number of successful invitations' })
+  successfulInvitations!: number;
+
+  @ApiProperty({ description: 'Number of failed invitations' })
+  failedInvitations!: number;
+
+  @ApiProperty({
+    description: 'Detailed results for each invitation',
+    type: 'array',
+    items: {
+      type: 'object',
+      properties: {
+        email: { type: 'string' },
+        success: { type: 'boolean' },
+        invitationId: { type: 'string', nullable: true },
+        error: { type: 'string', nullable: true },
+      },
+    },
+  })
+  results!: Array<{
+    email: string;
+    success: boolean;
+    invitationId?: string;
+    error?: string;
+  }>;
+}
+
+export class InvitationAnalyticsDto {
+  @ApiProperty({ description: 'Team ID' })
+  teamId!: string;
+
+  @ApiProperty({ description: 'Analytics period' })
+  period!: string;
+
+  @ApiProperty({ description: 'Total invitations sent' })
+  totalInvitations!: number;
+
+  @ApiProperty({ description: 'Pending invitations' })
+  pendingInvitations!: number;
+
+  @ApiProperty({ description: 'Accepted invitations' })
+  acceptedInvitations!: number;
+
+  @ApiProperty({ description: 'Expired invitations' })
+  expiredInvitations!: number;
+
+  @ApiProperty({ description: 'Cancelled invitations' })
+  cancelledInvitations!: number;
+
+  @ApiProperty({ description: 'Acceptance rate percentage' })
+  acceptanceRate!: number;
+
+  @ApiProperty({
+    description: 'Average response time in hours',
+    nullable: true,
+  })
+  averageResponseTime?: number;
+
+  @ApiProperty({
+    description: 'Invitations grouped by role',
+    type: 'object',
+    additionalProperties: { type: 'number' },
+  })
+  invitationsByRole!: Record<string, number>;
+
+  @ApiProperty({
+    description: 'Invitations grouped by day',
+    type: 'object',
+    additionalProperties: { type: 'number' },
+  })
+  invitationsByDay!: Record<string, number>;
 }
 
 export class TeamAnalyticsDto {
