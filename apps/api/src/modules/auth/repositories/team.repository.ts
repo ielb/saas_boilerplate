@@ -317,9 +317,6 @@ export class TeamRepository extends TenantScopedRepository<Team> {
     invitationData: Partial<TeamInvitation>,
     tenantId: string
   ): Promise<TeamInvitation> {
-    console.log('createTeamInvitation - invitationData:', invitationData);
-    console.log('createTeamInvitation - tenantId:', tenantId);
-
     const invitation = this.invitationRepository.create({
       ...invitationData,
       tenantId,
@@ -327,8 +324,13 @@ export class TeamRepository extends TenantScopedRepository<Team> {
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
     });
 
-    console.log('createTeamInvitation - created invitation:', invitation);
-    return this.invitationRepository.save(invitation);
+    const savedInvitation = await this.invitationRepository.save(invitation);
+
+    // Load the invitedBy relation to ensure it's available for the email service
+    return this.invitationRepository.findOne({
+      where: { id: savedInvitation.id, tenantId },
+      relations: ['invitedBy', 'role'],
+    }) as Promise<TeamInvitation>;
   }
 
   async updateInvitationStatus(

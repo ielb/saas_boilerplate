@@ -180,7 +180,7 @@ describe('TeamService', () => {
         mockTenantId
       );
       expect(auditService.logEvent).toHaveBeenCalledWith({
-        eventType: 'TEAM_CREATED',
+        eventType: 'team_created',
         userId: mockUserId,
         tenantId: mockTenantId,
         description: `Team "${createTeamDto.name}" created`,
@@ -291,7 +291,7 @@ describe('TeamService', () => {
         mockTenantId
       );
       expect(auditService.logEvent).toHaveBeenCalledWith({
-        eventType: 'TEAM_UPDATED',
+        eventType: 'team_updated',
         userId: mockUserId,
         tenantId: mockTenantId,
         description: `Team "${updatedTeam.name}" updated`,
@@ -335,7 +335,7 @@ describe('TeamService', () => {
         id: mockTeamId,
       });
       expect(auditService.logEvent).toHaveBeenCalledWith({
-        eventType: 'TEAM_DELETED',
+        eventType: 'team_deleted',
         userId: mockUserId,
         tenantId: mockTenantId,
         description: `Team "${mockTeam.name}" deleted`,
@@ -523,10 +523,10 @@ describe('TeamService', () => {
   });
 
   describe('removeTeamMember', () => {
-    const memberId = 'user-to-remove-123';
+    const userIdToRemove = 'user-to-remove-123';
 
     it('should remove team member successfully', async () => {
-      const mockMemberToRemove = { ...mockMembership, userId: memberId };
+      const mockMemberToRemove = { ...mockMembership, userId: userIdToRemove };
 
       teamRepository.findOneByIdForTenant.mockResolvedValue(mockTeam as Team);
       teamRepository.findTeamMember.mockResolvedValue(
@@ -537,7 +537,7 @@ describe('TeamService', () => {
 
       await service.removeTeamMember(
         mockTeamId,
-        memberId,
+        userIdToRemove,
         mockTenantId,
         mockUserId
       );
@@ -547,12 +547,12 @@ describe('TeamService', () => {
       );
       expect(teamRepository.findTeamMember).toHaveBeenCalledWith(
         mockTeamId,
-        memberId,
+        userIdToRemove,
         mockTenantId
       );
       expect(teamRepository.removeTeamMember).toHaveBeenCalledWith(
         mockTeamId,
-        memberId,
+        userIdToRemove,
         mockTenantId
       );
     });
@@ -562,7 +562,12 @@ describe('TeamService', () => {
       teamRepository.findTeamMember.mockResolvedValue(null);
 
       await expect(
-        service.removeTeamMember(mockTeamId, memberId, mockTenantId, mockUserId)
+        service.removeTeamMember(
+          mockTeamId,
+          userIdToRemove,
+          mockTenantId,
+          mockUserId
+        )
       ).rejects.toThrow(NotFoundException);
     });
   });
@@ -587,6 +592,13 @@ describe('TeamService', () => {
         tenantId: mockTenantId,
         createdAt: new Date(),
         updatedAt: new Date(),
+        invitedBy: {
+          id: mockUserId,
+          firstName: 'John',
+          lastName: 'Doe',
+          email: 'john.doe@example.com',
+        } as User,
+        role: mockRole as Role,
       };
 
       teamRepository.findOneByIdForTenant.mockResolvedValue(mockTeam as Team);
@@ -624,7 +636,7 @@ describe('TeamService', () => {
       expect(emailService.sendTeamInvitation).toHaveBeenCalledWith({
         to: inviteDto.email,
         teamName: mockTeam.name,
-        inviterName: expect.any(String),
+        inviterName: 'John Doe',
         roleName: mockRole.name,
         invitationToken: mockInvitation.token,
         message: inviteDto.message,

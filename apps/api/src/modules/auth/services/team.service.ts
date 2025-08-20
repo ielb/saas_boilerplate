@@ -309,7 +309,7 @@ export class TeamService {
 
   async removeTeamMember(
     teamId: string,
-    memberId: string,
+    userIdToRemove: string,
     tenantId: string,
     userId: string
   ): Promise<void> {
@@ -322,17 +322,16 @@ export class TeamService {
     // Get member details for audit log
     const membership = await this.teamRepository.findTeamMember(
       teamId,
-      memberId,
+      userIdToRemove,
       tenantId
     );
-    console.log('membership', membership);
     if (!membership) {
       throw new NotFoundException('Team member not found');
     }
 
     const success = await this.teamRepository.removeTeamMember(
       teamId,
-      memberId,
+      userIdToRemove,
       tenantId
     );
     if (!success) {
@@ -348,7 +347,7 @@ export class TeamService {
       metadata: {
         teamId,
         teamName: team.name,
-        memberId,
+        memberId: userIdToRemove,
         memberEmail: membership.user?.email,
         membershipId: membership.id,
       },

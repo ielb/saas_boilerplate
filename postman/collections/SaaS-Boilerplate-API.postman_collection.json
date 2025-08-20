@@ -6023,7 +6023,7 @@
                   "",
                   "if (pm.response.code === 201) {",
                   "    const response = pm.response.json();",
-                  "    pm.environment.set('teamMembershipId', response.id);",
+                  "    pm.environment.set('userId', response.userId);",
                   "}"
                 ],
                 "type": "text-javascript"
@@ -6141,9 +6141,9 @@
               "raw": "{\n  \"roleId\": \"new-role-123\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/teams/{{teamId}}/members/{{teamMembershipId}}",
+              "raw": "{{baseUrl}}/teams/{{teamId}}/members/{{userId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["teams", "{{teamId}}", "members", "{{teamMembershipId}}"]
+              "path": ["teams", "{{teamId}}", "members", "{{userId}}"]
             }
           },
           "response": []
@@ -6172,9 +6172,9 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/teams/{{teamId}}/members/{{teamMembershipId}}",
+              "raw": "{{baseUrl}}/teams/{{teamId}}/members/{{userId}}",
               "host": ["{{baseUrl}}"],
-              "path": ["teams", "{{teamId}}", "members", "{{teamMembershipId}}"]
+              "path": ["teams", "{{teamId}}", "members", "{{userId}}"]
             }
           },
           "response": []

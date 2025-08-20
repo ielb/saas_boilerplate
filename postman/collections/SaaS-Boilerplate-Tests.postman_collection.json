@@ -5816,7 +5816,7 @@
                   "",
                   "if (pm.response.code === 201) {",
                   "    const response = pm.response.json();",
-                  "    pm.environment.set('teamMembershipId', response.id);",
+                  "    pm.environment.set('userId', response.userId);",
                   "}"
                 ],
                 "type": "text-javascript"
@@ -5940,15 +5940,9 @@
               "raw": "{\n  \"role\": \"admin\",\n  \"permissions\": [\"read\", \"write\", \"admin\"]\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/teams/{{teamId}}/members/{{teamMembershipId}}",
+              "raw": "{{baseUrl}}/teams/{{teamId}}/members/{{userId}}",
               "host": ["{{baseUrl}}"],
-              "path": [
-                "auth",
-                "teams",
-                "{{teamId}}",
-                "members",
-                "{{teamMembershipId}}"
-              ]
+              "path": ["auth", "teams", "{{teamId}}", "members", "{{userId}}"]
             }
           },
           "response": []
@@ -6183,15 +6177,9 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/teams/{{teamId}}/members/{{teamMembershipId}}",
+              "raw": "{{baseUrl}}/teams/{{teamId}}/members/{{userId}}",
               "host": ["{{baseUrl}}"],
-              "path": [
-                "auth",
-                "teams",
-                "{{teamId}}",
-                "members",
-                "{{teamMembershipId}}"
-              ]
+              "path": ["auth", "teams", "{{teamId}}", "members", "{{userId}}"]
             }
           },
           "response": []

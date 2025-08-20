@@ -345,7 +345,7 @@ export class TeamController {
     );
   }
 
-  @Delete(':id/members/:memberId')
+  @Delete(':id/members/:userId')
   @ApiOperation({ summary: 'Remove member from team' })
   @ApiResponse({ status: 204, description: 'Member removed successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -355,7 +355,7 @@ export class TeamController {
   })
   @ApiResponse({ status: 404, description: 'Team or member not found' })
   @ApiParam({ name: 'id', description: 'Team ID' })
-  @ApiParam({ name: 'memberId', description: 'Member ID' })
+  @ApiParam({ name: 'userId', description: 'User ID to remove from team' })
   @HttpCode(HttpStatus.NO_CONTENT)
   @RequirePermissions({
     resource: PermissionResource.TEAMS,
@@ -363,13 +363,13 @@ export class TeamController {
   })
   async removeTeamMember(
     @Param('id') teamId: string,
-    @Param('memberId') memberId: string,
+    @Param('userId') userId: string,
     @Request() req: any,
     @TenantId() tenantId: string
   ): Promise<void> {
     return this.teamService.removeTeamMember(
       teamId,
-      memberId,
+      userId,
       tenantId,
       req.user.sub
     );
