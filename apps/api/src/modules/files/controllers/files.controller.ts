@@ -95,7 +95,6 @@ export class FilesController {
     @CurrentUser() user: JwtPayload,
     @TenantId() tenantId?: string
   ): Promise<FileUploadResponseDto> {
-    console.log('uploadFile', file, uploadDto, user, tenantId);
     const fileData = await this.fileService.uploadFile(
       file,
       uploadDto,

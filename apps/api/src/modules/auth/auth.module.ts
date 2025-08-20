@@ -10,6 +10,7 @@ import { PermissionController } from './controllers/permission.controller';
 import { AccountRecoveryController } from './controllers/account-recovery.controller';
 import { UserLifecycleController } from './controllers/user-lifecycle.controller';
 import { ProfileController } from './controllers/profile.controller';
+import { TeamController } from './controllers/team.controller';
 import { AuthService } from './services/auth.service';
 import { JwtService } from './services/jwt.service';
 import { RefreshTokenService } from './services/refresh-token.service';
@@ -22,6 +23,7 @@ import { AccountRecoveryService } from './services/account-recovery.service';
 import { AuditService } from './services/audit.service';
 import { UserLifecycleService } from './services/user-lifecycle.service';
 import { ProfileService } from './services/profile.service';
+import { TeamService } from './services/team.service';
 import { AuditInterceptor } from './interceptors/audit.interceptor';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { PermissionsGuard } from './guards/permissions.guard';
@@ -35,6 +37,7 @@ import {
   TenantUsageRepository,
   TenantFeatureFlagRepository,
   UserProfileRepository,
+  TeamRepository,
 } from './repositories';
 import {
   User,
@@ -48,6 +51,9 @@ import {
   TenantUsage,
   TenantFeatureFlag,
   UserProfile,
+  Team,
+  TeamMembership,
+  TeamInvitation,
 } from './entities';
 import { env } from '@app/config';
 import { FilesModule } from '../files/files.module';
@@ -67,6 +73,9 @@ import { CommonModule } from '../../common/common.module';
       TenantUsage,
       TenantFeatureFlag,
       UserProfile,
+      Team,
+      TeamMembership,
+      TeamInvitation,
     ]),
     JwtModule.register({
       secret: env.JWT_SECRET,
@@ -88,6 +97,7 @@ import { CommonModule } from '../../common/common.module';
     AccountRecoveryController,
     UserLifecycleController,
     ProfileController,
+    TeamController,
   ],
   providers: [
     AuthService,
@@ -102,6 +112,7 @@ import { CommonModule } from '../../common/common.module';
     AuditService,
     UserLifecycleService,
     ProfileService,
+    TeamService,
     AuditInterceptor,
     JwtAuthGuard,
     PermissionsGuard,
@@ -115,6 +126,7 @@ import { CommonModule } from '../../common/common.module';
     TenantUsageRepository,
     TenantFeatureFlagRepository,
     UserProfileRepository,
+    TeamRepository,
   ],
   exports: [
     AuthService,
@@ -129,6 +141,7 @@ import { CommonModule } from '../../common/common.module';
     AuditService,
     UserLifecycleService,
     ProfileService,
+    TeamService,
     AuditInterceptor,
     JwtAuthGuard,
     PermissionsGuard,
@@ -141,6 +154,7 @@ import { CommonModule } from '../../common/common.module';
     TenantUsageRepository,
     TenantFeatureFlagRepository,
     UserProfileRepository,
+    TeamRepository,
   ],
 })
 export class AuthModule {}

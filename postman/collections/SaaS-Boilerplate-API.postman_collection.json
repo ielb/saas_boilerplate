@@ -96,6 +96,26 @@
       "type": "string"
     },
     {
+      "key": "teamId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "teamMembershipId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "teamInvitationId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "invitationToken",
+      "value": "",
+      "type": "string"
+    },
+    {
       "key": "newUserId",
       "value": "",
       "type": "string"
@@ -185,7 +205,7 @@
                   "",
                   "pm.test('User email matches request', function () {",
                   "    const response = pm.response.json();",
-                  "    pm.expect(response.user.email).to.equal('test@example.com');",
+                  "    pm.expect(response.user.email).to.equal('superadmin@example.com');",
                   "});",
                   "",
                   "pm.test('Tenant domain matches request', function () {",
@@ -212,7 +232,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"SecurePassword123!\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"tenantName\": \"Test Company\",\n  \"domain\": \"testcompany.com\",\n  \"description\": \"Test tenant for development\",\n  \"contactEmail\": \"admin@testcompany.com\",\n  \"contactPhone\": \"+1234567890\",\n  \"address\": \"123 Test Street\",\n  \"city\": \"Test City\",\n  \"state\": \"Test State\",\n  \"postalCode\": \"12345\",\n  \"country\": \"US\",\n  \"timezone\": \"America/New_York\",\n  \"locale\": \"en-US\",\n  \"currency\": \"USD\",\n  \"marketingConsent\": true,\n  \"acceptTerms\": true\n}"
+              "raw": "{\n  \"email\": \"superadmin@example.com\",\n  \"password\": \"SuperAdmin123!\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"tenantName\": \"Test Company\",\n  \"domain\": \"testcompany.com\",\n  \"description\": \"Test tenant for development\",\n  \"contactEmail\": \"admin@testcompany.com\",\n  \"contactPhone\": \"+1234567890\",\n  \"address\": \"123 Test Street\",\n  \"city\": \"Test City\",\n  \"state\": \"Test State\",\n  \"postalCode\": \"12345\",\n  \"country\": \"US\",\n  \"timezone\": \"America/New_York\",\n  \"locale\": \"en-US\",\n  \"currency\": \"USD\",\n  \"marketingConsent\": true,\n  \"acceptTerms\": true\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/register",
@@ -250,7 +270,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"SecurePassword123!\"\n}"
+              "raw": "{\n  \"email\": \"superadmin@example.com\",\n  \"password\": \"SuperAdmin123!\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/login",
@@ -340,7 +360,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"test@example.com\"\n}"
+              "raw": "{\n  \"email\": \"superadmin@example.com\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/resend-verification",
@@ -362,7 +382,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"test@example.com\"\n}"
+              "raw": "{\n  \"email\": \"superadmin@example.com\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/forgot-password",
@@ -384,7 +404,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"token\": \"password-reset-token-here\",\n  \"newPassword\": \"NewSecurePassword123!\"\n}"
+              "raw": "{\n  \"token\": \"password-reset-token-here\",\n  \"newPassword\": \"NewSuperAdmin123!\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/reset-password",
@@ -911,7 +931,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"test@example.com\"\n}"
+              "raw": "{\n  \"email\": \"superadmin@example.com\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/auth/recovery/initiate",
@@ -4509,7 +4529,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"SecurePassword123!\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"tenantId\": \"{{tenantId}}\",\n  \"role\": \"member\",\n  \"sendEmailVerification\": true,\n  \"sendWelcomeEmail\": true\n}"
+                  "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"SuperAdmin123!\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"tenantId\": \"{{tenantId}}\",\n  \"role\": \"member\",\n  \"sendEmailVerification\": true,\n  \"sendWelcomeEmail\": true\n}"
                 },
                 "url": {
                   "raw": "{{baseUrl}}/users",
@@ -4565,7 +4585,7 @@
                 ],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"email\": \"existinguser@example.com\",\n  \"password\": \"SecurePassword123!\",\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Smith\",\n  \"tenantId\": \"{{tenantId}}\",\n  \"role\": \"member\"\n}"
+                  "raw": "{\n  \"email\": \"existinguser@example.com\",\n  \"password\": \"SuperAdmin123!\",\n  \"firstName\": \"Jane\",\n  \"lastName\": \"Smith\",\n  \"tenantId\": \"{{tenantId}}\",\n  \"role\": \"member\"\n}"
                 },
                 "url": {
                   "raw": "{{baseUrl}}/users",
@@ -5671,6 +5691,685 @@
               }
             }
           ]
+        }
+      ]
+    },
+    {
+      "name": "Teams",
+      "item": [
+        {
+          "name": "Create Team",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Team created successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('id');",
+                  "    pm.expect(response).to.have.property('name');",
+                  "    pm.expect(response).to.have.property('description');",
+                  "    pm.expect(response).to.have.property('status');",
+                  "    pm.expect(response).to.have.property('createdAt');",
+                  "    pm.expect(response).to.have.property('updatedAt');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('teamId', response.id);",
+                  "}"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Development Team\",\n  \"description\": \"Core development team for the project\",\n  \"managerId\": \"{{userId}}\",\n  \"settings\": {\n    \"allowMemberInvites\": true,\n    \"requireApproval\": false,\n    \"maxMembers\": 10\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teams",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Teams",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Teams list retrieved', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('teams');",
+                  "    pm.expect(response).to.have.property('total');",
+                  "    pm.expect(response.teams).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams?page=1&limit=10&search=development&status=active",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "search",
+                  "value": "development"
+                },
+                {
+                  "key": "status",
+                  "value": "active"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Teams",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('User teams retrieved', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams/my-teams",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "my-teams"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Team by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Team details retrieved', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('id');",
+                  "    pm.expect(response).to.have.property('name');",
+                  "    pm.expect(response).to.have.property('description');",
+                  "    pm.expect(response).to.have.property('status');",
+                  "    pm.expect(response).to.have.property('createdAt');",
+                  "    pm.expect(response).to.have.property('updatedAt');",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "{{teamId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Team",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Team updated successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('id');",
+                  "    pm.expect(response).to.have.property('name');",
+                  "    pm.expect(response).to.have.property('description');",
+                  "    pm.expect(response.name).to.equal('Updated Development Team');",
+                  "    pm.expect(response.description).to.equal('Updated team description');",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Development Team\",\n  \"description\": \"Updated team description\",\n  \"settings\": {\n    \"allowMemberInvites\": false,\n    \"requireApproval\": true,\n    \"maxMembers\": 15\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "{{teamId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Team",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "{{teamId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Team Analytics",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Team analytics retrieved', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('memberCount');",
+                  "    pm.expect(response).to.have.property('activeMembers');",
+                  "    pm.expect(response).to.have.property('pendingInvitations');",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}/analytics",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "{{teamId}}", "analytics"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Team Member",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Member added successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('id');",
+                  "    pm.expect(response).to.have.property('teamId');",
+                  "    pm.expect(response).to.have.property('userId');",
+                  "    pm.expect(response).to.have.property('roleId');",
+                  "    pm.expect(response).to.have.property('status');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('userId', response.userId);",
+                  "}"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{userId}}\",\n  \"roleId\": \"{{roleId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}/members",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "{{teamId}}", "members"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Team Members",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Team members retrieved', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('members');",
+                  "    pm.expect(response).to.have.property('total');",
+                  "    pm.expect(response.members).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}/members?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "{{teamId}}", "members"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Team Member",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Member updated successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('id');",
+                  "    pm.expect(response).to.have.property('roleId');",
+                  "    pm.expect(response.roleId).to.equal('new-role-123');",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roleId\": \"new-role-123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}/members/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "{{teamId}}", "members", "{{userId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Team Member",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}/members/{{userId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "{{teamId}}", "members", "{{userId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Invite Team Member",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Invitation sent successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('id');",
+                  "    pm.expect(response).to.have.property('teamId');",
+                  "    pm.expect(response).to.have.property('email');",
+                  "    pm.expect(response).to.have.property('roleId');",
+                  "    pm.expect(response).to.have.property('status');",
+                  "    pm.expect(response).to.have.property('expiresAt');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('teamInvitationId', response.id);",
+                  "    pm.environment.set('invitationToken', response.token);",
+                  "}"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"newmember@example.com\",\n  \"roleId\": \"{{roleId}}\",\n  \"message\": \"You are invited to join our development team!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}/invitations",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "{{teamId}}", "invitations"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Team Invitations",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Team invitations retrieved', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('invitations');",
+                  "    pm.expect(response).to.have.property('total');",
+                  "    pm.expect(response.invitations).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}/invitations?page=1&limit=10&status=pending",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "{{teamId}}", "invitations"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "status",
+                  "value": "pending"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Team Invitation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204', function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams/{{teamId}}/invitations/{{teamInvitationId}}/cancel",
+              "host": ["{{baseUrl}}"],
+              "path": [
+                "teams",
+                "{{teamId}}",
+                "invitations",
+                "{{teamInvitationId}}",
+                "cancel"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Accept Team Invitation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Invitation accepted successfully', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('id');",
+                  "    pm.expect(response).to.have.property('teamId');",
+                  "    pm.expect(response).to.have.property('userId');",
+                  "    pm.expect(response).to.have.property('roleId');",
+                  "    pm.expect(response).to.have.property('status');",
+                  "});"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"{{invitationToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teams/invitations/accept",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "invitations", "accept"]
+            }
+          },
+          "response": []
         }
       ]
     },

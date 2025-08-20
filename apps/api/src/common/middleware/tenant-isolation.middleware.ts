@@ -138,18 +138,25 @@ export class TenantIsolationMiddleware implements NestMiddleware {
     // 3. JWT token tenant claim
     // 4. User's tenant from authentication
 
+    this.logger.debug(`Extracting tenant context for ${req.method} ${req.url}`);
+
     // 1. Check X-Tenant-ID header
     const tenantHeader = req.headers['x-tenant-id'] as string;
     if (tenantHeader) {
+      this.logger.debug(`Found tenant ID in header: ${tenantHeader}`);
       return tenantHeader;
     }
 
     // 2. Check subdomain
     const subdomain = this.extractSubdomain(req);
     if (subdomain) {
+      this.logger.debug(`Found subdomain: ${subdomain}`);
       try {
         const tenant = await this.tenantService.getTenantByDomain(subdomain);
-        return tenant?.id || null;
+        if (tenant) {
+          this.logger.debug(`Found tenant by domain: ${tenant.id}`);
+          return tenant.id;
+        }
       } catch (error) {
         // Domain not found, continue to next method
         this.logger.debug(
@@ -159,16 +166,22 @@ export class TenantIsolationMiddleware implements NestMiddleware {
     }
 
     // 3. Check JWT token for tenant claim
+    this.logger.debug('Attempting to extract tenant from JWT token');
     const tokenTenantId = await this.extractTenantFromToken(req);
     if (tokenTenantId) {
+      this.logger.debug(`Found tenant ID in JWT token: ${tokenTenantId}`);
       return tokenTenantId;
     }
 
     // 4. Check authenticated user's tenant
     if ((req.user as any)?.tenantId) {
+      this.logger.debug(
+        `Found tenant ID in user object: ${(req.user as any).tenantId}`
+      );
       return (req.user as any).tenantId;
     }
 
+    this.logger.debug('No tenant context found');
     return null;
   }
 
@@ -206,11 +219,16 @@ export class TenantIsolationMiddleware implements NestMiddleware {
       const token = authHeader.substring(7);
       const payload = this.jwtService.verify(token, {
         ignoreExpiration: false,
+        issuer: 'saas-boilerplate',
+        audience: 'saas-boilerplate-users',
       });
 
       return payload.tenantId || null;
     } catch (error) {
       // Token verification failed, ignore
+      this.logger.debug(
+        `Token verification failed in tenant extraction: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
       return null;
     }
   }
