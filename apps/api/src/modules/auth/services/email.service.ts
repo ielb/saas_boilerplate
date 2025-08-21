@@ -140,14 +140,26 @@ export class EmailService {
   /**
    * Send welcome email
    */
-  async sendWelcomeEmail(user: User): Promise<void> {
+  async sendWelcomeEmail(
+    user: User,
+    welcomeData?: {
+      invitation?: any;
+      tenant?: any;
+    }
+  ): Promise<void> {
     const emailData = {
       to: user.email,
-      subject: 'Welcome to Our Platform!',
-      template: 'welcome',
+      subject: welcomeData?.tenant?.name
+        ? `Welcome to ${welcomeData.tenant.name}!`
+        : 'Welcome to Our Platform!',
+      template: welcomeData?.invitation ? 'welcome-invitation' : 'welcome',
       context: {
         name: user.firstName,
-        loginUrl: `${process.env.WEB_URL}/login`,
+        loginUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/login`,
+        dashboardUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/dashboard`,
+        tenantName: welcomeData?.tenant?.name || 'our platform',
+        supportEmail:
+          process.env.SUPPORT_EMAIL || 'support@saas-boilerplate.com',
       },
     };
 
@@ -763,6 +775,33 @@ export class EmailService {
         invitationUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/teams/invite?token=${invitationData.invitationToken}`,
         message: invitationData.message,
         expiresIn: '7 days',
+      },
+    };
+
+    await this.sendEmail(emailData);
+  }
+
+  /**
+   * Send invitation email
+   */
+  async sendInvitationEmail(invitationData: {
+    to: string;
+    invitationUrl: string;
+    invitedBy: User;
+    invitation: any;
+    tenant: any;
+  }): Promise<void> {
+    const emailData = {
+      to: invitationData.to,
+      subject: `You've been invited to join ${invitationData.tenant?.name || 'our platform'}`,
+      template: 'invitation',
+      context: {
+        invitedByName: `${invitationData.invitedBy.firstName} ${invitationData.invitedBy.lastName}`,
+        tenantName: invitationData.tenant?.name || 'our platform',
+        invitationUrl: invitationData.invitationUrl,
+        message: invitationData.invitation?.message,
+        expiresIn: '14 days',
+        roleType: invitationData.invitation?.type || 'Team Member',
       },
     };
 
