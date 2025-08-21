@@ -93,6 +93,13 @@ export enum AuditEventType {
   TEAM_INVITATION_SENT = 'team_invitation_sent',
   TEAM_INVITATION_ACCEPTED = 'team_invitation_accepted',
   TEAM_INVITATION_CANCELLED = 'team_invitation_cancelled',
+
+  // Invitation Events
+  INVITATION_CREATED = 'invitation_created',
+  INVITATION_ACCEPTED = 'invitation_accepted',
+  INVITATION_REVOKED = 'invitation_revoked',
+  INVITATION_RESENT = 'invitation_resent',
+  INVITATION_EXPIRED = 'invitation_expired',
 }
 
 export enum AuditEventStatus {

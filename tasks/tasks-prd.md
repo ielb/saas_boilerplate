@@ -58,6 +58,17 @@ Based on PRD: `docs/prd.md`
 - `apps/api/src/modules/auth/services/audit.service.spec.ts` - Audit service unit tests
 - `apps/api/src/modules/auth/interceptors/audit.interceptor.ts` - Audit interceptor for automatic event capture
 - `apps/api/src/database/migrations/1700000000005-CreateAuditLogs.ts` - Audit logs database migration
+- `apps/api/src/modules/auth/entities/invitation.entity.ts` - Invitation entity with business logic methods
+- `apps/api/src/modules/auth/dto/invitation.dto.ts` - Invitation DTOs for request/response validation
+- `apps/api/src/modules/auth/repositories/invitation.repository.ts` - Invitation repository with tenant scoping
+- `apps/api/src/modules/auth/services/invitation.service.ts` - Invitation service with business logic
+- `apps/api/src/modules/auth/services/invitation.service.spec.ts` - Invitation service unit tests (21 tests passing)
+- `apps/api/src/modules/auth/controllers/invitation.controller.ts` - Invitation controller with REST API endpoints
+- `apps/api/src/modules/auth/services/email.service.ts` - Email service with invitation and welcome email methods
+- `apps/api/src/database/migrations/CreateInvitations.ts` - Invitations database migration
+- `apps/api/src/modules/auth/README.md` - Comprehensive invitation system documentation
+- `postman/collections/SaaS-Boilerplate-API.postman_collection.json` - Main API collection with invitation endpoints
+- `apps/api/postman/environments/Development.postman_environment.json` - Postman environment for testing
 - `apps/api/src/database/migrations/1700000000006-CreateTenants.ts` - Tenants database migration
 - `apps/api/src/modules/auth/entities/tenant-usage.entity.ts` - Tenant usage tracking entity
 - `apps/api/src/modules/auth/entities/tenant-feature-flag.entity.ts` - Tenant feature flags entity
@@ -191,7 +202,7 @@ Based on PRD: `docs/prd.md`
   - [x] 3.8 Create user lifecycle management (registration, activation, suspension) (#32) ✅
   - [x] 3.9 Implement user profile management with avatar upload (#33)
   - [x] 3.10 Create team collaboration with role hierarchy (#34)
-  - [ ] 3.11 Implement invitation system with email notifications (#35)
+  - [x] 3.11 Implement invitation system with email notifications (#35)
   - [ ] 3.12 Add bulk user import/export with CSV support (#36)
   - [ ] 3.13 Create team switching and multi-team membership (#37)
   - [ ] 3.14 Implement access delegation and temporary permissions (#38)

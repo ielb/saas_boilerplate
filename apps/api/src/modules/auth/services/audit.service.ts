@@ -866,4 +866,100 @@ export class AuditService {
       eventsBySeverity,
     };
   }
+
+  /**
+   * Log invitation created event
+   */
+  async logInvitationCreated(
+    invitation: any,
+    invitedBy: User
+  ): Promise<AuditLog> {
+    return this.logEvent({
+      eventType: AuditEventType.INVITATION_CREATED,
+      userId: invitedBy.id,
+      tenantId: invitation.tenantId,
+      userEmail: invitedBy.email,
+      targetUserEmail: invitation.email,
+      description: `Invitation created for ${invitation.email}`,
+      metadata: {
+        invitationId: invitation.id,
+        invitationType: invitation.type,
+        roleId: invitation.roleId,
+        expiresAt: invitation.expiresAt,
+      },
+      severity: AuditEventSeverity.LOW,
+    });
+  }
+
+  /**
+   * Log invitation accepted event
+   */
+  async logInvitationAccepted(
+    invitation: any,
+    acceptedBy: User
+  ): Promise<AuditLog> {
+    return this.logEvent({
+      eventType: AuditEventType.INVITATION_ACCEPTED,
+      userId: acceptedBy.id,
+      tenantId: invitation.tenantId,
+      userEmail: acceptedBy.email,
+      targetUserEmail: invitation.email,
+      description: `Invitation accepted by ${acceptedBy.email}`,
+      metadata: {
+        invitationId: invitation.id,
+        invitationType: invitation.type,
+        roleId: invitation.roleId,
+        acceptedAt: invitation.acceptedAt,
+      },
+      severity: AuditEventSeverity.LOW,
+    });
+  }
+
+  /**
+   * Log invitation revoked event
+   */
+  async logInvitationRevoked(
+    invitation: any,
+    revokedBy: User
+  ): Promise<AuditLog> {
+    return this.logEvent({
+      eventType: AuditEventType.INVITATION_REVOKED,
+      userId: revokedBy.id,
+      tenantId: invitation.tenantId,
+      userEmail: revokedBy.email,
+      targetUserEmail: invitation.email,
+      description: `Invitation revoked for ${invitation.email}`,
+      metadata: {
+        invitationId: invitation.id,
+        invitationType: invitation.type,
+        roleId: invitation.roleId,
+        revokedAt: invitation.revokedAt,
+      },
+      severity: AuditEventSeverity.MEDIUM,
+    });
+  }
+
+  /**
+   * Log invitation resent event
+   */
+  async logInvitationResent(
+    invitation: any,
+    resentBy: User
+  ): Promise<AuditLog> {
+    return this.logEvent({
+      eventType: AuditEventType.INVITATION_RESENT,
+      userId: resentBy.id,
+      tenantId: invitation.tenantId,
+      userEmail: resentBy.email,
+      targetUserEmail: invitation.email,
+      description: `Invitation resent to ${invitation.email}`,
+      metadata: {
+        invitationId: invitation.id,
+        invitationType: invitation.type,
+        roleId: invitation.roleId,
+        expiresAt: invitation.expiresAt,
+      },
+      severity: AuditEventSeverity.LOW,
+    });
+  }
 }

@@ -11,6 +11,7 @@ import { AccountRecoveryController } from './controllers/account-recovery.contro
 import { UserLifecycleController } from './controllers/user-lifecycle.controller';
 import { ProfileController } from './controllers/profile.controller';
 import { TeamController } from './controllers/team.controller';
+import { InvitationController } from './controllers/invitation.controller';
 import { AuthService } from './services/auth.service';
 import { JwtService } from './services/jwt.service';
 import { RefreshTokenService } from './services/refresh-token.service';
@@ -24,6 +25,7 @@ import { AuditService } from './services/audit.service';
 import { UserLifecycleService } from './services/user-lifecycle.service';
 import { ProfileService } from './services/profile.service';
 import { TeamService } from './services/team.service';
+import { InvitationService } from './services/invitation.service';
 import { AuditInterceptor } from './interceptors/audit.interceptor';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { PermissionsGuard } from './guards/permissions.guard';
@@ -38,6 +40,7 @@ import {
   TenantFeatureFlagRepository,
   UserProfileRepository,
   TeamRepository,
+  InvitationRepository,
 } from './repositories';
 import {
   User,
@@ -54,6 +57,7 @@ import {
   Team,
   TeamMembership,
   TeamInvitation,
+  Invitation,
 } from './entities';
 import { env } from '@app/config';
 import { FilesModule } from '../files/files.module';
@@ -76,6 +80,7 @@ import { CommonModule } from '../../common/common.module';
       Team,
       TeamMembership,
       TeamInvitation,
+      Invitation,
     ]),
     JwtModule.register({
       secret: env.JWT_SECRET,
@@ -98,6 +103,7 @@ import { CommonModule } from '../../common/common.module';
     UserLifecycleController,
     ProfileController,
     TeamController,
+    InvitationController,
   ],
   providers: [
     AuthService,
@@ -113,6 +119,7 @@ import { CommonModule } from '../../common/common.module';
     UserLifecycleService,
     ProfileService,
     TeamService,
+    InvitationService,
     AuditInterceptor,
     JwtAuthGuard,
     PermissionsGuard,
@@ -127,6 +134,7 @@ import { CommonModule } from '../../common/common.module';
     TenantFeatureFlagRepository,
     UserProfileRepository,
     TeamRepository,
+    InvitationRepository,
   ],
   exports: [
     AuthService,
@@ -142,6 +150,7 @@ import { CommonModule } from '../../common/common.module';
     UserLifecycleService,
     ProfileService,
     TeamService,
+    InvitationService,
     AuditInterceptor,
     JwtAuthGuard,
     PermissionsGuard,
@@ -155,6 +164,7 @@ import { CommonModule } from '../../common/common.module';
     TenantFeatureFlagRepository,
     UserProfileRepository,
     TeamRepository,
+    InvitationRepository,
   ],
 })
 export class AuthModule {}
