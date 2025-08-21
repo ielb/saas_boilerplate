@@ -85,6 +85,7 @@ describe('InvitationService', () => {
           useValue: {
             save: jest.fn(),
             findByEmailAndTenant: jest.fn(),
+            findByIdAndTenant: jest.fn(),
             findByToken: jest.fn(),
             findOneByIdForTenant: jest.fn(),
             findWithFilters: jest.fn(),
@@ -247,7 +248,7 @@ describe('InvitationService', () => {
   describe('getInvitationById', () => {
     it('should return invitation by ID', async () => {
       // Arrange
-      invitationRepository.findOneByIdForTenant.mockResolvedValue(
+      invitationRepository.findByIdAndTenant.mockResolvedValue(
         mockInvitation as Invitation
       );
 
@@ -264,7 +265,7 @@ describe('InvitationService', () => {
 
     it('should throw NotFoundException if invitation not found', async () => {
       // Arrange
-      invitationRepository.findOneByIdForTenant.mockResolvedValue(null);
+      invitationRepository.findByIdAndTenant.mockResolvedValue(null);
 
       // Act & Assert
       await expect(
@@ -281,7 +282,7 @@ describe('InvitationService', () => {
 
     it('should update invitation successfully', async () => {
       // Arrange
-      invitationRepository.findOneByIdForTenant.mockResolvedValue(
+      invitationRepository.findByIdAndTenant.mockResolvedValue(
         mockInvitation as Invitation
       );
       invitationRepository.save.mockResolvedValue(mockInvitation as Invitation);
@@ -300,7 +301,7 @@ describe('InvitationService', () => {
 
     it('should throw NotFoundException if invitation not found', async () => {
       // Arrange
-      invitationRepository.findOneByIdForTenant.mockResolvedValue(null);
+      invitationRepository.findByIdAndTenant.mockResolvedValue(null);
 
       // Act & Assert
       await expect(
@@ -314,7 +315,7 @@ describe('InvitationService', () => {
         ...mockInvitation,
         canBeRevoked: jest.fn().mockReturnValue(false),
       };
-      invitationRepository.findOneByIdForTenant.mockResolvedValue(
+      invitationRepository.findByIdAndTenant.mockResolvedValue(
         expiredInvitation as unknown as Invitation
       );
 
@@ -328,7 +329,7 @@ describe('InvitationService', () => {
   describe('revokeInvitation', () => {
     it('should revoke invitation successfully', async () => {
       // Arrange
-      invitationRepository.findOneByIdForTenant.mockResolvedValue(
+      invitationRepository.findByIdAndTenant.mockResolvedValue(
         mockInvitation as Invitation
       );
       invitationRepository.save.mockResolvedValue(mockInvitation as Invitation);
@@ -349,7 +350,7 @@ describe('InvitationService', () => {
 
     it('should throw NotFoundException if invitation not found', async () => {
       // Arrange
-      invitationRepository.findOneByIdForTenant.mockResolvedValue(null);
+      invitationRepository.findByIdAndTenant.mockResolvedValue(null);
 
       // Act & Assert
       await expect(
@@ -448,7 +449,7 @@ describe('InvitationService', () => {
   describe('resendInvitation', () => {
     it('should resend invitation successfully', async () => {
       // Arrange
-      invitationRepository.findOneByIdForTenant.mockResolvedValue(
+      invitationRepository.findByIdAndTenant.mockResolvedValue(
         mockInvitation as Invitation
       );
       invitationRepository.save.mockResolvedValue(mockInvitation as Invitation);
@@ -471,7 +472,7 @@ describe('InvitationService', () => {
 
     it('should throw NotFoundException if invitation not found', async () => {
       // Arrange
-      invitationRepository.findOneByIdForTenant.mockResolvedValue(null);
+      invitationRepository.findByIdAndTenant.mockResolvedValue(null);
 
       // Act & Assert
       await expect(
@@ -485,7 +486,7 @@ describe('InvitationService', () => {
         ...mockInvitation,
         isPending: jest.fn().mockReturnValue(false),
       };
-      invitationRepository.findOneByIdForTenant.mockResolvedValue(
+      invitationRepository.findByIdAndTenant.mockResolvedValue(
         acceptedInvitation as unknown as Invitation
       );
 

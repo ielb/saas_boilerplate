@@ -32,6 +32,16 @@ export class InvitationRepository extends TenantScopedRepository<Invitation> {
     });
   }
 
+  async findByIdAndTenant(
+    id: string,
+    tenantId: string
+  ): Promise<Invitation | null> {
+    return this.invitationRepository.findOne({
+      where: { id, tenantId },
+      relations: ['tenant', 'invitedBy', 'role', 'acceptedBy'],
+    });
+  }
+
   async findByToken(token: string): Promise<Invitation | null> {
     return this.invitationRepository.findOne({
       where: { token },

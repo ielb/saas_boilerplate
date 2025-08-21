@@ -179,7 +179,10 @@ export class InvitationService implements IInvitationService {
     id: string,
     tenantId: string
   ): Promise<InvitationResponseDto> {
-    const invitation = await this.invitationRepository.findOneByIdForTenant(id);
+    const invitation = await this.invitationRepository.findByIdAndTenant(
+      id,
+      tenantId
+    );
     if (!invitation) {
       throw new NotFoundException('Invitation not found');
     }
@@ -192,7 +195,10 @@ export class InvitationService implements IInvitationService {
     updateDto: UpdateInvitationDto,
     tenantId: string
   ): Promise<InvitationResponseDto> {
-    const invitation = await this.invitationRepository.findOneByIdForTenant(id);
+    const invitation = await this.invitationRepository.findByIdAndTenant(
+      id,
+      tenantId
+    );
     if (!invitation) {
       throw new NotFoundException('Invitation not found');
     }
@@ -230,7 +236,10 @@ export class InvitationService implements IInvitationService {
     tenantId: string,
     revokedBy: User
   ): Promise<void> {
-    const invitation = await this.invitationRepository.findOneByIdForTenant(id);
+    const invitation = await this.invitationRepository.findByIdAndTenant(
+      id,
+      tenantId
+    );
     if (!invitation) {
       throw new NotFoundException('Invitation not found');
     }
@@ -306,7 +315,10 @@ export class InvitationService implements IInvitationService {
     tenantId: string,
     resentBy: User
   ): Promise<InvitationResponseDto> {
-    const invitation = await this.invitationRepository.findOneByIdForTenant(id);
+    const invitation = await this.invitationRepository.findByIdAndTenant(
+      id,
+      tenantId
+    );
     if (!invitation) {
       throw new NotFoundException('Invitation not found');
     }
