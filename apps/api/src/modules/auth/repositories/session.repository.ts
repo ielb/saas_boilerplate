@@ -34,8 +34,11 @@ export class SessionRepository {
 
   async deleteExpiredSessions(): Promise<void> {
     const expiredDate = new Date();
-    await this.sessionRepository.delete({
-      expiresAt: { $lt: expiredDate } as any,
-    });
+    await this.sessionRepository
+      .createQueryBuilder()
+      .delete()
+      .from(Session)
+      .where('expiresAt < :expiredDate', { expiredDate })
+      .execute();
   }
 }

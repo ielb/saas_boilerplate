@@ -20,7 +20,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { RoleService } from '@/modules/rbac/services/role.service';
+import { RoleService } from '../services/role.service';
 import {
   CreateRoleDto,
   UpdateRoleDto,
@@ -30,7 +30,7 @@ import {
   AssignUserRoleDto,
   UserRoleListResponseDto,
 } from '../dto/rbac.dto';
-import { RoleLevel } from '@/modules/rbac/entities/role.entity';
+import { RoleLevel } from '../entities/role.entity';
 import { RoleQueryDto } from '../dto/role-query.dto';
 import { Request } from 'express';
 import { Permission } from '../entities/permission.entity';

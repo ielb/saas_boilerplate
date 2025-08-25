@@ -32,9 +32,12 @@ export class RefreshTokenRepository {
 
   async deleteExpiredTokens(): Promise<void> {
     const expiredDate = new Date();
-    await this.refreshTokenRepository.delete({
-      expiresAt: { $lt: expiredDate } as any,
-    });
+    await this.refreshTokenRepository
+      .createQueryBuilder()
+      .delete()
+      .from(RefreshToken)
+      .where('expiresAt < :expiredDate', { expiredDate })
+      .execute();
   }
 
   async revokeAllUserTokens(userId: string): Promise<void> {

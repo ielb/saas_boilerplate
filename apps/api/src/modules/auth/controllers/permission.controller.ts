@@ -22,7 +22,7 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { PermissionsGuard } from '../../rbac/guards/permissions.guard';
-import { PermissionService } from '@/modules/rbac/services/permission.service';
+import { PermissionService } from '../../rbac/services/permission.service';
 import { PermissionCheckerService } from '../../../common/services/permission-checker.service';
 import {
   RequirePermissions,
@@ -44,7 +44,7 @@ import {
   PermissionResource,
   PermissionAction,
   PermissionScope,
-} from '@/modules/rbac/entities/permission.entity';
+} from '../../rbac/entities/permission.entity';
 import { PermissionQueryDto } from '../../rbac/dto/permission-query.dto';
 
 @ApiTags('Permissions')

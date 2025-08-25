@@ -1,4 +1,3 @@
-import { UsersAndGroups } from './../../../../../node_modules/aws-sdk/clients/qbusiness.d';
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
