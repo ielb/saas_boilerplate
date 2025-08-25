@@ -23,7 +23,7 @@ import {
 import { Request } from 'express';
 
 import { TenantOnboardingService } from '../services/tenant-onboarding.service';
-import { AuditInterceptor } from '../../auth/interceptors/audit.interceptor';
+import { AuditInterceptor } from '../../audit/interceptors/audit.interceptor';
 import { AuthGuard } from '../../auth/guards/auth.guard';
 import { RolesGuard } from '../../../common/guards/roles.guard';
 import { Roles } from '../../../common/decorators/auth.decorator';
@@ -31,8 +31,8 @@ import { UserRole } from '@app/shared';
 import {
   AuditEvent,
   AuditEventConfig,
-} from '../../auth/interceptors/audit.interceptor';
-import { AuditEventType } from '../../auth/entities/audit-log.entity';
+} from '../../audit/interceptors/audit.interceptor';
+import { AuditEventType } from '../../audit/entities/audit-log.entity';
 import {
   TenantOnboardingDto,
   OnboardingProgressDto,

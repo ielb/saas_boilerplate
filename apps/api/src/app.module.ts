@@ -6,15 +6,17 @@ import { ThrottlerModule } from '@nestjs/throttler';
 
 import { env } from '@app/config';
 
-// Import modules (will be created in subsequent tasks)
+// Import modules
 import { CommonModule } from './common/common.module';
 import { AuthModule } from './modules/auth/auth.module';
-// import { UsersModule } from './modules/users/users.module';
+import { UsersModule } from './modules/users/users.module';
+import { TeamsModule } from './modules/teams/teams.module';
+import { RBACModule } from './modules/rbac/rbac.module';
+import { InvitationsModule } from './modules/invitations/invitations.module';
+import { AuditModule } from './modules/audit/audit.module';
 import { TenantsModule } from './modules/tenants/tenants.module';
-// import { BillingModule } from './modules/billing/billing.module';
-// import { NotificationsModule } from './modules/notifications/notifications.module';
 import { FilesModule } from './modules/files/files.module';
-// import { AdminModule } from './modules/admin/admin.module';
+import { EmailModule } from './modules/email/email.module';
 import { TenantMiddlewareModule } from './common/middleware/tenant-middleware.module';
 import { TenantIsolationMiddleware } from './common/middleware/tenant-isolation.middleware';
 
@@ -75,16 +77,18 @@ import { TenantIsolationMiddleware } from './common/middleware/tenant-isolation.
       },
     ]),
 
-    // Feature modules (will be uncommented as they are created)
+    // Feature modules
     CommonModule,
     AuthModule,
-    // UsersModule,
+    UsersModule,
+    TeamsModule,
+    RBACModule,
+    InvitationsModule,
+    AuditModule,
     TenantsModule,
     TenantMiddlewareModule,
-    // BillingModule,
-    // NotificationsModule,
     FilesModule,
-    // AdminModule,
+    EmailModule,
   ],
   controllers: [],
   providers: [],

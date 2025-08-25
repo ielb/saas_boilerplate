@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { AuditEventType } from '../../../auth/entities/audit-log.entity';
-import { AuditService } from '../../../auth/services/audit.service';
+import { AuditEventType } from '../../../audit/entities/audit-log.entity';
+import { AuditService } from '../../../audit/services/audit.service';
 import { GetTenantBrandingResponseDto } from '../../dto/tenant-branding.dto';
 
 @Injectable()

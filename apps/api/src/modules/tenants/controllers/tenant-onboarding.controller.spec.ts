@@ -5,8 +5,8 @@ import { JwtService } from '@nestjs/jwt';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '../../auth/guards/auth.guard';
 import { RolesGuard } from '../../../common/guards/roles.guard';
-import { AuditInterceptor } from '../../auth/interceptors/audit.interceptor';
-import { AuditService } from '../../auth/services/audit.service';
+import { AuditInterceptor } from '../../audit/interceptors/audit.interceptor';
+import { AuditService } from '../../audit/services/audit.service';
 
 import { TenantOnboardingController } from './tenant-onboarding.controller';
 import { TenantOnboardingService } from '../services/tenant-onboarding.service';
@@ -21,7 +21,7 @@ import {
 import {
   OnboardingStep,
   OnboardingStatus,
-} from '../../auth/entities/tenant-onboarding.entity';
+} from '../entities/tenant-onboarding.entity';
 
 describe('TenantOnboardingController', () => {
   let controller: TenantOnboardingController;

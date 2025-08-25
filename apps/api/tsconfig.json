@@ -29,6 +29,7 @@
     "paths": {
       "@/*": ["*"],
       "@app/*": ["*"],
+      "@app/shared": ["../../packages/shared/dist"],
       "@shared/*": ["../../packages/shared/dist/*"],
       "@config/*": ["../../packages/config/dist/*"]
     }

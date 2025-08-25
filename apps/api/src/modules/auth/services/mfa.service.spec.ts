@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { UnauthorizedException, BadRequestException } from '@nestjs/common';
 
 import { MfaService } from './mfa.service';
-import { User } from '../entities/user.entity';
+import { User } from '../../users/entities/user.entity';
 import { UserStatus, UserRole, AuthProvider } from '@app/shared';
 
 describe('MfaService', () => {

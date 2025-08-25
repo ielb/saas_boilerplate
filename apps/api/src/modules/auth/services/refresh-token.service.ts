@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import * as crypto from 'crypto';
 
 import { RefreshToken } from '../entities/refresh-token.entity';
-import { User } from '../entities/user.entity';
+import { User } from '../../users/entities/user.entity';
 import { jwtConfig } from '@app/config';
 
 @Injectable()

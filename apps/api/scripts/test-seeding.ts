@@ -21,15 +21,15 @@ import {
   Permission,
   PermissionResource,
   PermissionAction,
-} from '../src/modules/auth/entities/permission.entity';
+} from '../src/modules/users/repositories/entities/permission.entity';
 import {
   Role,
   RoleType,
   RoleLevel,
-} from '../src/modules/auth/entities/role.entity';
-import { User } from '../src/modules/auth/entities/user.entity';
-import { Tenant } from '../src/modules/auth/entities/tenant.entity';
-import { UserTenantMembership } from '../src/modules/auth/entities/user-tenant-membership.entity';
+} from '../src/modules/users/repositories/entities/role.entity';
+import { User } from '../src/modules/users/entities/user.entity';
+import { Tenant } from '../src/modules/tenants/entities/tenant.entity';
+import { UserTenantMembership } from '../src/modules/tenants/entities/user-tenant-membership.entity';
 import { UserStatus, AuthProvider, MembershipStatus } from '@app/shared';
 
 // Database configuration

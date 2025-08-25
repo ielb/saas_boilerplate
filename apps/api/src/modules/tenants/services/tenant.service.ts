@@ -16,15 +16,15 @@ import {
   Not,
   DataSource,
 } from 'typeorm';
-import { Tenant } from '../../auth/entities/tenant.entity';
+import { Tenant } from '../entities/tenant.entity';
 import {
   TenantUsage,
   TenantUsageMetric,
-} from '../../auth/entities/tenant-usage.entity';
+} from '../entities/tenant-usage.entity';
 import {
   TenantFeatureFlag,
   TenantFeature,
-} from '../../auth/entities/tenant-feature-flag.entity';
+} from '../entities/tenant-feature-flag.entity';
 import { CreateTenantDto, UpdateTenantDto, TenantQueryDto } from '../dto';
 
 export interface TenantStatistics {

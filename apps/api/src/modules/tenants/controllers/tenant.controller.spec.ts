@@ -2,12 +2,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TenantController } from './tenant.controller';
 import { TenantService } from '../services/tenant.service';
 import { CreateTenantDto, UpdateTenantDto, TenantQueryDto } from '../dto';
-import { Tenant, TenantUsage, TenantFeatureFlag } from '../../auth/entities';
-import { TenantFeature } from '../../auth/entities/tenant-feature-flag.entity';
-import { TenantUsageMetric } from '../../auth/entities/tenant-usage.entity';
+import { TenantFeature } from '../entities/tenant-feature-flag.entity';
+import { TenantUsageMetric } from '../entities/tenant-usage.entity';
 import { AuthGuard } from '../../auth/guards/auth.guard';
 import { RolesGuard } from '../../../common/guards';
-import { AuditInterceptor } from '../../auth/interceptors/audit.interceptor';
+import { AuditInterceptor } from '../../audit/interceptors/audit.interceptor';
 
 describe('TenantController', () => {
   let controller: TenantController;

@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Tenant } from '../../../auth/entities/tenant.entity';
+import { Tenant } from '../../entities';
 import {
   BrandingTheme,
   LogoType,

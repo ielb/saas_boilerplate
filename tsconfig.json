@@ -22,7 +22,9 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@app/*": ["apps/*/src/*"],
+      "@app/api/*": ["apps/api/src/*"],
+      "@app/web/*": ["apps/web/src/*"],
+      "@app/mobile/*": ["apps/mobile/src/*"],
       "@shared/*": ["packages/shared/src/*"],
       "@shared": ["packages/shared/src"],
       "@ui/*": ["packages/ui/src/*"],

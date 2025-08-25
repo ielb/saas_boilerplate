@@ -7,7 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, LessThan, MoreThan } from 'typeorm';
 import { Session, SessionStatus, DeviceType } from '../entities/session.entity';
-import { User } from '../entities/user.entity';
+import { User } from '../../users/entities/user.entity';
 import {
   CreateSessionDto,
   UpdateSessionDto,

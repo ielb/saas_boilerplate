@@ -6,11 +6,11 @@ import { UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { MfaController } from './mfa.controller';
 import { MfaService } from '../services/mfa.service';
 import { AuthService } from '../services/auth.service';
-import { User } from '../entities/user.entity';
-import { Tenant } from '../entities/tenant.entity';
+import { User } from '../../users/entities/user.entity';
+import { Tenant } from '../../tenants/entities/tenant.entity';
 import { JwtService } from '../services/jwt.service';
 import { RefreshTokenService } from '../services/refresh-token.service';
-import { EmailService } from '../services/email.service';
+import { EmailService } from '../../email/services/email.service';
 import { UserStatus, UserRole } from '@app/shared';
 
 describe('MfaController', () => {

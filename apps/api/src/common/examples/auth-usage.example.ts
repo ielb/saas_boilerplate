@@ -40,7 +40,7 @@ import { UserRole } from '@app/shared';
 import {
   PermissionResource,
   PermissionAction,
-} from '../../modules/auth/entities/permission.entity';
+} from '@/modules/rbac/entities/permission.entity';
 
 /**
  * Example controller demonstrating how to use authentication guards and decorators

@@ -1,4 +1,4 @@
-import { TenantUsageMetric } from '../../auth/entities/tenant-usage.entity';
+import { TenantUsageMetric } from '../entities/tenant-usage.entity';
 
 /**
  * Convert camelCase metric names to snake_case enum values

@@ -1,11 +1,11 @@
 import { Injectable, Logger, ForbiddenException } from '@nestjs/common';
-import { PermissionService } from '../../modules/auth/services/permission.service';
-import { RoleService } from '../../modules/auth/services/role.service';
+import { PermissionService } from '../../modules/rbac/services/permission.service';
+import { RoleService } from '../../modules/rbac/services/role.service';
 import {
   PermissionResource,
   PermissionAction,
   PermissionScope,
-} from '../../modules/auth/entities/permission.entity';
+} from '../../modules/rbac/entities/permission.entity';
 
 @Injectable()
 export class PermissionCheckerService {
