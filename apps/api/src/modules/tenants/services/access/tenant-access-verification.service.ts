@@ -1,12 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UserTenantMembership } from '../../../auth/entities';
+import { UserTenantMembership } from '../../entities';
 import { TenantAccessControlService } from './tenant-access-control.service';
 import { TenantCacheService } from '../cache/tenant-cache.service';
-import { PermissionService } from '../../../auth/services/permission.service';
-import { AuditService } from '../../../auth/services/audit.service';
-import { AuditEventType } from '../../../auth/entities/audit-log.entity';
+import { PermissionService } from '../../../rbac/services/permission.service';
+import { AuditService } from '../../../audit/services/audit.service';
+import { AuditEventType } from '../../../audit/entities/audit-log.entity';
 import {
   TenantAccessVerificationDto,
   TenantAccessResponseDto,

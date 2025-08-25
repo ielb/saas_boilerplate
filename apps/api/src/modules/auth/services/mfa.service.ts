@@ -8,7 +8,7 @@ import { Repository } from 'typeorm';
 import * as speakeasy from 'speakeasy';
 import * as QRCode from 'qrcode';
 
-import { User } from '../entities/user.entity';
+import { User } from '../../users/entities/user.entity';
 import { TwoFactorAuthSetup } from '@app/shared';
 
 // Define local interfaces for now

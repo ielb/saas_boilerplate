@@ -7,7 +7,6 @@ import { AuthGuard } from '@nestjs/passport';
 import { Reflector } from '@nestjs/core';
 
 import { JwtService } from '../services/jwt.service';
-import { UserRole } from '@app/shared';
 import {
   IS_PUBLIC_KEY,
   SKIP_AUTH_KEY,

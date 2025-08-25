@@ -6,9 +6,10 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
-import { User, UserTenantMembership } from '../../auth/entities';
-import { AuditEventType } from '../../auth/entities/audit-log.entity';
-import { AuditService } from '../../auth/services/audit.service';
+import { User } from '../../users/entities/user.entity';
+import { UserTenantMembership } from '../entities';
+import { AuditEventType } from '../../audit/entities/audit-log.entity';
+import { AuditService } from '../../audit/services/audit.service';
 import { TenantAccessControlService } from './access/tenant-access-control.service';
 import { TenantAccessVerificationService } from './access/tenant-access-verification.service';
 import { TenantMembershipService } from './membership/tenant-membership.service';

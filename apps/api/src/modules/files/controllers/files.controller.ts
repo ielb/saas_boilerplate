@@ -33,7 +33,7 @@ import {
   FileRateLimit,
   FileRateLimitConfigs,
 } from '../decorators/file-rate-limit.decorator';
-import { User } from '../../auth/entities/user.entity';
+import { User } from '../../users/entities/user.entity';
 import { FileService } from '../services/file.service';
 import { UploadFileDto } from '../dto/upload-file.dto';
 import { FileQueryDto } from '../dto/file-query.dto';

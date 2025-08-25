@@ -7,13 +7,13 @@ import { FilesModule } from './files.module';
 import { AuthModule } from '../auth/auth.module';
 import { CommonModule } from '../../common/common.module';
 import { FileStatus, FileVisibility } from './entities/file.entity';
-import { User } from '../auth/entities/user.entity';
-import { Tenant } from '../auth/entities/tenant.entity';
+import { User } from '../users/entities/user.entity';
+import { Tenant } from '../tenants/entities/tenant.entity';
 import { RefreshToken } from '../auth/entities/refresh-token.entity';
 import { Session } from '../auth/entities/session.entity';
-import { Role } from '../auth/entities/role.entity';
-import { Permission } from '../auth/entities/permission.entity';
-import { UserTenantMembership } from '../auth/entities/user-tenant-membership.entity';
+import { Role } from '../rbac/entities/role.entity';
+import { Permission } from '../rbac/entities/permission.entity';
+import { UserTenantMembership } from '../tenants/entities/user-tenant-membership.entity';
 import { File } from './entities/file.entity';
 
 describe('FilesController (e2e)', () => {

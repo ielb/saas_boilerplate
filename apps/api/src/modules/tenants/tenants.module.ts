@@ -34,10 +34,14 @@ import {
   TenantUsage,
   TenantFeatureFlag,
   TenantOnboarding,
-  User,
   UserTenantMembership,
-} from '../auth/entities';
+} from './entities';
+import { User } from '../users/entities/user.entity';
 import { AuthModule } from '../auth/auth.module';
+import { RBACModule } from '../rbac/rbac.module';
+import { EmailModule } from '../email/email.module';
+import { AuditModule } from '../audit/audit.module';
+import { AuthJwtModule } from '../auth/jwt.module';
 
 @Module({
   imports: [
@@ -54,6 +58,10 @@ import { AuthModule } from '../auth/auth.module';
       max: 1000, // Maximum number of items in cache
     }),
     AuthModule,
+    RBACModule,
+    EmailModule,
+    AuditModule,
+    AuthJwtModule,
   ],
   controllers: [
     TenantController,

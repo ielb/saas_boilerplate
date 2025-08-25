@@ -5,10 +5,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 
 import { AuthModule } from './auth.module';
-import { User } from './entities/user.entity';
-import { Tenant } from './entities/tenant.entity';
+import { User } from '../users/entities/user.entity';
+import { Tenant } from '../tenants/entities/tenant.entity';
 import { RefreshToken } from './entities/refresh-token.entity';
-import { UserStatus, UserRole } from '@app/shared';
 
 describe('Authentication (e2e)', () => {
   let app: INestApplication;
