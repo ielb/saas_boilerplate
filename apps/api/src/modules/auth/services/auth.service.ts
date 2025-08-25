@@ -8,14 +8,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as argon2 from 'argon2';
 
-import { User, Tenant } from '../entities';
+import { User } from '../../users/entities/user.entity';
+import { Tenant } from '../../tenants/entities';
 import { JwtService } from './jwt.service';
 import { RefreshTokenService } from './refresh-token.service';
 import { MfaService } from './mfa.service';
-import { EmailService } from './email.service';
+import { EmailService } from '../../email/services/email.service';
 import { SessionService } from './session.service';
-import { RoleService } from './role.service';
-import { PermissionService } from './permission.service';
+import { RoleService } from '../../rbac/services/role.service';
+import { PermissionService } from '../../rbac/services/permission.service';
 import { LoginDto, RegisterDto } from '../dto';
 import {
   LoginResponse,

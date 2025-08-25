@@ -1,9 +1,9 @@
-import { SetMetadata } from '@nestjs/common';
 import {
-  PermissionResource,
   PermissionAction,
+  PermissionResource,
   PermissionScope,
-} from '../../modules/auth/entities/permission.entity';
+} from '../../modules/rbac/entities/permission.entity';
+import { SetMetadata } from '@nestjs/common';
 
 export interface PermissionMetadata {
   resource: PermissionResource;

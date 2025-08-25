@@ -10,11 +10,12 @@ import {
 } from '@nestjs/common';
 
 import { TenantSwitchingService } from './tenant-switching.service';
-import { User, Tenant, UserTenantMembership } from '../../auth/entities';
-import { AuditEventType } from '../../auth/entities/audit-log.entity';
+import { Tenant, UserTenantMembership } from '../entities';
+import { User } from '../../users/entities/user.entity';
+import { AuditEventType } from '../../audit/entities/audit-log.entity';
 import { JwtService } from '../../auth/services/jwt.service';
-import { AuditService } from '../../auth/services/audit.service';
-import { PermissionService } from '../../auth/services/permission.service';
+import { AuditService } from '../../audit/services/audit.service';
+import { PermissionService } from '../../rbac/services/permission.service';
 import { TenantCacheUtil } from '../utils/tenant-cache.util';
 import { TenantAccessControlService } from './access/tenant-access-control.service';
 import { TenantAccessVerificationService } from './access/tenant-access-verification.service';

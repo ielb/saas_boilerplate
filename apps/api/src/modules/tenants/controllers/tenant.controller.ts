@@ -39,9 +39,13 @@ import {
   convertFeatureToEnum,
   getValidFeatures,
 } from '../utils/feature-converter.util';
-import { Tenant, TenantUsage, TenantFeatureFlag } from '../../auth/entities';
-import { TenantFeature } from '../../auth/entities/tenant-feature-flag.entity';
-import { TenantUsageMetric } from '../../auth/entities/tenant-usage.entity';
+import {
+  Tenant,
+  TenantUsage,
+  TenantFeatureFlag,
+} from '../entities';
+import { TenantFeature } from '../entities/tenant-feature-flag.entity';
+import { TenantUsageMetric } from '../entities/tenant-usage.entity';
 import { AuthGuard } from '../../auth/guards/auth.guard';
 import { RolesGuard } from '../../../common/guards';
 import { Roles } from '../../../common/decorators';
@@ -49,7 +53,7 @@ import {
   AuditInterceptor,
   AuditConfigs,
   AuditEvent,
-} from '../../auth/interceptors/audit.interceptor';
+} from '../../audit/interceptors/audit.interceptor';
 import { UserRole } from '@app/shared';
 
 @ApiTags('tenants')

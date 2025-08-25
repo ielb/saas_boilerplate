@@ -5,8 +5,8 @@ import {
 } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../../../auth/entities/user.entity';
-import { Tenant } from '../../../auth/entities/tenant.entity';
+import { User } from '../../../users/entities/user.entity';
+import { Tenant } from '../../entities/tenant.entity';
 import { UserRole } from '@app/shared';
 
 @Injectable()

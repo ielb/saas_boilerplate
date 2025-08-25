@@ -15,13 +15,13 @@ import {
   TenantOnboarding,
   OnboardingStep,
   OnboardingStatus,
-} from '../../auth/entities/tenant-onboarding.entity';
-import { Tenant } from '../../auth/entities/tenant.entity';
-import { User } from '../../auth/entities/user.entity';
+} from '../entities/tenant-onboarding.entity';
+import { Tenant } from '../entities/tenant.entity';
+import { User } from '../../users/entities/user.entity';
 import { UserRole, AuthProvider, UserStatus } from '@app/shared';
 import { TenantService } from './tenant.service';
 import { AuthService } from '../../auth/services/auth.service';
-import { EmailService } from '../../auth/services/email.service';
+import { EmailService } from '../../email/services/email.service';
 import {
   TenantOnboardingDto,
   OnboardingStepUpdateDto,

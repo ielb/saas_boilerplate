@@ -1,3 +1,4 @@
+import { UsersAndGroups } from './../../../../../node_modules/aws-sdk/clients/qbusiness.d';
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -8,7 +9,8 @@ import { JwtService } from '@nestjs/jwt';
 
 import { TenantsModule } from './tenants.module';
 import { AuthModule } from '../auth/auth.module';
-import { User, Tenant, UserTenantMembership } from '../auth/entities';
+import { Tenant, UserTenantMembership } from './entities';
+import { User } from '../users/entities/user.entity';
 import { UserRole, MembershipStatus } from '@app/shared';
 import { BrandingTheme, LogoType } from './dto/tenant-branding.dto';
 

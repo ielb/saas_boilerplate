@@ -4,7 +4,4 @@ export * from './refresh-token.dto';
 export * from './mfa.dto';
 export * from './forgot-password.dto';
 export * from './reset-password.dto';
-export * from './user-lifecycle.dto';
-export * from './profile.dto';
-export * from './team.dto';
-export * from './invitation.dto';
+export * from './session.dto';

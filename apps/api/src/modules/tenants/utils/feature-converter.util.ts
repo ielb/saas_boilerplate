@@ -1,4 +1,4 @@
-import { TenantFeature } from '../../auth/entities/tenant-feature-flag.entity';
+import { TenantFeature } from '../entities/tenant-feature-flag.entity';
 
 /**
  * Convert feature names to enum values

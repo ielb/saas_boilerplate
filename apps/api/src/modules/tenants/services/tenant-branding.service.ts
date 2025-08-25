@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
-import { AuditEventType } from '../../auth/entities/audit-log.entity';
-import { AuditService } from '../../auth/services/audit.service';
+import { AuditEventType } from '../../audit/entities/audit-log.entity';
+import { AuditService } from '../../audit/services/audit.service';
 import { TenantAccessControlService } from './access/tenant-access-control.service';
 import { TenantBrandingCacheService } from './cache/tenant-branding-cache.service';
 import { TenantBrandingValidationService } from './branding/tenant-branding-validation.service';

@@ -1,170 +1,78 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
 
+// Controllers
 import { AuthController } from './controllers/auth.controller';
 import { MfaController } from './controllers/mfa.controller';
 import { SessionController } from './controllers/session.controller';
-import { RoleController } from './controllers/role.controller';
-import { PermissionController } from './controllers/permission.controller';
-import { AccountRecoveryController } from './controllers/account-recovery.controller';
-import { UserLifecycleController } from './controllers/user-lifecycle.controller';
-import { ProfileController } from './controllers/profile.controller';
-import { TeamController } from './controllers/team.controller';
-import { InvitationController } from './controllers/invitation.controller';
+
+// Services
 import { AuthService } from './services/auth.service';
 import { JwtService } from './services/jwt.service';
-import { RefreshTokenService } from './services/refresh-token.service';
 import { MfaService } from './services/mfa.service';
-import { EmailService } from './services/email.service';
 import { SessionService } from './services/session.service';
-import { RoleService } from './services/role.service';
-import { PermissionService } from './services/permission.service';
-import { AccountRecoveryService } from './services/account-recovery.service';
-import { AuditService } from './services/audit.service';
-import { UserLifecycleService } from './services/user-lifecycle.service';
-import { ProfileService } from './services/profile.service';
-import { TeamService } from './services/team.service';
-import { InvitationService } from './services/invitation.service';
-import { AuditInterceptor } from './interceptors/audit.interceptor';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { PermissionsGuard } from './guards/permissions.guard';
-import { AuthGuard } from './guards/auth.guard';
+import { RefreshTokenService } from './services/refresh-token.service';
+
+// Entities
+import { User } from '../users/entities/user.entity';
+import { Session } from './entities/session.entity';
+import { RefreshToken } from './entities/refresh-token.entity';
+import { Tenant } from '../tenants/entities';
+
+// Repositories
+import { UserRepository } from '../users/repositories/user.repository';
+import { SessionRepository } from './repositories/session.repository';
+import { RefreshTokenRepository } from './repositories/refresh-token.repository';
+
+// Strategies
 import { JwtStrategy } from './strategies/jwt.strategy';
-import { PermissionCheckerService } from '../../common/services/permission-checker.service';
-import {
-  UserRepository,
-  RoleRepository,
-  AuditLogRepository,
-  TenantUsageRepository,
-  TenantFeatureFlagRepository,
-  UserProfileRepository,
-  TeamRepository,
-  InvitationRepository,
-} from './repositories';
-import {
-  User,
-  Tenant,
-  RefreshToken,
-  Session,
-  Permission,
-  Role,
-  AccountRecovery,
-  AuditLog,
-  TenantUsage,
-  TenantFeatureFlag,
-  UserProfile,
-  Team,
-  TeamMembership,
-  TeamInvitation,
-  Invitation,
-} from './entities';
-import { env } from '@app/config';
-import { FilesModule } from '../files/files.module';
+
+// Guards
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+
+// Common Module
 import { CommonModule } from '../../common/common.module';
 
+// Import other modules
+import { UsersModule } from '../users/users.module';
+import { RBACModule } from '../rbac/rbac.module';
+import { AuditModule } from '../audit/audit.module';
+import { EmailModule } from '../email/email.module';
+import { FilesModule } from '../files/files.module';
+import { AuthJwtModule } from './jwt.module';
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      User,
-      Tenant,
-      RefreshToken,
-      Session,
-      Permission,
-      Role,
-      AccountRecovery,
-      AuditLog,
-      TenantUsage,
-      TenantFeatureFlag,
-      UserProfile,
-      Team,
-      TeamMembership,
-      TeamInvitation,
-      Invitation,
-    ]),
-    JwtModule.register({
-      secret: env.JWT_SECRET,
-      signOptions: {
-        expiresIn: env.JWT_EXPIRES_IN,
-        issuer: 'saas-boilerplate',
-        audience: 'saas-boilerplate-users',
-      },
-    }),
-    forwardRef(() => FilesModule),
+    TypeOrmModule.forFeature([User, Session, RefreshToken, Tenant]),
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    AuthJwtModule,
     CommonModule,
+    RBACModule,
+    AuditModule,
+    EmailModule,
+    FilesModule,
   ],
-  controllers: [
-    AuthController,
-    MfaController,
-    SessionController,
-    RoleController,
-    PermissionController,
-    AccountRecoveryController,
-    UserLifecycleController,
-    ProfileController,
-    TeamController,
-    InvitationController,
-  ],
+  controllers: [AuthController, MfaController, SessionController],
   providers: [
     AuthService,
-    JwtService,
-    RefreshTokenService,
     MfaService,
-    EmailService,
     SessionService,
-    RoleService,
-    PermissionService,
-    AccountRecoveryService,
-    AuditService,
-    UserLifecycleService,
-    ProfileService,
-    TeamService,
-    InvitationService,
-    AuditInterceptor,
-    JwtAuthGuard,
-    PermissionsGuard,
-    AuthGuard,
+    RefreshTokenService,
     JwtStrategy,
-    PermissionCheckerService,
-    // Tenant-scoped repositories
+    JwtAuthGuard,
     UserRepository,
-    RoleRepository,
-    AuditLogRepository,
-    TenantUsageRepository,
-    TenantFeatureFlagRepository,
-    UserProfileRepository,
-    TeamRepository,
-    InvitationRepository,
+    SessionRepository,
+    RefreshTokenRepository,
   ],
   exports: [
     AuthService,
-    JwtService,
-    RefreshTokenService,
     MfaService,
-    EmailService,
     SessionService,
-    RoleService,
-    PermissionService,
-    AccountRecoveryService,
-    AuditService,
-    UserLifecycleService,
-    ProfileService,
-    TeamService,
-    InvitationService,
-    AuditInterceptor,
+    RefreshTokenService,
     JwtAuthGuard,
-    PermissionsGuard,
-    AuthGuard,
-    PermissionCheckerService,
-    // Export tenant-scoped repositories
     UserRepository,
-    RoleRepository,
-    AuditLogRepository,
-    TenantUsageRepository,
-    TenantFeatureFlagRepository,
-    UserProfileRepository,
-    TeamRepository,
-    InvitationRepository,
+    SessionRepository,
+    RefreshTokenRepository,
   ],
 })
 export class AuthModule {}

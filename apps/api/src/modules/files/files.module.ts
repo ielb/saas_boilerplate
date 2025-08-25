@@ -9,6 +9,7 @@ import { FileService } from './services/file.service';
 import { FileRepository } from './repositories/file.repository';
 import { FilesController } from './controllers/files.controller';
 import { AuthModule } from '../auth/auth.module';
+import { AuthJwtModule } from '../auth/jwt.module';
 
 /**
  * Files module configuration
@@ -18,6 +19,7 @@ import { AuthModule } from '../auth/auth.module';
     ConfigModule,
     TypeOrmModule.forFeature([File]),
     forwardRef(() => AuthModule),
+    AuthJwtModule,
   ],
   controllers: [FilesController],
   providers: [

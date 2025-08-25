@@ -3,7 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository, MoreThan, LessThan } from 'typeorm';
 import { SessionService } from './session.service';
 import { Session, SessionStatus, DeviceType } from '../entities/session.entity';
-import { User } from '../entities/user.entity';
+import { User } from '../../users/entities/user.entity';
 import { JwtService } from './jwt.service';
 import { RefreshTokenService } from './refresh-token.service';
 import {

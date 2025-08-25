@@ -3,8 +3,6 @@ import { SessionController } from './session.controller';
 import { SessionService } from '../services/session.service';
 import { JwtService } from '../services/jwt.service';
 import { Session, SessionStatus, DeviceType } from '../entities/session.entity';
-import { Request } from 'express';
-import { HttpStatus } from '@nestjs/common';
 
 describe('SessionController', () => {
   let controller: SessionController;

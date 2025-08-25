@@ -5,7 +5,7 @@ import { UnauthorizedException } from '@nestjs/common';
 
 import { RefreshTokenService } from './refresh-token.service';
 import { RefreshToken } from '../entities/refresh-token.entity';
-import { User } from '../entities/user.entity';
+import { User } from '../../users/entities/user.entity';
 import { UserStatus, UserRole } from '@app/shared';
 
 describe('RefreshTokenService', () => {
