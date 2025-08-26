@@ -8,19 +8,13 @@ import { File } from './entities/file.entity';
 import { FileService } from './services/file.service';
 import { FileRepository } from './repositories/file.repository';
 import { FilesController } from './controllers/files.controller';
-import { AuthModule } from '../auth/auth.module';
 import { AuthJwtModule } from '../auth/jwt.module';
 
 /**
  * Files module configuration
  */
 @Module({
-  imports: [
-    ConfigModule,
-    TypeOrmModule.forFeature([File]),
-    forwardRef(() => AuthModule),
-    AuthJwtModule,
-  ],
+  imports: [ConfigModule, TypeOrmModule.forFeature([File]), AuthJwtModule],
   controllers: [FilesController],
   providers: [
     StorageProviderFactory,

@@ -109,9 +109,9 @@ export class FilesController {
     };
   }
 
-  @Get('metadata/:key')
+  @Get('metadata')
   @ApiOperation({ summary: 'Get file metadata' })
-  @ApiParam({ name: 'key', description: 'File key' })
+  @ApiQuery({ name: 'key', description: 'File key', required: true })
   @ApiResponse({
     status: 200,
     description: 'File metadata retrieved successfully',
@@ -123,16 +123,16 @@ export class FilesController {
     description: 'Forbidden - insufficient permissions',
   })
   async getFileMetadata(
-    @Param('key') key: string,
+    @Query('key') key: string,
     @CurrentUser() user: JwtPayload,
     @TenantId() tenantId?: string
   ): Promise<FileMetadataResponseDto> {
     return this.fileService.getFile(key, user.sub, tenantId);
   }
 
-  @Get('download/:key')
+  @Get('download')
   @ApiOperation({ summary: 'Download a file' })
-  @ApiParam({ name: 'key', description: 'File key' })
+  @ApiQuery({ name: 'key', description: 'File key', required: true })
   @ApiResponse({
     status: 200,
     description: 'File downloaded successfully',
@@ -147,13 +147,13 @@ export class FilesController {
     description: 'Forbidden - insufficient permissions',
   })
   async downloadFile(
-    @Param('key') key: string,
-    @CurrentUser() user: User,
+    @Query('key') key: string,
+    @CurrentUser() user: JwtPayload,
     @Res() res: Response,
     @TenantId() tenantId?: string
   ): Promise<void> {
-    const file = await this.fileService.getFile(key, user.id, tenantId);
-    const buffer = await this.fileService.downloadFile(key, user.id, tenantId);
+    const file = await this.fileService.getFile(key, user.sub, tenantId);
+    const buffer = await this.fileService.downloadFile(key, user.sub, tenantId);
 
     res.set({
       'Content-Type': file.mimeType,
@@ -164,9 +164,9 @@ export class FilesController {
     res.send(buffer);
   }
 
-  @Get('stream/:key')
+  @Get('stream')
   @ApiOperation({ summary: 'Stream a file' })
-  @ApiParam({ name: 'key', description: 'File key' })
+  @ApiQuery({ name: 'key', description: 'File key', required: true })
   @ApiResponse({
     status: 200,
     description: 'File streamed successfully',
@@ -181,13 +181,17 @@ export class FilesController {
     description: 'Forbidden - insufficient permissions',
   })
   async streamFile(
-    @Param('key') key: string,
-    @CurrentUser() user: User,
+    @Query('key') key: string,
+    @CurrentUser() user: JwtPayload,
     @Res() res: Response,
     @TenantId() tenantId?: string
   ): Promise<void> {
-    const file = await this.fileService.getFile(key, user.id, tenantId);
-    const stream = await this.fileService.getFileStream(key, user.id, tenantId);
+    const file = await this.fileService.getFile(key, user.sub, tenantId);
+    const stream = await this.fileService.getFileStream(
+      key,
+      user.sub,
+      tenantId
+    );
 
     res.set({
       'Content-Type': file.mimeType,
@@ -230,10 +234,10 @@ export class FilesController {
   })
   async listFiles(
     @Query() query: FileQueryDto,
-    @CurrentUser() user: User,
+    @CurrentUser() user: JwtPayload,
     @TenantId() tenantId?: string
   ): Promise<FileListResponseDto> {
-    const result = await this.fileService.listFiles(query, user.id, tenantId);
+    const result = await this.fileService.listFiles(query, user.sub, tenantId);
 
     return {
       success: true,
@@ -242,9 +246,9 @@ export class FilesController {
     };
   }
 
-  @Delete(':key')
+  @Delete()
   @ApiOperation({ summary: 'Delete a file' })
-  @ApiParam({ name: 'key', description: 'File key' })
+  @ApiQuery({ name: 'key', description: 'File key', required: true })
   @ApiResponse({ status: 204, description: 'File deleted successfully' })
   @ApiResponse({ status: 404, description: 'File not found' })
   @ApiResponse({
@@ -253,11 +257,11 @@ export class FilesController {
   })
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteFile(
-    @Param('key') key: string,
-    @CurrentUser() user: User,
+    @Query('key') key: string,
+    @CurrentUser() user: JwtPayload,
     @TenantId() tenantId?: string
   ): Promise<void> {
-    await this.fileService.deleteFile(key, user.id, tenantId);
+    await this.fileService.deleteFile(key, user.sub, tenantId);
   }
 
   @Post('signed-url')
@@ -288,13 +292,13 @@ export class FilesController {
   })
   async getSignedUrl(
     @Body() body: { key: string; expiresIn?: number },
-    @CurrentUser() user: User,
+    @CurrentUser() user: JwtPayload,
     @TenantId() tenantId?: string
   ): Promise<FileSignedUrlResponseDto> {
     const signedUrl = await this.fileService.getSignedUrl(
       body.key,
       body.expiresIn,
-      user.id,
+      user.sub,
       tenantId
     );
     const expiresAt = new Date(Date.now() + (body.expiresIn || 3600) * 1000);
@@ -310,9 +314,9 @@ export class FilesController {
     };
   }
 
-  @Get('public-url/:key')
+  @Get('public-url')
   @ApiOperation({ summary: 'Get public URL for a file' })
-  @ApiParam({ name: 'key', description: 'File key' })
+  @ApiQuery({ name: 'key', description: 'File key', required: true })
   @ApiResponse({
     status: 200,
     description: 'Public URL retrieved successfully',
@@ -337,15 +341,15 @@ export class FilesController {
     description: 'Forbidden - insufficient permissions',
   })
   async getPublicUrl(
-    @Param('key') key: string,
-    @CurrentUser() user: User,
+    @Query('key') key: string,
+    @CurrentUser() user: JwtPayload,
     @TenantId() tenantId?: string
   ): Promise<{
     success: boolean;
     data: { publicUrl: string; key: string };
     message: string;
   }> {
-    const file = await this.fileService.getFile(key, user.id, tenantId);
+    const file = await this.fileService.getFile(key, user.sub, tenantId);
 
     return {
       success: true,
@@ -382,13 +386,13 @@ export class FilesController {
   })
   async copyFile(
     @Body() body: { sourceKey: string; destinationKey: string },
-    @CurrentUser() user: User,
+    @CurrentUser() user: JwtPayload,
     @TenantId() tenantId?: string
   ): Promise<FileCopyMoveResponseDto> {
     const fileData = await this.fileService.copyFile(
       body.sourceKey,
       body.destinationKey,
-      user.id,
+      user.sub,
       tenantId
     );
 
@@ -428,13 +432,13 @@ export class FilesController {
   })
   async moveFile(
     @Body() body: { sourceKey: string; destinationKey: string },
-    @CurrentUser() user: User,
+    @CurrentUser() user: JwtPayload,
     @TenantId() tenantId?: string
   ): Promise<FileCopyMoveResponseDto> {
     const fileData = await this.fileService.moveFile(
       body.sourceKey,
       body.destinationKey,
-      user.id,
+      user.sub,
       tenantId
     );
 
@@ -449,9 +453,9 @@ export class FilesController {
     };
   }
 
-  @Get('exists/:key')
+  @Get('exists')
   @ApiOperation({ summary: 'Check if a file exists' })
-  @ApiParam({ name: 'key', description: 'File key' })
+  @ApiQuery({ name: 'key', description: 'File key', required: true })
   @ApiResponse({
     status: 200,
     description: 'File existence checked successfully',
@@ -471,8 +475,8 @@ export class FilesController {
     },
   })
   async fileExists(
-    @Param('key') key: string,
-    @CurrentUser() user: User,
+    @Query('key') key: string,
+    @CurrentUser() user: JwtPayload,
     @TenantId() tenantId?: string
   ): Promise<{
     success: boolean;
@@ -480,7 +484,7 @@ export class FilesController {
     message: string;
   }> {
     try {
-      await this.fileService.getFile(key, user.id, tenantId);
+      await this.fileService.getFile(key, user.sub, tenantId);
       return {
         success: true,
         data: { exists: true, key },
@@ -577,7 +581,7 @@ export class FilesController {
     },
   })
   async getStorageStats(
-    @CurrentUser() user: User,
+    @CurrentUser() user: JwtPayload,
     @TenantId() tenantId?: string
   ): Promise<{ success: boolean; data: any; message: string }> {
     const stats = await this.fileService.getStorageStats(tenantId);

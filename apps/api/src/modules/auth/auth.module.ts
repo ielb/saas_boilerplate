@@ -39,8 +39,8 @@ import { UsersModule } from '../users/users.module';
 import { RBACModule } from '../rbac/rbac.module';
 import { AuditModule } from '../audit/audit.module';
 import { EmailModule } from '../email/email.module';
-import { FilesModule } from '../files/files.module';
 import { AuthJwtModule } from './jwt.module';
+
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Session, RefreshToken, Tenant]),
@@ -50,7 +50,6 @@ import { AuthJwtModule } from './jwt.module';
     RBACModule,
     AuditModule,
     EmailModule,
-    FilesModule,
   ],
   controllers: [AuthController, MfaController, SessionController],
   providers: [

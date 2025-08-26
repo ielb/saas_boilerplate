@@ -5212,9 +5212,15 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/files/download/{{fileKey}}",
+              "raw": "{{baseUrl}}/files/download?key={{fileKey}}",
               "host": ["{{baseUrl}}"],
-              "path": ["files", "download", "{{fileKey}}"]
+              "path": ["files", "download"],
+              "query": [
+                {
+                  "key": "key",
+                  "value": "{{fileKey}}"
+                }
+              ]
             }
           },
           "response": [],
@@ -5247,9 +5253,15 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/files/metadata/{{fileKey}}",
+              "raw": "{{baseUrl}}/files/metadata?key={{fileKey}}",
               "host": ["{{baseUrl}}"],
-              "path": ["files", "metadata", "{{fileKey}}"]
+              "path": ["files", "metadata"],
+              "query": [
+                {
+                  "key": "key",
+                  "value": "{{fileKey}}"
+                }
+              ]
             }
           },
           "response": [],
@@ -5286,9 +5298,15 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/files/stream/{{fileKey}}",
+              "raw": "{{baseUrl}}/files/stream?key={{fileKey}}",
               "host": ["{{baseUrl}}"],
-              "path": ["files", "stream", "{{fileKey}}"]
+              "path": ["files", "stream"],
+              "query": [
+                {
+                  "key": "key",
+                  "value": "{{fileKey}}"
+                }
+              ]
             }
           },
           "response": [],
@@ -5371,9 +5389,15 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/files/public-url/{{fileKey}}",
+              "raw": "{{baseUrl}}/files/public-url?key={{fileKey}}",
               "host": ["{{baseUrl}}"],
-              "path": ["files", "public-url", "{{fileKey}}"]
+              "path": ["files", "public-url"],
+              "query": [
+                {
+                  "key": "key",
+                  "value": "{{fileKey}}"
+                }
+              ]
             }
           },
           "response": [],
@@ -5558,9 +5582,15 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/files/exists/{{fileKey}}",
+              "raw": "{{baseUrl}}/files/exists?key={{fileKey}}",
               "host": ["{{baseUrl}}"],
-              "path": ["files", "exists", "{{fileKey}}"]
+              "path": ["files", "exists"],
+              "query": [
+                {
+                  "key": "key",
+                  "value": "{{fileKey}}"
+                }
+              ]
             }
           },
           "response": [],
@@ -5595,9 +5625,15 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/files/{{fileKey}}",
+              "raw": "{{baseUrl}}/files?key={{fileKey}}",
               "host": ["{{baseUrl}}"],
-              "path": ["files", "{{fileKey}}"]
+              "path": ["files"],
+              "query": [
+                {
+                  "key": "key",
+                  "value": "{{fileKey}}"
+                }
+              ]
             }
           },
           "response": [],
