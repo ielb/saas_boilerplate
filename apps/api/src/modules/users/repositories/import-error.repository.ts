@@ -1,17 +1,31 @@
-import { Injectable } from '@nestjs/common';
-import { DataSource } from 'typeorm';
+import { Injectable, Logger } from '@nestjs/common';
+import { DataSource, Repository } from 'typeorm';
 import { ImportError } from '../entities/import-error.entity';
-import { TenantScopedRepository } from '../../../common/repositories/tenant-scoped.repository';
+import { BulkImportJob } from '../entities/bulk-import-job.entity';
 import { PaginationDto } from '../../../common/dto/pagination.dto';
+import { getCurrentTenantId } from '../../../common/interceptors/tenant-scoping.interceptor';
 
 @Injectable()
-export class ImportErrorRepository extends TenantScopedRepository<ImportError> {
+export class ImportErrorRepository extends Repository<ImportError> {
+  private readonly logger = new Logger(ImportErrorRepository.name);
+
   constructor(private dataSource: DataSource) {
     super(ImportError, dataSource.manager);
   }
 
-  protected getTenantIdField(): string {
-    return 'jobId'; // Import errors are scoped by job, not tenant directly
+  /**
+   * Apply tenant scoping through job relationship
+   */
+  private applyTenantScope(queryBuilder: any): any {
+    const tenantId = getCurrentTenantId();
+    if (!tenantId) {
+      this.logger.warn('No tenant context available for query scoping');
+      return queryBuilder;
+    }
+
+    return queryBuilder
+      .leftJoin('error.job', 'job')
+      .andWhere('job.tenantId = :tenantId', { tenantId });
   }
 
   /**
@@ -23,14 +37,21 @@ export class ImportErrorRepository extends TenantScopedRepository<ImportError> {
   }
 
   /**
-   * Get errors for a specific job with pagination
+   * Get errors for a specific job with pagination and tenant scoping
    */
   async findErrorsByJobId(
     jobId: string,
     pagination: PaginationDto
   ): Promise<{ errors: ImportError[]; total: number }> {
+    const tenantId = getCurrentTenantId();
+    if (!tenantId) {
+      throw new Error('Tenant context required');
+    }
+
     const query = this.createQueryBuilder('error')
+      .leftJoin('error.job', 'job')
       .where('error.jobId = :jobId', { jobId })
+      .andWhere('job.tenantId = :tenantId', { tenantId })
       .orderBy('error.rowNumber', 'ASC')
       .addOrderBy('error.createdAt', 'ASC');
 
@@ -46,20 +67,31 @@ export class ImportErrorRepository extends TenantScopedRepository<ImportError> {
   }
 
   /**
-   * Get error summary for a job
+   * Get error summary for a job with tenant scoping
    */
   async getErrorSummary(jobId: string): Promise<{
     totalErrors: number;
     errorsByField: Record<string, number>;
     errorsByType: Record<string, number>;
   }> {
-    const totalErrors = await this.count({ where: { jobId } });
+    const tenantId = getCurrentTenantId();
+    if (!tenantId) {
+      throw new Error('Tenant context required');
+    }
+
+    const totalErrors = await this.createQueryBuilder('error')
+      .leftJoin('error.job', 'job')
+      .where('error.jobId = :jobId', { jobId })
+      .andWhere('job.tenantId = :tenantId', { tenantId })
+      .getCount();
 
     // Get errors by field
     const fieldStats = await this.createQueryBuilder('error')
+      .leftJoin('error.job', 'job')
       .select('error.fieldName', 'fieldName')
       .addSelect('COUNT(*)', 'count')
       .where('error.jobId = :jobId', { jobId })
+      .andWhere('job.tenantId = :tenantId', { tenantId })
       .andWhere('error.fieldName IS NOT NULL')
       .groupBy('error.fieldName')
       .getRawMany();
@@ -71,6 +103,7 @@ export class ImportErrorRepository extends TenantScopedRepository<ImportError> {
 
     // Get errors by type (based on error message patterns)
     const typeStats = await this.createQueryBuilder('error')
+      .leftJoin('error.job', 'job')
       .select(
         'CASE ' +
           "WHEN error.errorMessage LIKE '%email%' THEN 'email' " +
@@ -84,6 +117,7 @@ export class ImportErrorRepository extends TenantScopedRepository<ImportError> {
       )
       .addSelect('COUNT(*)', 'count')
       .where('error.jobId = :jobId', { jobId })
+      .andWhere('job.tenantId = :tenantId', { tenantId })
       .groupBy('errorType')
       .getRawMany();
 
@@ -100,7 +134,7 @@ export class ImportErrorRepository extends TenantScopedRepository<ImportError> {
   }
 
   /**
-   * Get most common errors for a job
+   * Get most common errors for a job with tenant scoping
    */
   async getMostCommonErrors(
     jobId: string,
@@ -112,10 +146,17 @@ export class ImportErrorRepository extends TenantScopedRepository<ImportError> {
       examples: string[];
     }[]
   > {
+    const tenantId = getCurrentTenantId();
+    if (!tenantId) {
+      throw new Error('Tenant context required');
+    }
+
     const commonErrors = await this.createQueryBuilder('error')
+      .leftJoin('error.job', 'job')
       .select('error.errorMessage', 'errorMessage')
       .addSelect('COUNT(*)', 'count')
       .where('error.jobId = :jobId', { jobId })
+      .andWhere('job.tenantId = :tenantId', { tenantId })
       .groupBy('error.errorMessage')
       .orderBy('count', 'DESC')
       .limit(limit)
@@ -125,8 +166,10 @@ export class ImportErrorRepository extends TenantScopedRepository<ImportError> {
     for (const error of commonErrors) {
       // Get example row numbers for this error
       const examples = await this.createQueryBuilder('error')
+        .leftJoin('error.job', 'job')
         .select('error.rowNumber', 'rowNumber')
         .where('error.jobId = :jobId', { jobId })
+        .andWhere('job.tenantId = :tenantId', { tenantId })
         .andWhere('error.errorMessage = :errorMessage', {
           errorMessage: error.errorMessage,
         })
@@ -145,36 +188,62 @@ export class ImportErrorRepository extends TenantScopedRepository<ImportError> {
   }
 
   /**
-   * Delete errors for a job
+   * Delete errors for a job with tenant scoping
    */
   async deleteErrorsByJobId(jobId: string): Promise<number> {
-    const result = await this.delete({ jobId });
+    const tenantId = getCurrentTenantId();
+    if (!tenantId) {
+      throw new Error('Tenant context required');
+    }
+
+    const result = await this.createQueryBuilder('error')
+      .leftJoin('error.job', 'job')
+      .delete()
+      .where('error.jobId = :jobId', { jobId })
+      .andWhere('job.tenantId = :tenantId', { tenantId })
+      .execute();
+
     return result.affected || 0;
   }
 
   /**
-   * Get errors by field name
+   * Get errors by field name with tenant scoping
    */
   async findErrorsByField(
     jobId: string,
     fieldName: string
   ): Promise<ImportError[]> {
-    return await this.find({
-      where: { jobId, fieldName },
-      order: { rowNumber: 'ASC' },
-    });
+    const tenantId = getCurrentTenantId();
+    if (!tenantId) {
+      throw new Error('Tenant context required');
+    }
+
+    return await this.createQueryBuilder('error')
+      .leftJoin('error.job', 'job')
+      .where('error.jobId = :jobId', { jobId })
+      .andWhere('job.tenantId = :tenantId', { tenantId })
+      .andWhere('error.fieldName = :fieldName', { fieldName })
+      .orderBy('error.rowNumber', 'ASC')
+      .getMany();
   }
 
   /**
-   * Get errors by row number range
+   * Get errors by row number range with tenant scoping
    */
   async findErrorsByRowRange(
     jobId: string,
     startRow: number,
     endRow: number
   ): Promise<ImportError[]> {
+    const tenantId = getCurrentTenantId();
+    if (!tenantId) {
+      throw new Error('Tenant context required');
+    }
+
     return await this.createQueryBuilder('error')
+      .leftJoin('error.job', 'job')
       .where('error.jobId = :jobId', { jobId })
+      .andWhere('job.tenantId = :tenantId', { tenantId })
       .andWhere('error.rowNumber >= :startRow', { startRow })
       .andWhere('error.rowNumber <= :endRow', { endRow })
       .orderBy('error.rowNumber', 'ASC')
@@ -182,13 +251,36 @@ export class ImportErrorRepository extends TenantScopedRepository<ImportError> {
   }
 
   /**
-   * Export errors to CSV format
+   * Count errors for a job with tenant scoping
+   */
+  async countErrorsByJobId(jobId: string): Promise<number> {
+    const tenantId = getCurrentTenantId();
+    if (!tenantId) {
+      throw new Error('Tenant context required');
+    }
+
+    return await this.createQueryBuilder('error')
+      .leftJoin('error.job', 'job')
+      .where('error.jobId = :jobId', { jobId })
+      .andWhere('job.tenantId = :tenantId', { tenantId })
+      .getCount();
+  }
+
+  /**
+   * Export errors to CSV format with tenant scoping
    */
   async exportErrorsToCsv(jobId: string): Promise<string> {
-    const errors = await this.find({
-      where: { jobId },
-      order: { rowNumber: 'ASC' },
-    });
+    const tenantId = getCurrentTenantId();
+    if (!tenantId) {
+      throw new Error('Tenant context required');
+    }
+
+    const errors = await this.createQueryBuilder('error')
+      .leftJoin('error.job', 'job')
+      .where('error.jobId = :jobId', { jobId })
+      .andWhere('job.tenantId = :tenantId', { tenantId })
+      .orderBy('error.rowNumber', 'ASC')
+      .getMany();
 
     const csvHeaders = [
       'Row Number',

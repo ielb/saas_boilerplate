@@ -250,7 +250,12 @@ export class BulkUsersImportService {
    * Get existing emails for duplicate checking
    */
   private async getExistingEmails(tenantId: string): Promise<Set<string>> {
-    const users = await this.userRepository.findWithTenantScope();
+    const users = await this.userRepository
+      .createQueryBuilder('user')
+      .select('user.email')
+      .where('user.tenantId = :tenantId', { tenantId })
+      .getMany();
+
     return new Set(users.map((user: any) => user.email.toLowerCase()));
   }
 
@@ -318,9 +323,8 @@ export class BulkUsersImportService {
       throw new BadRequestException('Import job not found');
     }
 
-    const errorCount = await this.importErrorRepository.count({
-      where: { jobId },
-    });
+    const errorCount =
+      await this.importErrorRepository.countErrorsByJobId(jobId);
 
     const result: ImportProgressDto = {
       jobId: job.id,
