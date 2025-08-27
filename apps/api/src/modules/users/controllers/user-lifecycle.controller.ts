@@ -45,7 +45,7 @@ import {
 } from '../../rbac/entities/permission.entity';
 
 @ApiTags('User Lifecycle Management')
-@Controller('users')
+@Controller('users/lifecycle')
 @UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
 @UseInterceptors(ClassSerializerInterceptor, TenantContextInterceptor)
 @ApiBearerAuth()
@@ -87,6 +87,146 @@ export class UserLifecycleController {
     });
 
     return this.mapUserToResponseDto(user);
+  }
+
+  @Post('activate')
+  @HttpCode(HttpStatus.OK)
+  @Roles(UserRole.ADMIN, UserRole.OWNER)
+  @RequirePermissions({
+    resource: PermissionResource.USERS,
+    action: PermissionAction.UPDATE,
+  })
+  @ApiOperation({
+    summary: 'Bulk activate users',
+    description: 'Activate multiple users at once',
+  })
+  @ApiBody({ type: BulkUserOperationDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Bulk activation completed',
+    type: BulkUserOperationResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - Invalid user IDs',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Insufficient permissions',
+  })
+  async bulkActivateUsers(
+    @Body() bulkOperationDto: BulkUserOperationDto
+  ): Promise<BulkUserOperationResponseDto> {
+    return this.performBulkOperation(
+      bulkOperationDto,
+      'activate',
+      'user.bulk_activated_by_admin'
+    );
+  }
+
+  @Post('suspend')
+  @HttpCode(HttpStatus.OK)
+  @Roles(UserRole.ADMIN, UserRole.OWNER)
+  @RequirePermissions({
+    resource: PermissionResource.USERS,
+    action: PermissionAction.UPDATE,
+  })
+  @ApiOperation({
+    summary: 'Bulk suspend users',
+    description: 'Suspend multiple users at once',
+  })
+  @ApiBody({ type: BulkUserOperationDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Bulk suspension completed',
+    type: BulkUserOperationResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - Invalid user IDs',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Insufficient permissions',
+  })
+  async bulkSuspendUsers(
+    @Body() bulkOperationDto: BulkUserOperationDto
+  ): Promise<BulkUserOperationResponseDto> {
+    return this.performBulkOperation(
+      bulkOperationDto,
+      'suspend',
+      'user.bulk_suspended_by_admin'
+    );
+  }
+
+  @Post('reactivate')
+  @HttpCode(HttpStatus.OK)
+  @Roles(UserRole.ADMIN, UserRole.OWNER)
+  @RequirePermissions({
+    resource: PermissionResource.USERS,
+    action: PermissionAction.UPDATE,
+  })
+  @ApiOperation({
+    summary: 'Bulk reactivate users',
+    description: 'Reactivate multiple suspended users at once',
+  })
+  @ApiBody({ type: BulkUserOperationDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Bulk reactivation completed',
+    type: BulkUserOperationResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - Invalid user IDs',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Insufficient permissions',
+  })
+  async bulkReactivateUsers(
+    @Body() bulkOperationDto: BulkUserOperationDto
+  ): Promise<BulkUserOperationResponseDto> {
+    return this.performBulkOperation(
+      bulkOperationDto,
+      'reactivate',
+      'user.bulk_reactivated_by_admin'
+    );
+  }
+
+  @Post('delete')
+  @HttpCode(HttpStatus.OK)
+  @Roles(UserRole.ADMIN, UserRole.OWNER)
+  @RequirePermissions({
+    resource: PermissionResource.USERS,
+    action: PermissionAction.DELETE,
+  })
+  @ApiOperation({
+    summary: 'Bulk delete users',
+    description: 'Delete multiple users at once (cannot delete tenant owners)',
+  })
+  @ApiBody({ type: BulkUserOperationDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Bulk deletion completed',
+    type: BulkUserOperationResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - Invalid user IDs',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Insufficient permissions',
+  })
+  async bulkDeleteUsers(
+    @Body() bulkOperationDto: BulkUserOperationDto
+  ): Promise<BulkUserOperationResponseDto> {
+    return this.performBulkOperation(
+      bulkOperationDto,
+      'delete',
+      'user.bulk_deleted_by_admin'
+    );
   }
 
   @Put(':id/activate')
@@ -313,146 +453,6 @@ export class UserLifecycleController {
       isDeleted: lifecycleInfo.isDeleted,
       suspensionInfo: lifecycleInfo.suspensionInfo,
     } as UserLifecycleInfoResponseDto;
-  }
-
-  @Post('bulk/activate')
-  @HttpCode(HttpStatus.OK)
-  @Roles(UserRole.ADMIN, UserRole.OWNER)
-  @RequirePermissions({
-    resource: PermissionResource.USERS,
-    action: PermissionAction.UPDATE,
-  })
-  @ApiOperation({
-    summary: 'Bulk activate users',
-    description: 'Activate multiple users at once',
-  })
-  @ApiBody({ type: BulkUserOperationDto })
-  @ApiResponse({
-    status: 200,
-    description: 'Bulk activation completed',
-    type: BulkUserOperationResponseDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Bad request - Invalid user IDs',
-  })
-  @ApiResponse({
-    status: 403,
-    description: 'Forbidden - Insufficient permissions',
-  })
-  async bulkActivateUsers(
-    @Body() bulkOperationDto: BulkUserOperationDto
-  ): Promise<BulkUserOperationResponseDto> {
-    return this.performBulkOperation(
-      bulkOperationDto,
-      'activate',
-      'user.bulk_activated_by_admin'
-    );
-  }
-
-  @Post('bulk/suspend')
-  @HttpCode(HttpStatus.OK)
-  @Roles(UserRole.ADMIN, UserRole.OWNER)
-  @RequirePermissions({
-    resource: PermissionResource.USERS,
-    action: PermissionAction.UPDATE,
-  })
-  @ApiOperation({
-    summary: 'Bulk suspend users',
-    description: 'Suspend multiple users at once',
-  })
-  @ApiBody({ type: BulkUserOperationDto })
-  @ApiResponse({
-    status: 200,
-    description: 'Bulk suspension completed',
-    type: BulkUserOperationResponseDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Bad request - Invalid user IDs',
-  })
-  @ApiResponse({
-    status: 403,
-    description: 'Forbidden - Insufficient permissions',
-  })
-  async bulkSuspendUsers(
-    @Body() bulkOperationDto: BulkUserOperationDto
-  ): Promise<BulkUserOperationResponseDto> {
-    return this.performBulkOperation(
-      bulkOperationDto,
-      'suspend',
-      'user.bulk_suspended_by_admin'
-    );
-  }
-
-  @Post('bulk/reactivate')
-  @HttpCode(HttpStatus.OK)
-  @Roles(UserRole.ADMIN, UserRole.OWNER)
-  @RequirePermissions({
-    resource: PermissionResource.USERS,
-    action: PermissionAction.UPDATE,
-  })
-  @ApiOperation({
-    summary: 'Bulk reactivate users',
-    description: 'Reactivate multiple suspended users at once',
-  })
-  @ApiBody({ type: BulkUserOperationDto })
-  @ApiResponse({
-    status: 200,
-    description: 'Bulk reactivation completed',
-    type: BulkUserOperationResponseDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Bad request - Invalid user IDs',
-  })
-  @ApiResponse({
-    status: 403,
-    description: 'Forbidden - Insufficient permissions',
-  })
-  async bulkReactivateUsers(
-    @Body() bulkOperationDto: BulkUserOperationDto
-  ): Promise<BulkUserOperationResponseDto> {
-    return this.performBulkOperation(
-      bulkOperationDto,
-      'reactivate',
-      'user.bulk_reactivated_by_admin'
-    );
-  }
-
-  @Post('bulk/delete')
-  @HttpCode(HttpStatus.OK)
-  @Roles(UserRole.ADMIN, UserRole.OWNER)
-  @RequirePermissions({
-    resource: PermissionResource.USERS,
-    action: PermissionAction.DELETE,
-  })
-  @ApiOperation({
-    summary: 'Bulk delete users',
-    description: 'Delete multiple users at once (cannot delete tenant owners)',
-  })
-  @ApiBody({ type: BulkUserOperationDto })
-  @ApiResponse({
-    status: 200,
-    description: 'Bulk deletion completed',
-    type: BulkUserOperationResponseDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Bad request - Invalid user IDs',
-  })
-  @ApiResponse({
-    status: 403,
-    description: 'Forbidden - Insufficient permissions',
-  })
-  async bulkDeleteUsers(
-    @Body() bulkOperationDto: BulkUserOperationDto
-  ): Promise<BulkUserOperationResponseDto> {
-    return this.performBulkOperation(
-      bulkOperationDto,
-      'delete',
-      'user.bulk_deleted_by_admin'
-    );
   }
 
   /**

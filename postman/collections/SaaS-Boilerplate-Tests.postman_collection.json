@@ -4367,9 +4367,9 @@
                   "raw": "{\n  \"skipEmailVerification\": false,\n  \"auditEvent\": \"user.activated_by_admin\"\n}"
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/users/{{newUserId}}/activate",
+                  "raw": "{{baseUrl}}/users/lifecycle/{{newUserId}}/activate",
                   "host": ["{{baseUrl}}"],
-                  "path": ["users", "{{newUserId}}", "activate"]
+                  "path": ["users", "lifecycle", "{{newUserId}}", "activate"]
                 }
               },
               "response": [],
@@ -4416,9 +4416,9 @@
                   "raw": "{\n  \"skipEmailVerification\": false\n}"
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/users/{{userId}}/activate",
+                  "raw": "{{baseUrl}}/users/lifecycle/{{userId}}/activate",
                   "host": ["{{baseUrl}}"],
-                  "path": ["users", "{{userId}}", "activate"]
+                  "path": ["users", "lifecycle", "{{userId}}", "activate"]
                 }
               },
               "response": [],
@@ -4465,9 +4465,9 @@
                   "raw": "{\n  \"reason\": \"Violation of terms of service\",\n  \"duration\": 30,\n  \"auditEvent\": \"user.suspended_by_admin\"\n}"
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/users/{{userId}}/suspend",
+                  "raw": "{{baseUrl}}/users/lifecycle/{{userId}}/suspend",
                   "host": ["{{baseUrl}}"],
-                  "path": ["users", "{{userId}}", "suspend"]
+                  "path": ["users", "lifecycle", "{{userId}}", "suspend"]
                 }
               },
               "response": [],
@@ -4513,9 +4513,9 @@
                   "raw": "{\n  \"reason\": \"Security violation\",\n  \"auditEvent\": \"user.suspended_indefinitely\"\n}"
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/users/{{newUserId}}/suspend",
+                  "raw": "{{baseUrl}}/users/lifecycle/{{newUserId}}/suspend",
                   "host": ["{{baseUrl}}"],
-                  "path": ["users", "{{newUserId}}", "suspend"]
+                  "path": ["users", "lifecycle", "{{newUserId}}", "suspend"]
                 }
               },
               "response": [],
@@ -4562,9 +4562,9 @@
                   "raw": "{\n  \"auditEvent\": \"user.reactivated_by_admin\"\n}"
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/users/{{newUserId}}/reactivate",
+                  "raw": "{{baseUrl}}/users/lifecycle/{{newUserId}}/reactivate",
                   "host": ["{{baseUrl}}"],
-                  "path": ["users", "{{newUserId}}", "reactivate"]
+                  "path": ["users", "lifecycle", "{{newUserId}}", "reactivate"]
                 }
               },
               "response": [],
@@ -4747,9 +4747,9 @@
                   "raw": "{\n  \"userIds\": [\"{{userId}}\"],\n  \"auditEvent\": \"users.bulk_activated_by_admin\"\n}"
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/users/bulk/activate",
+                  "raw": "{{baseUrl}}/users/lifecycle/activate",
                   "host": ["{{baseUrl}}"],
-                  "path": ["users", "bulk", "activate"]
+                  "path": ["users", "lifecycle", "activate"]
                 }
               },
               "response": [],
@@ -4798,9 +4798,9 @@
                   "raw": "{\n  \"userIds\": [\"{{userId}}\"],\n  \"auditEvent\": \"users.bulk_suspended_by_admin\"\n}"
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/users/bulk/suspend",
+                  "raw": "{{baseUrl}}/users/lifecycle/suspend",
                   "host": ["{{baseUrl}}"],
-                  "path": ["users", "bulk", "suspend"]
+                  "path": ["users", "lifecycle", "suspend"]
                 }
               },
               "response": [],
@@ -4847,9 +4847,9 @@
                   "raw": "{\n  \"userIds\": [\"{{userId}}\"],\n  \"auditEvent\": \"users.bulk_reactivated_by_admin\"\n}"
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/users/bulk/reactivate",
+                  "raw": "{{baseUrl}}/users/lifecycle/reactivate",
                   "host": ["{{baseUrl}}"],
-                  "path": ["users", "bulk", "reactivate"]
+                  "path": ["users", "lifecycle", "reactivate"]
                 }
               },
               "response": [],
@@ -4896,9 +4896,9 @@
                   "raw": "{\n  \"userIds\": [\"{{userId}}\"],\n  \"auditEvent\": \"users.bulk_deleted_by_admin\"\n}"
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/users/bulk/delete",
+                  "raw": "{{baseUrl}}/users/lifecycle/delete",
                   "host": ["{{baseUrl}}"],
-                  "path": ["users", "bulk", "delete"]
+                  "path": ["users", "lifecycle", "delete"]
                 }
               },
               "response": [],

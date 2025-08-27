@@ -101,6 +101,11 @@
       "type": "string"
     },
     {
+      "key": "importJobId",
+      "value": "",
+      "type": "string"
+    },
+    {
       "key": "teamMembershipId",
       "value": "",
       "type": "string"
@@ -4642,9 +4647,9 @@
                   "raw": "{\n  \"skipEmailVerification\": false,\n  \"auditEvent\": \"user.activated_by_admin\"\n}"
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/users/{{newUserId}}/activate",
+                  "raw": "{{baseUrl}}/users/lifecycle/{{newUserId}}/activate",
                   "host": ["{{baseUrl}}"],
-                  "path": ["users", "{{newUserId}}", "activate"]
+                  "path": ["users", "lifecycle", "{{newUserId}}", "activate"]
                 }
               },
               "response": [],
@@ -4687,9 +4692,9 @@
                   "raw": "{\n  \"skipEmailVerification\": false\n}"
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/users/{{userId}}/activate",
+                  "raw": "{{baseUrl}}/users/lifecycle/{{userId}}/activate",
                   "host": ["{{baseUrl}}"],
-                  "path": ["users", "{{userId}}", "activate"]
+                  "path": ["users", "lifecycle", "{{userId}}", "activate"]
                 }
               },
               "response": [],
@@ -4736,9 +4741,9 @@
                   "raw": "{\n  \"reason\": \"Violation of terms of service\",\n  \"duration\": 30,\n  \"auditEvent\": \"user.suspended_by_admin\"\n}"
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/users/{{userId}}/suspend",
+                  "raw": "{{baseUrl}}/users/lifecycle/{{userId}}/suspend",
                   "host": ["{{baseUrl}}"],
-                  "path": ["users", "{{userId}}", "suspend"]
+                  "path": ["users", "lifecycle", "{{userId}}", "suspend"]
                 }
               },
               "response": [],
@@ -4780,9 +4785,9 @@
                   "raw": "{\n  \"reason\": \"Security violation\",\n  \"auditEvent\": \"user.suspended_indefinitely\"\n}"
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/users/{{newUserId}}/suspend",
+                  "raw": "{{baseUrl}}/users/lifecycle/{{newUserId}}/suspend",
                   "host": ["{{baseUrl}}"],
-                  "path": ["users", "{{newUserId}}", "suspend"]
+                  "path": ["users", "lifecycle", "{{newUserId}}", "suspend"]
                 }
               },
               "response": [],
@@ -4829,9 +4834,9 @@
                   "raw": "{\n  \"auditEvent\": \"user.reactivated_by_admin\"\n}"
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/users/{{newUserId}}/reactivate",
+                  "raw": "{{baseUrl}}/users/lifecycle/{{newUserId}}/reactivate",
                   "host": ["{{baseUrl}}"],
-                  "path": ["users", "{{newUserId}}", "reactivate"]
+                  "path": ["users", "lifecycle", "{{newUserId}}", "reactivate"]
                 }
               },
               "response": [],
@@ -4966,9 +4971,9 @@
                   "raw": "{\n  \"userIds\": [\"{{userId}}\"],\n  \"auditEvent\": \"users.bulk_activated_by_admin\"\n}"
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/users/bulk/activate",
+                  "raw": "{{baseUrl}}/users/lifecycle/activate",
                   "host": ["{{baseUrl}}"],
-                  "path": ["users", "bulk", "activate"]
+                  "path": ["users", "lifecycle", "activate"]
                 }
               },
               "response": [],
@@ -5013,9 +5018,9 @@
                   "raw": "{\n  \"userIds\": [\"{{userId}}\"],\n  \"auditEvent\": \"users.bulk_suspended_by_admin\"\n}"
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/users/bulk/suspend",
+                  "raw": "{{baseUrl}}/users/lifecycle/suspend",
                   "host": ["{{baseUrl}}"],
-                  "path": ["users", "bulk", "suspend"]
+                  "path": ["users", "lifecycle", "suspend"]
                 }
               },
               "response": [],
@@ -5058,9 +5063,9 @@
                   "raw": "{\n  \"userIds\": [\"{{userId}}\"],\n  \"auditEvent\": \"users.bulk_reactivated_by_admin\"\n}"
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/users/bulk/reactivate",
+                  "raw": "{{baseUrl}}/users/lifecycle/reactivate",
                   "host": ["{{baseUrl}}"],
-                  "path": ["users", "bulk", "reactivate"]
+                  "path": ["users", "lifecycle", "reactivate"]
                 }
               },
               "response": [],
@@ -5103,9 +5108,9 @@
                   "raw": "{\n  \"userIds\": [\"{{userId}}\"],\n  \"auditEvent\": \"users.bulk_deleted_by_admin\"\n}"
                 },
                 "url": {
-                  "raw": "{{baseUrl}}/users/bulk/delete",
+                  "raw": "{{baseUrl}}/users/lifecycle/delete",
                   "host": ["{{baseUrl}}"],
-                  "path": ["users", "bulk", "delete"]
+                  "path": ["users", "lifecycle", "delete"]
                 }
               },
               "response": [],
@@ -5126,6 +5131,818 @@
                     ],
                     "type": "text/javascript"
                   }
+                }
+              ]
+            },
+            {
+              "name": "Bulk Import Operations",
+              "item": [
+                {
+                  "name": "Upload and Start Import",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "multipart/form-data"
+                      },
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{accessToken}}"
+                      }
+                    ],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "file",
+                          "type": "file",
+                          "src": []
+                        },
+                        {
+                          "key": "options",
+                          "value": "{\n  \"mapping\": {\n    \"email\": \"Email\",\n    \"firstName\": \"First Name\",\n    \"lastName\": \"Last Name\",\n    \"role\": \"Role\",\n    \"phone\": \"Phone\",\n    \"status\": \"Status\",\n    \"team\": \"Team\"\n  },\n  \"validationRules\": {\n    \"skipHeaderRow\": true,\n    \"maxRecords\": 1000,\n    \"allowDuplicateEmails\": false\n  }\n}",
+                          "type": "text"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/users/bulk/import",
+                      "host": ["{{baseUrl}}"],
+                      "path": ["users", "bulk", "import"]
+                    }
+                  },
+                  "response": [],
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          "pm.test('Status code is 201', function () {",
+                          "    pm.response.to.have.status(201);",
+                          "});",
+                          "",
+                          "pm.test('Response has required fields', function () {",
+                          "    const response = pm.response.json();",
+                          "    pm.expect(response).to.have.property('success');",
+                          "    pm.expect(response).to.have.property('data');",
+                          "    pm.expect(response.data).to.have.property('id');",
+                          "    pm.expect(response.data).to.have.property('status');",
+                          "});",
+                          "",
+                          "pm.test('Job is created successfully', function () {",
+                          "    const response = pm.response.json();",
+                          "    pm.expect(response.success).to.be.true;",
+                          "    pm.expect(response.data.status).to.be.oneOf(['pending', 'processing']);",
+                          "});",
+                          "",
+                          "// Store job ID for subsequent requests",
+                          "if (pm.response.code === 201) {",
+                          "    const response = pm.response.json();",
+                          "    pm.collectionVariables.set('importJobId', response.data.jobId);",
+                          "}"
+                        ],
+                        "type": "text/javascript"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "name": "Get Import Progress",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{accessToken}}"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/users/bulk/import/{{importJobId}}/progress",
+                      "host": ["{{baseUrl}}"],
+                      "path": [
+                        "users",
+                        "bulk",
+                        "import",
+                        "{{importJobId}}",
+                        "progress"
+                      ]
+                    }
+                  },
+                  "response": [],
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          "pm.test('Status code is 200', function () {",
+                          "    pm.response.to.have.status(200);",
+                          "});",
+                          "",
+                          "pm.test('Progress data is correct', function () {",
+                          "    const response = pm.response.json();",
+                          "    pm.expect(response).to.have.property('jobId');",
+                          "    pm.expect(response).to.have.property('status');",
+                          "    pm.expect(response).to.have.property('progress');",
+                          "    pm.expect(response.progress).to.have.property('total');",
+                          "    pm.expect(response.progress).to.have.property('processed');",
+                          "    pm.expect(response.progress).to.have.property('successful');",
+                          "    pm.expect(response.progress).to.have.property('failed');",
+                          "    pm.expect(response.progress).to.have.property('percentage');",
+                          "});",
+                          "",
+                          "pm.test('Progress values are valid', function () {",
+                          "    const response = pm.response.json();",
+                          "    pm.expect(response.progress.total).to.be.at.least(0);",
+                          "    pm.expect(response.progress.processed).to.be.at.least(0);",
+                          "    pm.expect(response.progress.successful).to.be.at.least(0);",
+                          "    pm.expect(response.progress.failed).to.be.at.least(0);",
+                          "    pm.expect(response.progress.percentage).to.be.at.least(0);",
+                          "    pm.expect(response.progress.percentage).to.be.at.most(100);",
+                          "});"
+                        ],
+                        "type": "text/javascript"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "name": "Get Import Errors",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{accessToken}}"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/users/bulk/import/{{importJobId}}/errors?page=1&limit=10",
+                      "host": ["{{baseUrl}}"],
+                      "path": [
+                        "users",
+                        "bulk",
+                        "import",
+                        "{{importJobId}}",
+                        "errors"
+                      ],
+                      "query": [
+                        {
+                          "key": "page",
+                          "value": "1"
+                        },
+                        {
+                          "key": "limit",
+                          "value": "10"
+                        }
+                      ]
+                    }
+                  },
+                  "response": [],
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          "pm.test('Status code is 200', function () {",
+                          "    pm.response.to.have.status(200);",
+                          "});",
+                          "",
+                          "pm.test('Errors response structure', function () {",
+                          "    const response = pm.response.json();",
+                          "    pm.expect(response).to.have.property('success');",
+                          "    pm.expect(response).to.have.property('data');",
+                          "    pm.expect(response.data).to.have.property('errors');",
+                          "    pm.expect(response.data).to.have.property('total');",
+                          "    pm.expect(response.data).to.have.property('pagination');",
+                          "});",
+                          "",
+                          "pm.test('Errors array structure', function () {",
+                          "    const response = pm.response.json();",
+                          "    if (response.data.errors.length > 0) {",
+                          "        const error = response.data.errors[0];",
+                          "        pm.expect(error).to.have.property('id');",
+                          "        pm.expect(error).to.have.property('rowNumber');",
+                          "        pm.expect(error).to.have.property('errorMessage');",
+                          "        pm.expect(error).to.have.property('createdAt');",
+                          "    }",
+                          "});"
+                        ],
+                        "type": "text/javascript"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "name": "Get Import Error Summary",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{accessToken}}"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/users/bulk/import/{{importJobId}}/errors/summary",
+                      "host": ["{{baseUrl}}"],
+                      "path": [
+                        "users",
+                        "bulk-import",
+                        "{{importJobId}}",
+                        "errors",
+                        "summary"
+                      ]
+                    }
+                  },
+                  "response": [],
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          "pm.test('Status code is 200', function () {",
+                          "    pm.response.to.have.status(200);",
+                          "});",
+                          "",
+                          "pm.test('Summary response structure', function () {",
+                          "    const response = pm.response.json();",
+                          "    pm.expect(response).to.have.property('success');",
+                          "    pm.expect(response).to.have.property('data');",
+                          "    pm.expect(response.data).to.have.property('totalErrors');",
+                          "    pm.expect(response.data).to.have.property('errorTypes');",
+                          "    pm.expect(response.data).to.have.property('commonErrors');",
+                          "});"
+                        ],
+                        "type": "text/javascript"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "name": "Export Import Errors to CSV",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{accessToken}}"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/users/bulk/import/{{importJobId}}/errors/export",
+                      "host": ["{{baseUrl}}"],
+                      "path": [
+                        "users",
+                        "bulk-import",
+                        "{{importJobId}}",
+                        "errors",
+                        "export"
+                      ]
+                    }
+                  },
+                  "response": [],
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          "pm.test('Status code is 200', function () {",
+                          "    pm.response.to.have.status(200);",
+                          "});",
+                          "",
+                          "pm.test('CSV content type', function () {",
+                          "    pm.expect(pm.response.headers.get('Content-Type')).to.include('text/csv');",
+                          "});",
+                          "",
+                          "pm.test('File download header', function () {",
+                          "    pm.expect(pm.response.headers.get('Content-Disposition')).to.include('attachment');",
+                          "});",
+                          "",
+                          "pm.test('Response body is not empty', function () {",
+                          "    pm.expect(pm.response.text()).to.not.be.empty;",
+                          "});"
+                        ],
+                        "type": "text/javascript"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "name": "Cancel Import Job",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{accessToken}}"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/users/bulk/import/{{importJobId}}/cancel",
+                      "host": ["{{baseUrl}}"],
+                      "path": [
+                        "users",
+                        "bulk-import",
+                        "{{importJobId}}",
+                        "cancel"
+                      ]
+                    }
+                  },
+                  "response": [],
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          "pm.test('Status code is 200', function () {",
+                          "    pm.response.to.have.status(200);",
+                          "});",
+                          "",
+                          "pm.test('Cancel response', function () {",
+                          "    const response = pm.response.json();",
+                          "    pm.expect(response).to.have.property('success');",
+                          "    pm.expect(response.success).to.be.true;",
+                          "});"
+                        ],
+                        "type": "text/javascript"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "name": "Retry Failed Import Job",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{accessToken}}"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/users/bulk/import/{{importJobId}}/retry",
+                      "host": ["{{baseUrl}}"],
+                      "path": [
+                        "users",
+                        "bulk-import",
+                        "{{importJobId}}",
+                        "retry"
+                      ]
+                    }
+                  },
+                  "response": [],
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          "pm.test('Status code is 200', function () {",
+                          "    pm.response.to.have.status(200);",
+                          "});",
+                          "",
+                          "pm.test('Retry response', function () {",
+                          "    const response = pm.response.json();",
+                          "    pm.expect(response).to.have.property('success');",
+                          "    pm.expect(response.success).to.be.true;",
+                          "    pm.expect(response).to.have.property('data');",
+                          "});"
+                        ],
+                        "type": "text/javascript"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "name": "Get Recent Import Jobs",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{accessToken}}"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/users/bulk/import/jobs/recent?limit=5",
+                      "host": ["{{baseUrl}}"],
+                      "path": ["users", "bulk", "import", "jobs", "recent"],
+                      "query": [
+                        {
+                          "key": "limit",
+                          "value": "5"
+                        }
+                      ]
+                    }
+                  },
+                  "response": [],
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          "pm.test('Status code is 200', function () {",
+                          "    pm.response.to.have.status(200);",
+                          "});",
+                          "",
+                          "pm.test('Recent jobs response', function () {",
+                          "    const response = pm.response.json();",
+                          "    pm.expect(response).to.have.property('success');",
+                          "    pm.expect(response).to.have.property('data');",
+                          "    pm.expect(response.data).to.be.an('array');",
+                          "});"
+                        ],
+                        "type": "text/javascript"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "name": "Get Import Job Statistics",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{accessToken}}"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/users/bulk/import/jobs/statistics",
+                      "host": ["{{baseUrl}}"],
+                      "path": ["users", "bulk", "import", "jobs", "statistics"]
+                    }
+                  },
+                  "response": [],
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          "pm.test('Status code is 200', function () {",
+                          "    pm.response.to.have.status(200);",
+                          "});",
+                          "",
+                          "pm.test('Statistics response', function () {",
+                          "    const response = pm.response.json();",
+                          "    pm.expect(response).to.have.property('success');",
+                          "    pm.expect(response).to.have.property('data');",
+                          "    pm.expect(response.data).to.have.property('totalJobs');",
+                          "    pm.expect(response.data).to.have.property('completedJobs');",
+                          "    pm.expect(response.data).to.have.property('failedJobs');",
+                          "    pm.expect(response.data).to.have.property('pendingJobs');",
+                          "});"
+                        ],
+                        "type": "text/javascript"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "name": "Validate Import File",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "multipart/form-data"
+                      },
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{accessToken}}"
+                      }
+                    ],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "file",
+                          "type": "file",
+                          "src": []
+                        },
+                        {
+                          "key": "options",
+                          "value": "{\n  \"mapping\": {\n    \"email\": \"Email\",\n    \"firstName\": \"First Name\",\n    \"lastName\": \"Last Name\",\n    \"role\": \"Role\"\n  },\n  \"validationRules\": {\n    \"skipHeaderRow\": true,\n    \"maxRecords\": 1000\n  }\n}",
+                          "type": "text"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/users/bulk/import/validate",
+                      "host": ["{{baseUrl}}"],
+                      "path": ["users", "bulk", "import", "validate"]
+                    }
+                  },
+                  "response": [],
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          "pm.test('Status code is 200', function () {",
+                          "    pm.response.to.have.status(200);",
+                          "});",
+                          "",
+                          "pm.test('Validation response', function () {",
+                          "    const response = pm.response.json();",
+                          "    pm.expect(response).to.have.property('success');",
+                          "    pm.expect(response).to.have.property('data');",
+                          "    pm.expect(response.data).to.have.property('isValid');",
+                          "    pm.expect(response.data).to.have.property('errors');",
+                          "    pm.expect(response.data).to.have.property('warnings');",
+                          "    pm.expect(response.data).to.have.property('suggestedMapping');",
+                          "});"
+                        ],
+                        "type": "text/javascript"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Bulk Export Operations",
+              "item": [
+                {
+                  "name": "Export Users to CSV",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{accessToken}}"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/users/bulk/export?format=csv&fields=email,firstName,lastName,role,status&role=user&status=active",
+                      "host": ["{{baseUrl}}"],
+                      "path": ["users", "bulk", "export"],
+                      "query": [
+                        {
+                          "key": "format",
+                          "value": "csv"
+                        },
+                        {
+                          "key": "fields",
+                          "value": "email,firstName,lastName,role,status"
+                        },
+                        {
+                          "key": "role",
+                          "value": "user"
+                        },
+                        {
+                          "key": "status",
+                          "value": "active"
+                        }
+                      ]
+                    }
+                  },
+                  "response": [],
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          "pm.test('Status code is 200', function () {",
+                          "    pm.response.to.have.status(200);",
+                          "});",
+                          "",
+                          "pm.test('CSV content type', function () {",
+                          "    pm.expect(pm.response.headers.get('Content-Type')).to.include('text/csv');",
+                          "});",
+                          "",
+                          "pm.test('File download header', function () {",
+                          "    pm.expect(pm.response.headers.get('Content-Disposition')).to.include('attachment');",
+                          "    pm.expect(pm.response.headers.get('Content-Disposition')).to.include('.csv');",
+                          "});",
+                          "",
+                          "pm.test('Response body is not empty', function () {",
+                          "    pm.expect(pm.response.text()).to.not.be.empty;",
+                          "});"
+                        ],
+                        "type": "text/javascript"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "name": "Export Users to Excel",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{accessToken}}"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/users/bulk/export?format=xlsx&fields=email,firstName,lastName,role,status,createdAt&includeInactive=true",
+                      "host": ["{{baseUrl}}"],
+                      "path": ["users", "bulk", "export"],
+                      "query": [
+                        {
+                          "key": "format",
+                          "value": "xlsx"
+                        },
+                        {
+                          "key": "fields",
+                          "value": "email,firstName,lastName,role,status,createdAt"
+                        },
+                        {
+                          "key": "includeInactive",
+                          "value": "true"
+                        }
+                      ]
+                    }
+                  },
+                  "response": [],
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          "pm.test('Status code is 200', function () {",
+                          "    pm.response.to.have.status(200);",
+                          "});",
+                          "",
+                          "pm.test('Excel content type', function () {",
+                          "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');",
+                          "});",
+                          "",
+                          "pm.test('File download header', function () {",
+                          "    pm.expect(pm.response.headers.get('Content-Disposition')).to.include('attachment');",
+                          "    pm.expect(pm.response.headers.get('Content-Disposition')).to.include('.xlsx');",
+                          "});",
+                          "",
+                          "pm.test('Response body is not empty', function () {",
+                          "    pm.expect(pm.response.raw()).to.not.be.empty;",
+                          "});"
+                        ],
+                        "type": "text/javascript"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "name": "Generate Import Template",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{accessToken}}"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/users/bulk/export/template?fields=email,firstName,lastName,role,status,phone,team",
+                      "host": ["{{baseUrl}}"],
+                      "path": ["users", "bulk", "export", "template"],
+                      "query": [
+                        {
+                          "key": "fields",
+                          "value": "email,firstName,lastName,role,status,phone,team"
+                        }
+                      ]
+                    }
+                  },
+                  "response": [],
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          "pm.test('Status code is 200', function () {",
+                          "    pm.response.to.have.status(200);",
+                          "});",
+                          "",
+                          "pm.test('Template content type', function () {",
+                          "    pm.expect(pm.response.headers.get('Content-Type')).to.include('text/csv');",
+                          "});",
+                          "",
+                          "pm.test('Template download header', function () {",
+                          "    pm.expect(pm.response.headers.get('Content-Disposition')).to.include('attachment');",
+                          "    pm.expect(pm.response.headers.get('Content-Disposition')).to.include('template');",
+                          "});",
+                          "",
+                          "pm.test('Template contains headers', function () {",
+                          "    const csvContent = pm.response.text();",
+                          "    pm.expect(csvContent).to.include('Email');",
+                          "    pm.expect(csvContent).to.include('First Name');",
+                          "    pm.expect(csvContent).to.include('Last Name');",
+                          "});"
+                        ],
+                        "type": "text/javascript"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "name": "Get Export Statistics",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{accessToken}}"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/users/bulk/export/statistics?fields=email,firstName,lastName,role,status&role=user&status=active",
+                      "host": ["{{baseUrl}}"],
+                      "path": ["users", "bulk", "export", "statistics"],
+                      "query": [
+                        {
+                          "key": "fields",
+                          "value": "email,firstName,lastName,role,status"
+                        },
+                        {
+                          "key": "role",
+                          "value": "user"
+                        },
+                        {
+                          "key": "status",
+                          "value": "active"
+                        }
+                      ]
+                    }
+                  },
+                  "response": [],
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          "pm.test('Status code is 200', function () {",
+                          "    pm.response.to.have.status(200);",
+                          "});",
+                          "",
+                          "pm.test('Statistics response', function () {",
+                          "    const response = pm.response.json();",
+                          "    pm.expect(response).to.have.property('success');",
+                          "    pm.expect(response).to.have.property('data');",
+                          "    pm.expect(response.data).to.have.property('totalUsers');",
+                          "    pm.expect(response.data).to.have.property('filteredUsers');",
+                          "    pm.expect(response.data).to.have.property('exportSize');",
+                          "    pm.expect(response.data).to.have.property('estimatedTime');",
+                          "});",
+                          "",
+                          "pm.test('Statistics values are valid', function () {",
+                          "    const response = pm.response.json();",
+                          "    pm.expect(response.data.totalUsers).to.be.at.least(0);",
+                          "    pm.expect(response.data.filteredUsers).to.be.at.least(0);",
+                          "    pm.expect(response.data.exportSize).to.be.at.least(0);",
+                          "    pm.expect(response.data.estimatedTime).to.be.at.least(0);",
+                          "});"
+                        ],
+                        "type": "text/javascript"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Bulk Operations Dashboard",
+              "item": [
+                {
+                  "name": "Get Bulk Operations Dashboard",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Authorization",
+                        "value": "Bearer {{accessToken}}"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/users/bulk/dashboard",
+                      "host": ["{{baseUrl}}"],
+                      "path": ["users", "bulk", "dashboard"]
+                    }
+                  },
+                  "response": [],
+                  "event": [
+                    {
+                      "listen": "test",
+                      "script": {
+                        "exec": [
+                          "pm.test('Status code is 200', function () {",
+                          "    pm.response.to.have.status(200);",
+                          "});",
+                          "",
+                          "pm.test('Dashboard response', function () {",
+                          "    const response = pm.response.json();",
+                          "    pm.expect(response).to.have.property('success');",
+                          "    pm.expect(response).to.have.property('data');",
+                          "    pm.expect(response.data).to.have.property('jobStats');",
+                          "    pm.expect(response.data).to.have.property('recentJobs');",
+                          "    pm.expect(response.data).to.have.property('stuckJobsCount');",
+                          "});"
+                        ],
+                        "type": "text/javascript"
+                      }
+                    }
+                  ]
                 }
               ]
             }

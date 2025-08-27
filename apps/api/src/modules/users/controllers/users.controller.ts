@@ -61,16 +61,4 @@ export class UsersController {
   remove(@Param('id') id: string, @Tenant() tenantId: string) {
     return this.usersService.remove(id, tenantId);
   }
-
-  @Post(':id/activate')
-  @Roles(UserRole.ADMIN, UserRole.OWNER)
-  activate(@Param('id') id: string, @Tenant() tenantId: string) {
-    return this.usersService.activate(id, tenantId);
-  }
-
-  @Post(':id/deactivate')
-  @Roles(UserRole.ADMIN, UserRole.OWNER)
-  deactivate(@Param('id') id: string, @Tenant() tenantId: string) {
-    return this.usersService.deactivate(id, tenantId);
-  }
 }
