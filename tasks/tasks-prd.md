@@ -203,7 +203,15 @@ Based on PRD: `docs/prd.md`
   - [x] 3.9 Implement user profile management with avatar upload (#33)
   - [x] 3.10 Create team collaboration with role hierarchy (#34)
   - [x] 3.11 Implement invitation system with email notifications (#35)
-  - [ ] 3.12 Add bulk user import/export with CSV support (#36)
+  - [x] 3.12 Add bulk user import/export with CSV support (#36)
+    - [x] 3.12.1 Create database schema for bulk import jobs and import errors
+    - [x] 3.12.2 Create entities for bulk import jobs and import errors
+    - [x] 3.12.3 Create DTOs for bulk import/export operations
+    - [x] 3.12.4 Create CSV processing utilities (parser, validator, mapper)
+    - [x] 3.12.5 Create repositories for bulk import operations
+    - [x] 3.12.6 Create bulk import/export services
+    - [x] 3.12.7 Create bulk operations controller
+    - [x] 3.12.8 Fix TypeScript compilation errors and test implementation
   - [ ] 3.13 Create team switching and multi-team membership (#37)
   - [ ] 3.14 Implement access delegation and temporary permissions (#38)
   - [ ] 3.15 Set up tenant usage analytics and reporting (#39)
