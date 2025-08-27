@@ -19,17 +19,7 @@ import * as argon2 from 'argon2';
 import { v4 as uuidv4 } from 'uuid';
 
 // Import entities and enums
-import {
-  Permission,
-  PermissionResource,
-  PermissionAction,
-  PermissionScope,
-} from '../src/modules/users/repositories/entities/permission.entity';
-import {
-  Role,
-  RoleType,
-  RoleLevel,
-} from '../src/modules/users/repositories/entities/role.entity';
+
 import { User } from '../src/modules/users/entities/user.entity';
 import { Tenant } from '../src/modules/tenants/entities/tenant.entity';
 import { UserTenantMembership } from '../src/modules/tenants/entities/user-tenant-membership.entity';
@@ -39,6 +29,17 @@ import {
   MembershipStatus,
   UserRole,
 } from '@app/shared';
+import {
+  Permission,
+  PermissionAction,
+  PermissionResource,
+  PermissionScope,
+} from '../src/modules/rbac/entities/permission.entity';
+import {
+  Role,
+  RoleLevel,
+  RoleType,
+} from '../src/modules/rbac/entities/role.entity';
 
 // Database configuration
 const dataSource = new DataSource({

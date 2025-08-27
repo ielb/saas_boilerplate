@@ -7,6 +7,8 @@ import {
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
+import { UserStatus } from '@app/shared';
+
 
 export enum ExportFormat {
   CSV = 'csv',
@@ -47,8 +49,9 @@ export class BulkExportDto {
 
   @ApiProperty({ description: 'Filter by status', required: false })
   @IsOptional()
-  @IsString()
-  status?: string;
+  @IsEnum(UserStatus)
+  status?: UserStatus;
+
 
   @ApiProperty({
     description: 'Filter by creation date (after)',
