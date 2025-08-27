@@ -9,6 +9,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { UserStatus } from '@app/shared';
 
+
 export enum ExportFormat {
   CSV = 'csv',
   XLSX = 'xlsx',
@@ -50,6 +51,7 @@ export class BulkExportDto {
   @IsOptional()
   @IsEnum(UserStatus)
   status?: UserStatus;
+
 
   @ApiProperty({
     description: 'Filter by creation date (after)',

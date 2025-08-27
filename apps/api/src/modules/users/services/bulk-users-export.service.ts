@@ -365,9 +365,11 @@ export class BulkUsersExportService {
         createdBefore: new Date(filters.createdBefore),
       });
     }
+
     if (filters.status) {
       queryBuilder.andWhere('user.status = :status', {
         status: filters.status,
+
       });
     }
 
