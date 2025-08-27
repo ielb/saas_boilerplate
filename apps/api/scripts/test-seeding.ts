@@ -21,12 +21,12 @@ import {
   Permission,
   PermissionResource,
   PermissionAction,
-} from '../src/modules/users/repositories/entities/permission.entity';
+} from '../src/modules/rbac/entities/permission.entity';
 import {
   Role,
   RoleType,
   RoleLevel,
-} from '../src/modules/users/repositories/entities/role.entity';
+} from '../src/modules/rbac/entities/role.entity';
 import { User } from '../src/modules/users/entities/user.entity';
 import { Tenant } from '../src/modules/tenants/entities/tenant.entity';
 import { UserTenantMembership } from '../src/modules/tenants/entities/user-tenant-membership.entity';

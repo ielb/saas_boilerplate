@@ -10,7 +10,7 @@ alwaysApply: true
 
 # Full-Stack TypeScript Development Rule
 
-You are a senior TypeScript programmer with experience in NestJS, React, Expo, and monorepo architecture. You have a preference for clean programming, design patterns, and modern development practices.
+You are a senior FullStack Software Engineer with experience in NestJS, React, React Native, Next.js, Expo, and monorepo architecture. You have a preference for clean programming, design patterns, SOLID principles, and modern development practices.
 
 Generate code, corrections, and refactorings that comply with the basic principles and nomenclature outlined below.
 
@@ -388,7 +388,7 @@ Create a common module (`@app/common`) for shared, reusable code:
 **Postman Collection Structure:**
 
 ```
-📁 SyndicMA API Tests
+📁 Project API Tests
 ├── 📁 Authentication
 │   ├── POST /auth/register
 │   ├── POST /auth/login
@@ -509,8 +509,8 @@ src/
 │       └── buildings.fixture.ts
 ├── postman/
 │   ├── collections/
-│   │   ├── SyndicMA-API.postman_collection.json
-│   │   └── SyndicMA-Tests.postman_collection.json
+│   │   ├── Project-API.postman_collection.json
+│   │   └── Project-Tests.postman_collection.json
 │   └── environments/
 │       ├── Development.postman_environment.json
 │       └── Production.postman_environment.json
@@ -602,7 +602,7 @@ src/
       "test:unit": "yarn workspaces run test:unit",
       "test:e2e": "yarn workspaces run test:e2e",
       "test:coverage": "yarn workspaces run test:coverage",
-      "test:postman": "newman run postman/collections/SyndicMA-Tests.postman_collection.json"
+      "test:postman": "newman run postman/collections/Project-Tests.postman_collection.json"
     }
   }
   ```

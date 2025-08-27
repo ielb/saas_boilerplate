@@ -50,7 +50,7 @@ export class UsersService {
   async findOne(id: string, tenantId: string): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id: id, tenantId },
-      relations: ['profile', 'roles', 'teams'],
+      relations: ['roles', 'tenant'],
     });
 
     if (!user) {
@@ -63,7 +63,7 @@ export class UsersService {
   async findByEmail(email: string, tenantId: string): Promise<User | null> {
     return this.userRepository.findOne({
       where: { email, tenantId },
-      relations: ['profile', 'roles'],
+      relations: ['roles'],
     });
   }
 
