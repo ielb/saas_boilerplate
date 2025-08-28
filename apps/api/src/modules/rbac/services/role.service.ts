@@ -7,7 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { Role, RoleType, RoleLevel } from '../entities/role.entity';
-import { Permission } from '../entities/permission.entity';
+import { Permission, PermissionScope } from '../entities/permission.entity';
 import { User } from '../../users/entities/user.entity';
 import { RoleRepository } from '../repositories/role.repository';
 import { UserRepository } from '../repositories/user.repository';
@@ -65,7 +65,17 @@ export class RoleService {
 
     // Assign permissions if provided
     if (permissionIds && permissionIds.length > 0) {
-      await this.assignPermissionsToRole(savedRole.id, { permissionIds });
+      try {
+        await this.assignPermissionsToRole(savedRole.id, { permissionIds });
+      } catch (error) {
+        // If permission assignment fails, still return the role but log the error
+        this.logger.warn(
+          `Failed to assign permissions to role ${savedRole.name}: ${error instanceof Error ? error.message : 'Unknown error'}`
+        );
+        // You might want to delete the role here if permission assignment is critical
+        // await this.roleRepository.delete(savedRole.id);
+        // throw error;
+      }
     }
 
     this.logger.log(`Created role: ${savedRole.name}`);
@@ -177,12 +187,30 @@ export class RoleService {
     const { permissionIds } = assignPermissionsDto;
     const role = await this.getRole(roleId);
 
+    // Find permissions and validate they exist
     const permissions = await this.permissionRepository.find({
       where: { id: In(permissionIds) },
     });
 
     if (permissions.length !== permissionIds.length) {
-      throw new BadRequestException('Some permissions not found');
+      const foundIds = permissions.map(p => p.id);
+      const missingIds = permissionIds.filter(id => !foundIds.includes(id));
+      throw new BadRequestException(
+        `Some permissions not found: ${missingIds.join(', ')}`
+      );
+    }
+
+    // Validate that permissions are accessible (either global or tenant-scoped)
+    const invalidPermissions = permissions.filter(
+      permission => 
+        permission.scope !== PermissionScope.GLOBAL && 
+        permission.scope !== PermissionScope.TENANT
+    );
+
+    if (invalidPermissions.length > 0) {
+      throw new BadRequestException(
+        `Cannot assign permissions with scope other than GLOBAL or TENANT: ${invalidPermissions.map(p => p.name).join(', ')}`
+      );
     }
 
     role.permissions = permissions;

@@ -38,7 +38,11 @@ import {
 import { RoleLevel } from '../entities/role.entity';
 import { RoleQueryDto } from '../dto/role-query.dto';
 import { Request } from 'express';
-import { Permission, PermissionAction, PermissionResource } from '../entities/permission.entity';
+import {
+  Permission,
+  PermissionAction,
+  PermissionResource,
+} from '../entities/permission.entity';
 import { Role } from '../entities/role.entity';
 
 @ApiTags('Roles')
@@ -93,7 +97,10 @@ export class RoleController {
   })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  @ApiResponse({ status: 403, description: 'Forbidden - insufficient permissions' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - insufficient permissions',
+  })
   @RequirePermissions({
     resource: PermissionResource.ROLES,
     action: PermissionAction.CREATE,
