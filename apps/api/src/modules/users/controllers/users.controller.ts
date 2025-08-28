@@ -20,11 +20,12 @@ import { Roles } from '../../rbac/decorators/roles.decorator';
 import { UserRole } from '@app/shared';
 import { TenantAccessGuard } from '../../tenants/guards/tenant-access.guard';
 import { TenantId } from '../../../common/decorators/tenant.decorator';
+import { TenantScopingInterceptor } from '../../../common/interceptors/tenant-scoping.interceptor';
 import { AuditInterceptor } from '../../audit/interceptors/audit.interceptor';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard, TenantAccessGuard)
-@UseInterceptors(AuditInterceptor)
+@UseInterceptors(TenantScopingInterceptor, AuditInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
