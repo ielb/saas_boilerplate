@@ -1,7 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TeamController } from './controllers/team.controller';
+import { TeamSwitchingController } from './controllers/team-switching.controller';
 import { TeamService } from './services/team.service';
+import { TeamSwitchingService } from './services/team-switching.service';
 import { Team, TeamInvitation } from './entities/team.entity';
 import { TeamRepository } from './repositories/team.repository';
 import { CommonModule } from '../../common/common.module';
@@ -30,8 +32,20 @@ import { AuthJwtModule } from '../auth/jwt.module';
     RBACModule,
     AuthJwtModule,
   ],
-  controllers: [TeamController],
-  providers: [TeamService, TeamRepository, UserRepository, RoleRepository],
-  exports: [TeamService, TeamRepository, UserRepository, RoleRepository],
+  controllers: [TeamController, TeamSwitchingController],
+  providers: [
+    TeamService,
+    TeamSwitchingService,
+    TeamRepository,
+    UserRepository,
+    RoleRepository,
+  ],
+  exports: [
+    TeamService,
+    TeamSwitchingService,
+    TeamRepository,
+    UserRepository,
+    RoleRepository,
+  ],
 })
 export class TeamsModule {}

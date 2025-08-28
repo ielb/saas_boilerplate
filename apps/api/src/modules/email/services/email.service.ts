@@ -219,7 +219,8 @@ export class EmailService {
       | 'user-suspension'
       | 'user-reactivation'
       | 'user-deletion'
-      | 'team-invitation';
+      | 'team-invitation'
+      | 'team-switch-notification';
 
     const templates: Record<TemplateType, { html: string; text: string }> = {
       'email-verification': {
@@ -551,6 +552,28 @@ export class EmailService {
           If you have any questions, please contact the team administrator.
         `,
       },
+      'team-switch-notification': {
+        html: `
+          <h1>{{userName}} Joined Your Team</h1>
+          <p>Hello!</p>
+          <p><strong>{{userName}}</strong> ({{userEmail}}) has switched to your team <strong>{{teamName}}</strong>.</p>
+          <p>You can view your team dashboard to see the latest activity:</p>
+          <a href="{{dashboardUrl}}" style="display: inline-block; padding: 12px 24px; background-color: #28a745; color: white; text-decoration: none; border-radius: 4px;">View Team Dashboard</a>
+          <p>This notification helps keep team members informed about who is currently active in the team.</p>
+        `,
+        text: `
+          {{userName}} Joined Your Team
+          
+          Hello!
+          
+          {{userName}} ({{userEmail}}) has switched to your team {{teamName}}.
+          
+          You can view your team dashboard to see the latest activity:
+          {{dashboardUrl}}
+          
+          This notification helps keep team members informed about who is currently active in the team.
+        `,
+      },
     };
 
     const template = templates[templateName as TemplateType];
@@ -802,6 +825,30 @@ export class EmailService {
         message: invitationData.invitation?.message,
         expiresIn: '14 days',
         roleType: invitationData.invitation?.type || 'Team Member',
+      },
+    };
+
+    await this.sendEmail(emailData);
+  }
+
+  /**
+   * Send team switch notification email
+   */
+  async sendTeamSwitchNotification(notificationData: {
+    to: string;
+    teamName: string;
+    userName: string;
+    userEmail: string;
+  }): Promise<void> {
+    const emailData = {
+      to: notificationData.to,
+      subject: `${notificationData.userName} joined your team`,
+      template: 'team-switch-notification',
+      context: {
+        teamName: notificationData.teamName,
+        userName: notificationData.userName,
+        userEmail: notificationData.userEmail,
+        dashboardUrl: `${process.env.FRONTEND_URL || 'http://localhost:3000'}/dashboard`,
       },
     };
 

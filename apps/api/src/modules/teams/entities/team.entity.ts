@@ -93,6 +93,9 @@ export class TeamMembership {
   @Column({ type: 'timestamp', nullable: true })
   expiresAt?: Date;
 
+  @Column({ type: 'timestamp', nullable: true })
+  lastAccessedAt?: Date;
+
   @Column({ type: 'uuid' })
   tenantId!: string;
 

@@ -423,4 +423,56 @@ export class TeamRepository extends TenantScopedRepository<Team> {
     });
     return membership?.role || null;
   }
+
+  async findUserTeamsWithMemberships(
+    userId: string,
+    tenantId: string
+  ): Promise<{
+    teams: Array<Team & { membership: TeamMembership; memberCount: number }>;
+    total: number;
+  }> {
+    const queryBuilder = this.teamRepository
+      .createQueryBuilder('team')
+      .leftJoinAndSelect('team.memberships', 'membership')
+      .leftJoinAndSelect('membership.role', 'role')
+      .leftJoinAndSelect('team.manager', 'manager')
+      .where('membership.userId = :userId AND team.tenantId = :tenantId', {
+        userId,
+        tenantId,
+      });
+
+    const teams = await queryBuilder.getMany();
+
+    // Add member count and filter to only include the user's membership
+    const teamsWithMembership = await Promise.all(
+      teams.map(async team => {
+        const memberCount = await this.membershipRepository.count({
+          where: { teamId: team.id, status: TeamStatus.ACTIVE },
+        });
+
+        const userMembership = team.memberships?.find(m => m.userId === userId);
+
+        return {
+          ...team,
+          membership: userMembership!,
+          memberCount,
+        } as Team & { membership: TeamMembership; memberCount: number };
+      })
+    );
+
+    return {
+      teams: teamsWithMembership,
+      total: teamsWithMembership.length,
+    };
+  }
+
+  async updateMembershipLastAccessed(
+    membershipId: string,
+    tenantId: string
+  ): Promise<void> {
+    await this.membershipRepository.update(
+      { id: membershipId, tenantId },
+      { lastAccessedAt: new Date() }
+    );
+  }
 }
