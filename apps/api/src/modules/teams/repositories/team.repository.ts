@@ -36,6 +36,15 @@ export class TeamRepository extends TenantScopedRepository<Team> {
     return 'tenantId';
   }
 
+  /**
+   * Find team by name within current tenant
+   */
+  async findByName(name: string, tenantId: string): Promise<Team | null> {
+    return this.findOneWithTenantScope({
+      where: { name },
+    });
+  }
+
   async findTeamsWithDetails(
     tenantId: string,
     query: any = {}
