@@ -19,7 +19,7 @@ import { RolesGuard } from '../../rbac/guards/roles.guard';
 import { Roles } from '../../rbac/decorators/roles.decorator';
 import { UserRole } from '@app/shared';
 import { TenantAccessGuard } from '../../tenants/guards/tenant-access.guard';
-import { Tenant } from '../../../common/decorators/tenant.decorator';
+import { TenantId } from '../../../common/decorators/tenant.decorator';
 import { AuditInterceptor } from '../../audit/interceptors/audit.interceptor';
 
 @Controller('users')
@@ -30,19 +30,19 @@ export class UsersController {
 
   @Post()
   @Roles(UserRole.ADMIN, UserRole.OWNER)
-  create(@Body() createUserDto: CreateUserDto, @Tenant() tenantId: string) {
+  create(@Body() createUserDto: CreateUserDto, @TenantId() tenantId: string) {
     return this.usersService.create(createUserDto, tenantId);
   }
 
   @Get()
   @Roles(UserRole.ADMIN, UserRole.OWNER, UserRole.MANAGER)
-  findAll(@Query() query: UserQueryDto, @Tenant() tenantId: string) {
+  findAll(@Query() query: UserQueryDto, @TenantId() tenantId: string) {
     return this.usersService.findAll(query, tenantId);
   }
 
   @Get(':id')
   @Roles(UserRole.ADMIN, UserRole.OWNER, UserRole.MANAGER)
-  findOne(@Param('id') id: string, @Tenant() tenantId: string) {
+  findOne(@Param('id') id: string, @TenantId() tenantId: string) {
     return this.usersService.findOne(id, tenantId);
   }
 
@@ -51,14 +51,14 @@ export class UsersController {
   update(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
-    @Tenant() tenantId: string
+    @TenantId() tenantId: string
   ) {
     return this.usersService.update(id, updateUserDto, tenantId);
   }
 
   @Delete(':id')
   @Roles(UserRole.ADMIN, UserRole.OWNER)
-  remove(@Param('id') id: string, @Tenant() tenantId: string) {
+  remove(@Param('id') id: string, @TenantId() tenantId: string) {
     return this.usersService.remove(id, tenantId);
   }
 }

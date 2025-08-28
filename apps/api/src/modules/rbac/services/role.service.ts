@@ -202,8 +202,8 @@ export class RoleService {
 
     // Validate that permissions are accessible (either global or tenant-scoped)
     const invalidPermissions = permissions.filter(
-      permission => 
-        permission.scope !== PermissionScope.GLOBAL && 
+      permission =>
+        permission.scope !== PermissionScope.GLOBAL &&
         permission.scope !== PermissionScope.TENANT
     );
 
