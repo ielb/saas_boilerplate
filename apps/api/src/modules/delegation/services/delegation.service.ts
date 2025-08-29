@@ -5,7 +5,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, Between } from 'typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
 import {
@@ -530,6 +530,19 @@ export class DelegationService {
    * Get delegation statistics
    */
   async getDelegationStats(tenantId: string): Promise<DelegationStatsDto> {
+    // Calculate date range for current month
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endOfMonth = new Date(
+      now.getFullYear(),
+      now.getMonth() + 1,
+      0,
+      23,
+      59,
+      59,
+      999
+    );
+
     const [
       totalDelegations,
       activeDelegations,
@@ -573,19 +586,15 @@ export class DelegationService {
       this.delegationRepository.count({
         where: {
           tenantId,
-          createdAt: new Date(
-            new Date().getFullYear(),
-            new Date().getMonth(),
-            1
-          ),
+          createdAt: Between(startOfMonth, endOfMonth),
         },
       }),
     ]);
 
     // Calculate average delegation duration
+    // Get full delegation entities to access the getDurationInHours method
     const delegations = await this.delegationRepository.find({
       where: { tenantId },
-      select: ['requestedAt', 'expiresAt'],
     });
 
     const totalDuration = delegations.reduce((sum, delegation) => {
