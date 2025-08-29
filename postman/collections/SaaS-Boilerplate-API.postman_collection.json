@@ -101,6 +101,26 @@
       "type": "string"
     },
     {
+      "key": "delegationId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "delegateId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "delegatorId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "approverId",
+      "value": "",
+      "type": "string"
+    },
+    {
       "key": "importJobId",
       "value": "",
       "type": "string"
@@ -8052,6 +8072,583 @@
             }
           },
           "response": []
+        }
+      ]
+    },
+    {
+      "name": "Delegations",
+      "item": [
+        {
+          "name": "Create Delegation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"delegateId\": \"{{delegateId}}\",\n  \"title\": \"Test Delegation\",\n  \"description\": \"Delegation for testing purposes\",\n  \"delegationType\": \"permission_based\",\n  \"expiresAt\": \"{{$timestamp}}\",\n  \"permissionIds\": [\"{{permissionId}}\"],\n  \"requiresApproval\": true,\n  \"approverId\": \"{{approverId}}\",\n  \"isEmergency\": false,\n  \"isRecurring\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/delegations",
+              "host": ["{{baseUrl}}"],
+              "path": ["delegations"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has delegation data', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('id');",
+                  "  pm.expect(response).to.have.property('title');",
+                  "  pm.expect(response).to.have.property('status');",
+                  "  pm.expect(response.status).to.eql('pending');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "  const response = pm.response.json();",
+                  "  pm.environment.set('delegationId', response.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Delegations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/delegations?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["delegations"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has delegations array', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('delegations');",
+                  "  pm.expect(response.delegations).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Response has pagination info', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('total');",
+                  "  pm.expect(response).to.have.property('page');",
+                  "  pm.expect(response).to.have.property('limit');",
+                  "  pm.expect(response).to.have.property('totalPages');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Delegation by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/delegations/{{delegationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["delegations", "{{delegationId}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has delegation details', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('id');",
+                  "  pm.expect(response).to.have.property('title');",
+                  "  pm.expect(response).to.have.property('status');",
+                  "  pm.expect(response).to.have.property('delegator');",
+                  "  pm.expect(response).to.have.property('delegate');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Approve Delegation",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"approvalNotes\": \"Approved for testing purposes\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/delegations/{{delegationId}}/approve",
+              "host": ["{{baseUrl}}"],
+              "path": ["delegations", "{{delegationId}}", "approve"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Delegation is approved', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.status).to.eql('approved');",
+                  "  pm.expect(response).to.have.property('approvedAt');",
+                  "  pm.expect(response).to.have.property('approvalNotes');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reject Delegation",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rejectionReason\": \"Rejected for testing purposes\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/delegations/{{delegationId}}/reject",
+              "host": ["{{baseUrl}}"],
+              "path": ["delegations", "{{delegationId}}", "reject"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Delegation is rejected', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.status).to.eql('rejected');",
+                  "  pm.expect(response).to.have.property('rejectedAt');",
+                  "  pm.expect(response).to.have.property('rejectionReason');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Activate Delegation",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"confirmActivation\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/delegations/{{delegationId}}/activate",
+              "host": ["{{baseUrl}}"],
+              "path": ["delegations", "{{delegationId}}", "activate"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Delegation is activated', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.status).to.eql('active');",
+                  "  pm.expect(response).to.have.property('activatedAt');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Revoke Delegation",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"revocationReason\": \"Revoked for testing purposes\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/delegations/{{delegationId}}/revoke",
+              "host": ["{{baseUrl}}"],
+              "path": ["delegations", "{{delegationId}}", "revoke"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Delegation is revoked', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.status).to.eql('revoked');",
+                  "  pm.expect(response).to.have.property('revokedAt');",
+                  "  pm.expect(response).to.have.property('revocationReason');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get My Active Delegations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/delegations/my-active",
+              "host": ["{{baseUrl}}"],
+              "path": ["delegations", "my-active"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('All delegations are active', function () {",
+                  "  const response = pm.response.json();",
+                  "  response.forEach(delegation => {",
+                  "    pm.expect(delegation.status).to.eql('active');",
+                  "  });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Pending Approvals",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/delegations/pending-approvals",
+              "host": ["{{baseUrl}}"],
+              "path": ["delegations", "pending-approvals"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('All delegations are pending', function () {",
+                  "  const response = pm.response.json();",
+                  "  response.forEach(delegation => {",
+                  "    pm.expect(delegation.status).to.eql('pending');",
+                  "  });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Delegation Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/delegations/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["delegations", "stats"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has statistics', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('totalDelegations');",
+                  "  pm.expect(response).to.have.property('activeDelegations');",
+                  "  pm.expect(response).to.have.property('pendingApprovals');",
+                  "  pm.expect(response).to.have.property('expiredDelegations');",
+                  "  pm.expect(response).to.have.property('revokedDelegations');",
+                  "  pm.expect(response).to.have.property('emergencyDelegations');",
+                  "  pm.expect(response).to.have.property('delegationsThisMonth');",
+                  "  pm.expect(response).to.have.property('averageDelegationDuration');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Delegation Audit Logs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/delegations/{{delegationId}}/audit-logs",
+              "host": ["{{baseUrl}}"],
+              "path": ["delegations", "{{delegationId}}", "audit-logs"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Audit logs have required fields', function () {",
+                  "  const response = pm.response.json();",
+                  "  if (response.length > 0) {",
+                  "    const log = response[0];",
+                  "    pm.expect(log).to.have.property('id');",
+                  "    pm.expect(log).to.have.property('action');",
+                  "    pm.expect(log).to.have.property('createdAt');",
+                  "  }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Delegations by Delegator",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/delegations/delegator/{{delegatorId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["delegations", "delegator", "{{delegatorId}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('All delegations belong to the delegator', function () {",
+                  "  const response = pm.response.json();",
+                  "  response.forEach(delegation => {",
+                  "    pm.expect(delegation.delegatorId).to.eql(pm.environment.get('delegatorId'));",
+                  "  });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Delegations by Delegate",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/delegations/delegate/{{delegateId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["delegations", "delegate", "{{delegateId}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('All delegations belong to the delegate', function () {",
+                  "  const response = pm.response.json();",
+                  "  response.forEach(delegation => {",
+                  "    pm.expect(delegation.delegateId).to.eql(pm.environment.get('delegateId'));",
+                  "  });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Check Delegation Permissions",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"{{delegateId}}\",\n  \"permissionIds\": [\"{{permissionId}}\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/delegations/check-permissions",
+              "host": ["{{baseUrl}}"],
+              "path": ["delegations", "check-permissions"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has hasDelegation field', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('hasDelegation');",
+                  "  pm.expect(response.hasDelegation).to.be.a('boolean');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
         }
       ]
     },
