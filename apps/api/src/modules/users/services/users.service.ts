@@ -99,6 +99,6 @@ export class UsersService {
   async deactivate(id: string, tenantId: string): Promise<User> {
     const user = await this.findOne(id, tenantId);
     await user.markAsSuspended();
-    return this.userRepository.save(user);
+    return this.customUserRepository.saveWithTenantScope(user);
   }
 }
