@@ -8,6 +8,7 @@ import {
   Body,
   Query,
   UseGuards,
+  UseInterceptors,
   HttpCode,
   HttpStatus,
   Req,
@@ -20,6 +21,10 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../../rbac/guards/permissions.guard';
+import { RequirePermissions } from '../../../common/decorators/permissions.decorator';
+import { TenantScopingInterceptor } from '../../../common/interceptors/tenant-scoping.interceptor';
+import { TenantId } from '../../../common/decorators/tenant.decorator';
 import { RoleService } from '../services/role.service';
 import {
   CreateRoleDto,
@@ -33,12 +38,17 @@ import {
 import { RoleLevel } from '../entities/role.entity';
 import { RoleQueryDto } from '../dto/role-query.dto';
 import { Request } from 'express';
-import { Permission } from '../entities/permission.entity';
+import {
+  Permission,
+  PermissionAction,
+  PermissionResource,
+} from '../entities/permission.entity';
 import { Role } from '../entities/role.entity';
 
 @ApiTags('Roles')
 @Controller('roles')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
+@UseInterceptors(TenantScopingInterceptor)
 @ApiBearerAuth()
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
@@ -87,6 +97,14 @@ export class RoleController {
   })
   @ApiResponse({ status: 400, description: 'Bad request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - insufficient permissions',
+  })
+  @RequirePermissions({
+    resource: PermissionResource.ROLES,
+    action: PermissionAction.CREATE,
+  })
   async createRole(
     @Body() createRoleDto: CreateRoleDto,
     @Req() req: Request
@@ -144,36 +162,7 @@ export class RoleController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getSystemRoles(): Promise<RoleResponseDto[]> {
     const roles = await this.roleService.getSystemRoles();
-    return roles.map(role => ({
-      id: role.id,
-      name: role.name,
-      description: role.description || undefined,
-      type: role.type,
-      level: role.level,
-      tenantId: role.tenantId || undefined,
-      parentRoleId: role.parentRoleId || undefined,
-      isSystem: role.isSystem,
-      isActive: role.isActive,
-      metadata: role.metadata || undefined,
-      createdAt: role.createdAt,
-      updatedAt: role.updatedAt,
-      permissions:
-        role.permissions?.map((permission: Permission) => ({
-          id: permission.id,
-          name: permission.name,
-          description: permission.description || undefined,
-          resource: permission.resource,
-          action: permission.action,
-          scope: permission.scope,
-          isSystem: permission.isSystem,
-          conditions: permission.conditions || undefined,
-          isActive: permission.isActive,
-          createdAt: permission.createdAt,
-          updatedAt: permission.updatedAt,
-          fullName: permission.getFullName(),
-        })) || [],
-      totalPermissions: role.getAllPermissions().length,
-    }));
+    return roles.map(role => this.mapRoleToDto(role));
   }
 
   @Get('custom')
@@ -186,36 +175,7 @@ export class RoleController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getCustomRoles(@Req() req: Request): Promise<RoleResponseDto[]> {
     const roles = await this.roleService.getCustomRoles();
-    return roles.map(role => ({
-      id: role.id,
-      name: role.name,
-      description: role.description || undefined,
-      type: role.type,
-      level: role.level,
-      tenantId: role.tenantId || undefined,
-      parentRoleId: role.parentRoleId || undefined,
-      isSystem: role.isSystem,
-      isActive: role.isActive,
-      metadata: role.metadata || undefined,
-      createdAt: role.createdAt,
-      updatedAt: role.updatedAt,
-      permissions:
-        role.permissions?.map((permission: Permission) => ({
-          id: permission.id,
-          name: permission.name,
-          description: permission.description || undefined,
-          resource: permission.resource,
-          action: permission.action,
-          scope: permission.scope,
-          isSystem: permission.isSystem,
-          conditions: permission.conditions || undefined,
-          isActive: permission.isActive,
-          createdAt: permission.createdAt,
-          updatedAt: permission.updatedAt,
-          fullName: permission.getFullName(),
-        })) || [],
-      totalPermissions: role.getAllPermissions().length,
-    }));
+    return roles.map(role => this.mapRoleToDto(role));
   }
 
   @Get(':id')
@@ -229,36 +189,7 @@ export class RoleController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async getRole(@Param('id') id: string): Promise<RoleResponseDto> {
     const role = await this.roleService.getRole(id);
-    return {
-      id: role.id,
-      name: role.name,
-      description: role.description || undefined,
-      type: role.type,
-      level: role.level,
-      tenantId: role.tenantId || undefined,
-      parentRoleId: role.parentRoleId || undefined,
-      isSystem: role.isSystem,
-      isActive: role.isActive,
-      metadata: role.metadata || undefined,
-      createdAt: role.createdAt,
-      updatedAt: role.updatedAt,
-      permissions:
-        role.permissions?.map((permission: Permission) => ({
-          id: permission.id,
-          name: permission.name,
-          description: permission.description || undefined,
-          resource: permission.resource,
-          action: permission.action,
-          scope: permission.scope,
-          isSystem: permission.isSystem,
-          conditions: permission.conditions || undefined,
-          isActive: permission.isActive,
-          createdAt: permission.createdAt,
-          updatedAt: permission.updatedAt,
-          fullName: permission.getFullName(),
-        })) || [],
-      totalPermissions: role.getAllPermissions().length,
-    };
+    return this.mapRoleToDto(role);
   }
 
   @Put(':id')
@@ -276,36 +207,7 @@ export class RoleController {
     @Body() updateRoleDto: UpdateRoleDto
   ): Promise<RoleResponseDto> {
     const role = await this.roleService.updateRole(id, updateRoleDto);
-    return {
-      id: role.id,
-      name: role.name,
-      description: role.description || undefined,
-      type: role.type,
-      level: role.level,
-      tenantId: role.tenantId || undefined,
-      parentRoleId: role.parentRoleId || undefined,
-      isSystem: role.isSystem,
-      isActive: role.isActive,
-      metadata: role.metadata || undefined,
-      createdAt: role.createdAt,
-      updatedAt: role.updatedAt,
-      permissions:
-        role.permissions?.map((permission: Permission) => ({
-          id: permission.id,
-          name: permission.name,
-          description: permission.description || undefined,
-          resource: permission.resource,
-          action: permission.action,
-          scope: permission.scope,
-          isSystem: permission.isSystem,
-          conditions: permission.conditions || undefined,
-          isActive: permission.isActive,
-          createdAt: permission.createdAt,
-          updatedAt: permission.updatedAt,
-          fullName: permission.getFullName(),
-        })) || [],
-      totalPermissions: role.getAllPermissions().length,
-    };
+    return this.mapRoleToDto(role);
   }
 
   @Delete(':id')
@@ -337,36 +239,7 @@ export class RoleController {
       id,
       assignPermissionsDto
     );
-    return {
-      id: role.id,
-      name: role.name,
-      description: role.description || undefined,
-      type: role.type,
-      level: role.level,
-      tenantId: role.tenantId || undefined,
-      parentRoleId: role.parentRoleId || undefined,
-      isSystem: role.isSystem,
-      isActive: role.isActive,
-      metadata: role.metadata || undefined,
-      createdAt: role.createdAt,
-      updatedAt: role.updatedAt,
-      permissions:
-        role.permissions?.map((permission: Permission) => ({
-          id: permission.id,
-          name: permission.name,
-          description: permission.description || undefined,
-          resource: permission.resource,
-          action: permission.action,
-          scope: permission.scope,
-          isSystem: permission.isSystem,
-          conditions: permission.conditions || undefined,
-          isActive: permission.isActive,
-          createdAt: permission.createdAt,
-          updatedAt: permission.updatedAt,
-          fullName: permission.getFullName(),
-        })) || [],
-      totalPermissions: role.getAllPermissions().length,
-    };
+    return this.mapRoleToDto(role);
   }
 
   @Delete(':id/permissions')

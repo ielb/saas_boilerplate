@@ -7228,6 +7228,412 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Get User Team Memberships",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has teams array', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('teams');",
+                  "    pm.expect(response.teams).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Each team has required properties', function () {",
+                  "    const response = pm.response.json();",
+                  "    if (response.teams.length > 0) {",
+                  "        const team = response.teams[0];",
+                  "        pm.expect(team).to.have.property('id');",
+                  "        pm.expect(team).to.have.property('name');",
+                  "        pm.expect(team).to.have.property('membership');",
+                  "        pm.expect(team.membership).to.have.property('roleName');",
+                  "        pm.expect(team.membership).to.have.property('status');",
+                  "    }",
+                  "});",
+                  "",
+                  "// Store first team ID for subsequent requests",
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.teams.length > 0) {",
+                  "        pm.environment.set('teamId', response.teams[0].id);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams/switch/memberships",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "switch", "memberships"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current Team Context",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has team and membership', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('team');",
+                  "    pm.expect(response).to.have.property('membership');",
+                  "});",
+                  "",
+                  "pm.test('Team has required properties', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.team).to.have.property('id');",
+                  "    pm.expect(response.team).to.have.property('name');",
+                  "    pm.expect(response.team).to.have.property('status');",
+                  "});",
+                  "",
+                  "pm.test('Membership has required properties', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.membership).to.have.property('id');",
+                  "    pm.expect(response.membership).to.have.property('roleName');",
+                  "    pm.expect(response.membership).to.have.property('status');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams/switch/current",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "switch", "current"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Switch Team",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response indicates success', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.success).to.be.true;",
+                  "    pm.expect(response).to.have.property('message');",
+                  "});",
+                  "",
+                  "pm.test('Response has team information', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('team');",
+                  "    pm.expect(response.team).to.have.property('id');",
+                  "    pm.expect(response.team).to.have.property('name');",
+                  "});",
+                  "",
+                  "pm.test('Response has membership information', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('membership');",
+                  "    pm.expect(response.membership).to.have.property('roleName');",
+                  "    pm.expect(response.membership).to.have.property('status');",
+                  "});",
+                  "",
+                  "pm.test('Response has new access token', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('accessToken');",
+                  "    pm.expect(response.accessToken).to.be.a('string');",
+                  "});",
+                  "",
+                  "// Update auth token for subsequent requests",
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('accessToken', response.accessToken);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"teamId\": \"{{teamId}}\",\n  \"notifyTeamMembers\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teams/switch",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "switch"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Team Access",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has access status', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('hasAccess');",
+                  "    pm.expect(response.hasAccess).to.be.a('boolean');",
+                  "});",
+                  "",
+                  "pm.test('Response includes team info when access granted', function () {",
+                  "    const response = pm.response.json();",
+                  "    if (response.hasAccess) {",
+                  "        pm.expect(response).to.have.property('team');",
+                  "        pm.expect(response).to.have.property('membership');",
+                  "        pm.expect(response.team).to.have.property('id');",
+                  "        pm.expect(response.membership).to.have.property('roleName');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams/switch/{{teamId}}/verify-access",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "switch", "{{teamId}}", "verify-access"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Available Teams",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has teams array', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('teams');",
+                  "    pm.expect(response.teams).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Each team has required properties', function () {",
+                  "    const response = pm.response.json();",
+                  "    if (response.teams.length > 0) {",
+                  "        const team = response.teams[0];",
+                  "        pm.expect(team).to.have.property('id');",
+                  "        pm.expect(team).to.have.property('name');",
+                  "        pm.expect(team).to.have.property('role');",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/teams/switch/available",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "switch", "available"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Switch Team with Notifications",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Team switch successful with notifications', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.success).to.be.true;",
+                  "    pm.expect(response.message).to.include('Successfully switched');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"teamId\": \"{{teamId}}\",\n  \"notifyTeamMembers\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teams/switch",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "switch"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Switch to Unauthorized Team (Should Fail)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 403', function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});",
+                  "",
+                  "pm.test('Error message indicates access denied', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.message).to.include('access');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"teamId\": \"unauthorized-team-id\",\n  \"notifyTeamMembers\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teams/switch",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "switch"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Switch Team with Invalid ID (Should Fail)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Error message indicates validation failure', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.message).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"teamId\": \"invalid-uuid\",\n  \"notifyTeamMembers\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/teams/switch",
+              "host": ["{{baseUrl}}"],
+              "path": ["teams", "switch"]
+            }
+          },
+          "response": []
         }
       ]
     },

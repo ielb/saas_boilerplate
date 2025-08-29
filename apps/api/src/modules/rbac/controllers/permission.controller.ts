@@ -20,9 +20,9 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../guards/jwt-auth.guard';
-import { PermissionsGuard } from '../../rbac/guards/permissions.guard';
-import { PermissionService } from '../../rbac/services/permission.service';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../guards/permissions.guard';
+import { PermissionService } from '../services/permission.service';
 import { PermissionCheckerService } from '../../../common/services/permission-checker.service';
 import {
   RequirePermissions,
@@ -39,13 +39,13 @@ import {
   PermissionListResponseDto,
   CheckPermissionDto,
   PermissionCheckResponseDto,
-} from '../../rbac/dto/rbac.dto';
+} from '../dto/rbac.dto';
 import {
   PermissionResource,
   PermissionAction,
   PermissionScope,
-} from '../../rbac/entities/permission.entity';
-import { PermissionQueryDto } from '../../rbac/dto/permission-query.dto';
+} from '../entities/permission.entity';
+import { PermissionQueryDto } from '../dto/permission-query.dto';
 
 @ApiTags('Permissions')
 @ApiBearerAuth()

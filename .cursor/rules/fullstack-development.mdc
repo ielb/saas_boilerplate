@@ -5,6 +5,22 @@ globs:
   - '**/*.tsx'
   - '**/*.js'
   - '**/*.jsx'
+  - '**/*.md'
+  - '**/*.json'
+  - '**/*.yaml'
+  - '**/*.yml'
+  - '**/*.sh'
+  - '**/*.bash'
+  - '**/*.zsh'
+  - '**/*.fish'
+  - '**/*.sql'
+  - '**/*.csv'
+  - '**/*.txt'
+  - '**/*.log'
+  - '**/*.ini'
+  - '**/*.conf'
+  - '**/*.config'
+
 alwaysApply: true
 ---
 

@@ -10,6 +10,8 @@ import { PermissionService } from './services/permission.service';
 import { RoleController } from './controllers/role.controller';
 import { User } from '../users/entities/user.entity';
 import { AuthJwtModule } from '../auth/jwt.module';
+import { PermissionController } from './controllers/permission.controller';
+import { PermissionCheckerService } from '../../common/services/permission-checker.service';
 
 @Module({
   imports: [
@@ -17,8 +19,14 @@ import { AuthJwtModule } from '../auth/jwt.module';
     CommonModule,
     AuthJwtModule,
   ],
-  controllers: [RoleController],
-  providers: [RoleService, PermissionService, RoleRepository, UserRepository],
+  controllers: [RoleController, PermissionController],
+  providers: [
+    RoleService,
+    PermissionService,
+    RoleRepository,
+    UserRepository,
+    PermissionCheckerService,
+  ],
   exports: [RoleService, PermissionService, RoleRepository, UserRepository],
 })
 export class RBACModule {}

@@ -20,9 +20,9 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto, tenantId: string): Promise<User> {
-    const existingUser = await this.userRepository.findOne({
-      where: { email: createUserDto.email, tenantId },
-    });
+    const existingUser = await this.customUserRepository.findByEmail(
+      createUserDto.email
+    );
 
     if (existingUser) {
       throw new ConflictException('User with this email already exists');
@@ -33,7 +33,7 @@ export class UsersService {
       tenantId,
     });
 
-    return this.userRepository.save(user);
+    return this.customUserRepository.saveWithTenantScope(user);
   }
 
   async findAll(
@@ -48,8 +48,8 @@ export class UsersService {
   }
 
   async findOne(id: string, tenantId: string): Promise<User> {
-    const user = await this.userRepository.findOne({
-      where: { id: id, tenantId },
+    const user = await this.customUserRepository.findOneWithTenantScope({
+      where: { id },
       relations: ['roles', 'tenant'],
     });
 
@@ -61,10 +61,7 @@ export class UsersService {
   }
 
   async findByEmail(email: string, tenantId: string): Promise<User | null> {
-    return this.userRepository.findOne({
-      where: { email, tenantId },
-      relations: ['roles'],
-    });
+    return this.customUserRepository.findByEmail(email);
   }
 
   async update(
@@ -85,23 +82,23 @@ export class UsersService {
     }
 
     Object.assign(user, updateUserDto);
-    return this.userRepository.save(user);
+    return this.customUserRepository.saveWithTenantScope(user);
   }
 
   async remove(id: string, tenantId: string): Promise<void> {
     const user = await this.findOne(id, tenantId);
-    await this.userRepository.remove(user);
+    await this.customUserRepository.remove(user);
   }
 
   async activate(id: string, tenantId: string): Promise<User> {
     const user = await this.findOne(id, tenantId);
     await user.markAsActive();
-    return this.userRepository.save(user);
+    return this.customUserRepository.saveWithTenantScope(user);
   }
 
   async deactivate(id: string, tenantId: string): Promise<User> {
     const user = await this.findOne(id, tenantId);
     await user.markAsSuspended();
-    return this.userRepository.save(user);
+    return this.customUserRepository.saveWithTenantScope(user);
   }
 }

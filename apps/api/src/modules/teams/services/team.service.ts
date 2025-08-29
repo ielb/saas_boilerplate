@@ -46,6 +46,17 @@ export class TeamService {
     tenantId: string,
     userId: string
   ): Promise<TeamResponseDto> {
+    // Check if team name already exists in the tenant
+    const existingTeam = await this.teamRepository.findByName(
+      createTeamDto.name,
+      tenantId
+    );
+    if (existingTeam) {
+      throw new BadRequestException(
+        `Team with name '${createTeamDto.name}' already exists in this tenant`
+      );
+    }
+
     // Validate manager exists if provided
     if (createTeamDto.managerId) {
       const manager = await this.userRepository.findOneByIdForTenant(
