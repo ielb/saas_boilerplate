@@ -213,7 +213,7 @@ Based on PRD: `docs/prd.md`
     - [x] 3.12.7 Create bulk operations controller
     - [x] 3.12.8 Fix TypeScript compilation errors and test implementation
   - [x] 3.13 Create team switching and multi-team membership (#37)
-  - [ ] 3.14 Implement access delegation and temporary permissions (#38)
+  - [x] 3.14 Implement access delegation and temporary permissions (#38)
   - [ ] 3.15 Set up tenant usage analytics and reporting (#39)
 
 - [ ] 4.0 Payment & Billing Infrastructure
