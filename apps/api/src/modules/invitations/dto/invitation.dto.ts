@@ -107,6 +107,7 @@ export class InvitationQueryDto {
     default: 1,
   })
   @IsOptional()
+  @Type(() => Number)
   page?: number = 1;
 
   @ApiPropertyOptional({
@@ -116,6 +117,7 @@ export class InvitationQueryDto {
     default: 10,
   })
   @IsOptional()
+  @Type(() => Number)
   limit?: number = 10;
 }
 

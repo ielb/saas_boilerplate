@@ -384,15 +384,12 @@ describe('UserLifecycleService', () => {
           }),
         })
       );
-      expect(
-        mockEmailService.sendUserSuspensionNotification
-      ).toHaveBeenCalledWith(
-        suspendedUser,
-        expect.objectContaining({
-          suspendedAt: expect.any(Date),
-          suspensionReason: 'Test suspension',
-        })
-      );
+      const emailCall = mockEmailService.sendUserSuspensionNotification.mock.calls[0];
+      expect(emailCall[0]).toEqual(suspendedUser);
+      expect(emailCall[1]).toMatchObject({
+        suspendedAt: expect.any(Date),
+        suspensionReason: 'Test suspension',
+      });
     });
 
     it('should throw BadRequestException if user is already suspended', async () => {

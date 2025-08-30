@@ -151,6 +151,26 @@
       "type": "string"
     },
     {
+      "key": "analyticsEventId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "analyticsAlertId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "exportId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "reportId",
+      "value": "",
+      "type": "string"
+    },
+    {
       "key": "fileKey",
       "value": "",
       "type": "string"
@@ -177,11 +197,6 @@
     },
     {
       "key": "brandingId",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "exportId",
       "value": "",
       "type": "string"
     },
@@ -8643,6 +8658,1045 @@
                   "  const response = pm.response.json();",
                   "  pm.expect(response).to.have.property('hasDelegation');",
                   "  pm.expect(response.hasDelegation).to.be.a('boolean');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "Track Event",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"eventType\": \"user_login\",\n  \"eventName\": \"User Login\",\n  \"description\": \"User logged in successfully\",\n  \"metricType\": \"count\",\n  \"metricValue\": 1,\n  \"metadata\": {\n    \"browser\": \"Chrome\",\n    \"os\": \"Windows\",\n    \"ip\": \"192.168.1.1\"\n  },\n  \"sessionId\": \"session-123\",\n  \"ipAddress\": \"192.168.1.1\",\n  \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/analytics/events/track",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "events", "track"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has event ID', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('id');",
+                  "  pm.expect(response.success).to.be.true;",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "  const response = pm.response.json();",
+                  "  pm.environment.set('analyticsEventId', response.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Bulk Track Events",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"events\": [\n    {\n      \"eventType\": \"user_login\",\n      \"eventName\": \"User Login 1\",\n      \"metricValue\": 1\n    },\n    {\n      \"eventType\": \"user_logout\",\n      \"eventName\": \"User Logout 1\",\n      \"metricValue\": 1\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/analytics/events/track/bulk",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "events", "track", "bulk"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has success count', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('successCount');",
+                  "  pm.expect(response).to.have.property('failureCount');",
+                  "  pm.expect(response).to.have.property('eventIds');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Events",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/events?limit=10&offset=0&sortBy=timestamp&sortOrder=DESC",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "events"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "timestamp"
+                },
+                {
+                  "key": "sortOrder",
+                  "value": "DESC"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Aggregates",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/aggregates?period=day&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "aggregates"],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "day"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/dashboard?period=day",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "dashboard"],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "day"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has summary', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('summary');",
+                  "  pm.expect(response).to.have.property('recentEvents');",
+                  "  pm.expect(response).to.have.property('aggregates');",
+                  "  pm.expect(response).to.have.property('trends');",
+                  "  pm.expect(response).to.have.property('topResources');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/summary?period=day",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "summary"],
+              "query": [
+                {
+                  "key": "period",
+                  "value": "day"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has key metrics', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('totalEvents');",
+                  "  pm.expect(response).to.have.property('uniqueUsers');",
+                  "  pm.expect(response).to.have.property('activeSessions');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Real-time Metrics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/realtime",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "realtime"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has real-time data', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('activeUsers');",
+                  "  pm.expect(response).to.have.property('activeSessions');",
+                  "  pm.expect(response).to.have.property('eventsPerMinute');",
+                  "  pm.expect(response).to.have.property('systemHealth');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Alert",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"alertName\": \"High Login Rate\",\n  \"description\": \"Alert when login rate exceeds threshold\",\n  \"severity\": \"high\",\n  \"metricName\": \"user_login\",\n  \"condition\": \"gt\",\n  \"threshold\": 100,\n  \"isActive\": true,\n  \"metadata\": {\n    \"notificationEmail\": \"admin@example.com\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/analytics/alerts",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "alerts"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has alert ID', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('id');",
+                  "  pm.expect(response.alertName).to.eql('High Login Rate');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "  const response = pm.response.json();",
+                  "  pm.environment.set('analyticsAlertId', response.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Alerts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/alerts",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "alerts"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Alert by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/alerts/{{analyticsAlertId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "alerts", "{{analyticsAlertId}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has alert details', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('id');",
+                  "  pm.expect(response).to.have.property('alertName');",
+                  "  pm.expect(response).to.have.property('severity');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Alert",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"alertName\": \"Updated High Login Rate\",\n  \"isActive\": false,\n  \"threshold\": 150\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/analytics/alerts/{{analyticsAlertId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "alerts", "{{analyticsAlertId}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has updated alert', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.alertName).to.eql('Updated High Login Rate');",
+                  "  pm.expect(response.isActive).to.be.false;",
+                  "  pm.expect(response.threshold).to.eql(150);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Alert",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/alerts/{{analyticsAlertId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "alerts", "{{analyticsAlertId}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204', function () {",
+                  "  pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Generate Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reportType\": \"usage\",\n  \"reportName\": \"Monthly Usage Report\",\n  \"description\": \"Comprehensive usage analytics report\",\n  \"startDate\": \"2024-01-01\",\n  \"endDate\": \"2024-01-31\",\n  \"format\": \"pdf\",\n  \"metrics\": [\"user_activity\", \"feature_usage\", \"performance\"],\n  \"filters\": [\"active_users_only\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/analytics/reports",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "reports"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has report ID', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('id');",
+                  "  pm.expect(response.status).to.eql('pending');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "  const response = pm.response.json();",
+                  "  pm.environment.set('reportId', response.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/reports/{{reportId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "reports", "{{reportId}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has report details', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('id');",
+                  "  pm.expect(response).to.have.property('reportType');",
+                  "  pm.expect(response).to.have.property('status');",
+                  "  pm.expect(response).to.have.property('format');",
+                  "});",
+                  "",
+                  "pm.test('Report belongs to correct tenant', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.metadata.tenantId).to.eql(pm.environment.get('tenantId'));",
+                  "});",
+                  "",
+                  "pm.test('Check if PDF download URL is available', function () {",
+                  "  const response = pm.response.json();",
+                  "  if (response.status === 'completed' && response.format === 'pdf') {",
+                  "    pm.expect(response.downloadUrl).to.not.be.empty;",
+                  "    pm.expect(response.storageKey).to.not.be.empty;",
+                  "  }",
+                  "});",
+                  "",
+                  "pm.test('Check if storage URL is provided', function () {",
+                  "  const response = pm.response.json();",
+                  "  if (response.status === 'completed' && response.format === 'pdf') {",
+                  "    if (response.downloadUrl.startsWith('http')) {",
+                  "      pm.expect(response.downloadUrl).to.include('http');",
+                  "    }",
+                  "  }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Download Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/reports/{{reportId}}/download",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "reports", "{{reportId}}", "download"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is PDF content', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/pdf');",
+                  "});",
+                  "",
+                  "pm.test('Response has Content-Disposition header', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Disposition')).to.include('attachment');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Export Analytics",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"startDate\": \"2024-01-01\",\n  \"endDate\": \"2024-01-31\",\n  \"format\": \"csv\",\n  \"includeMetadata\": true,\n  \"includeUserInfo\": false,\n  \"eventTypes\": [\"user_login\", \"user_logout\", \"feature_access\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/analytics/export",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "export"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has export ID', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('id');",
+                  "  pm.expect(response.status).to.eql('pending');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "  const response = pm.response.json();",
+                  "  pm.environment.set('exportId', response.id);",
+                  "}"
+                ],
+                "type": "text-javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Health Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "health"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has health status', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('status');",
+                  "  pm.expect(response).to.have.property('checks');",
+                  "  pm.expect(response).to.have.property('metrics');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Event Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/stats/events?startDate=2024-01-01&endDate=2024-01-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "stats", "events"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-01-31"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has event statistics', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('totalEvents');",
+                  "  pm.expect(response).to.have.property('uniqueUsers');",
+                  "  pm.expect(response).to.have.property('eventTypes');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get User Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/stats/users?startDate=2024-01-01&endDate=2024-01-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "stats", "users"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-01-31"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has user statistics', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('activeUsers');",
+                  "  pm.expect(response).to.have.property('totalUserEvents');",
+                  "  pm.expect(response).to.have.property('averageEventsPerUser');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Performance Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/stats/performance",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "stats", "performance"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has performance data', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('realTime');",
+                  "  pm.expect(response).to.have.property('systemHealth');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Custom Metric",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/custom/user_login?startDate=2024-01-01&endDate=2024-01-31&groupBy=hour",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "custom", "user_login"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-01-31"
+                },
+                {
+                  "key": "groupBy",
+                  "value": "hour"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has custom metric data', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('metricName');",
+                  "  pm.expect(response).to.have.property('data');",
+                  "  pm.expect(response).to.have.property('period');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Export by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/export/{{exportId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "export", "{{exportId}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has export details', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('id');",
+                  "  pm.expect(response).to.have.property('status');",
+                  "  pm.expect(response).to.have.property('format');",
+                  "  pm.expect(response).to.have.property('downloadUrl');",
+                  "});",
+                  "",
+                  "pm.test('Export belongs to correct tenant', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.metadata.tenantId).to.eql(pm.environment.get('tenantId'));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Data Cleanup",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/cleanup?olderThan=2024-01-01",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "cleanup"],
+              "query": [
+                {
+                  "key": "olderThan",
+                  "value": "2024-01-01"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204', function () {",
+                  "  pm.response.to.have.status(204);",
+                  "});",
+                  "",
+                  "pm.test('Data cleanup completed successfully', function () {",
+                  "  pm.expect(pm.response.code).to.equal(204);",
                   "});"
                 ],
                 "type": "text/javascript"

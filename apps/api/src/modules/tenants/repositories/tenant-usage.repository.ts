@@ -6,6 +6,7 @@ import {
   TenantUsageMetric,
 } from '../entities/tenant-usage.entity';
 import { TenantScopedRepository } from '../../../common/repositories/tenant-scoped.repository';
+import { requireTenantContext } from '../../../common/interceptors/tenant-scoping.interceptor';
 
 @Injectable()
 export class TenantUsageRepository extends TenantScopedRepository<TenantUsage> {
@@ -236,9 +237,12 @@ export class TenantUsageRepository extends TenantScopedRepository<TenantUsage> {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
 
-    const result = await this.deleteWithTenantScope({
-      date: { $lt: cutoffDate },
-    });
+    const tenantId = requireTenantContext();
+    const result = await this.createQueryBuilder('usage')
+      .delete()
+      .where('usage.tenantId = :tenantId', { tenantId })
+      .andWhere('usage.date < :cutoffDate', { cutoffDate })
+      .execute();
 
     return result.affected || 0;
   }

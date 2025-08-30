@@ -65,6 +65,7 @@ describe('TeamService', () => {
   beforeEach(async () => {
     const mockTeamRepository = {
       createTeam: jest.fn(),
+      findByName: jest.fn(),
       findTeamsWithDetails: jest.fn(),
       findTeamWithDetails: jest.fn(),
       findOneByIdForTenant: jest.fn(),

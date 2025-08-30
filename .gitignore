@@ -111,6 +111,7 @@ Thumbs.db
 # Uploads
 uploads/
 public/uploads/
+reports/
 
 # SSL certificates
 *.pem
