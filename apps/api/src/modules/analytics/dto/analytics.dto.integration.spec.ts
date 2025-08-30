@@ -6,8 +6,16 @@ import { Repository } from 'typeorm';
 import { AnalyticsController } from '../controllers/analytics.controller';
 import { AnalyticsService } from '../services/analytics.service';
 import { AnalyticsModule } from '../analytics.module';
-import { UsageAnalytics, AnalyticsEventType, AnalyticsMetricType } from '../entities/usage-analytics.entity';
-import { AnalyticsQueryDto, AnalyticsAggregateQueryDto, ExportAnalyticsDto } from './analytics.dto';
+import {
+  UsageAnalytics,
+  AnalyticsEventType,
+  AnalyticsMetricType,
+} from '../entities/usage-analytics.entity';
+import {
+  AnalyticsQueryDto,
+  AnalyticsAggregateQueryDto,
+  ExportAnalyticsDto,
+} from './analytics.dto';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../../rbac/guards/permissions.guard';
 import { TenantScopingInterceptor } from '../../../common/interceptors/tenant-scoping.interceptor';
@@ -60,7 +68,7 @@ describe('Analytics DTOs - Integration Tests', () => {
       .compile();
 
     app = moduleFixture.createNestApplication();
-    
+
     // Apply global validation pipe with the same configuration as main.ts
     app.useGlobalPipes(
       new ValidationPipe({
@@ -75,20 +83,31 @@ describe('Analytics DTOs - Integration Tests', () => {
 
     await app.init();
 
-    analyticsController = moduleFixture.get<AnalyticsController>(AnalyticsController);
+    analyticsController =
+      moduleFixture.get<AnalyticsController>(AnalyticsController);
     analyticsService = moduleFixture.get<AnalyticsService>(AnalyticsService);
-    analyticsRepository = moduleFixture.get<Repository<UsageAnalytics>>(getRepositoryToken(UsageAnalytics));
+    analyticsRepository = moduleFixture.get<Repository<UsageAnalytics>>(
+      getRepositoryToken(UsageAnalytics)
+    );
 
     // Mock the tenant decorator
-    jest.spyOn(analyticsController, 'getEvents').mockImplementation(async (tenantId: string, query: AnalyticsQueryDto) => {
-      // This simulates what happens when the DTO is processed by the validation pipe
-      return [];
-    });
+    jest
+      .spyOn(analyticsController, 'getEvents')
+      .mockImplementation(
+        async (tenantId: string, query: AnalyticsQueryDto) => {
+          // This simulates what happens when the DTO is processed by the validation pipe
+          return [];
+        }
+      );
 
-    jest.spyOn(analyticsService, 'getEvents').mockImplementation(async (tenantId: string, query: AnalyticsQueryDto) => {
-      // Return the query object to verify default values are applied
-      return query as any;
-    });
+    jest
+      .spyOn(analyticsService, 'getEvents')
+      .mockImplementation(
+        async (tenantId: string, query: AnalyticsQueryDto) => {
+          // Return the query object to verify default values are applied
+          return query as any;
+        }
+      );
   });
 
   afterAll(async () => {
@@ -104,7 +123,10 @@ describe('Analytics DTOs - Integration Tests', () => {
       };
 
       // Act - Call the controller method (this simulates the validation pipe processing)
-      const result = await analyticsService.getEvents(mockTenantId, minimalQuery as AnalyticsQueryDto);
+      const result = await analyticsService.getEvents(
+        mockTenantId,
+        minimalQuery as AnalyticsQueryDto
+      );
 
       // Assert - Default values should be applied
       expect(result).toBeDefined();
@@ -126,7 +148,10 @@ describe('Analytics DTOs - Integration Tests', () => {
       };
 
       // Act - Call the service method
-      const result = await analyticsService.getEvents(mockTenantId, fullQuery as AnalyticsQueryDto);
+      const result = await analyticsService.getEvents(
+        mockTenantId,
+        fullQuery as AnalyticsQueryDto
+      );
 
       // Assert - Provided values should be used
       expect(result).toBeDefined();
@@ -145,7 +170,10 @@ describe('Analytics DTOs - Integration Tests', () => {
       };
 
       // Act - Call the service method
-      const result = await analyticsService.getEvents(mockTenantId, stringQuery as any);
+      const result = await analyticsService.getEvents(
+        mockTenantId,
+        stringQuery as any
+      );
 
       // Assert - String values should be converted to numbers
       expect(result).toBeDefined();
@@ -163,12 +191,19 @@ describe('Analytics DTOs - Integration Tests', () => {
       };
 
       // Mock the service method
-      jest.spyOn(analyticsService, 'getAggregates').mockImplementation(async (tenantId: string, query: AnalyticsAggregateQueryDto) => {
-        return query as any;
-      });
+      jest
+        .spyOn(analyticsService, 'getAggregates')
+        .mockImplementation(
+          async (tenantId: string, query: AnalyticsAggregateQueryDto) => {
+            return query as any;
+          }
+        );
 
       // Act - Call the service method
-      const result = await analyticsService.getAggregates(mockTenantId, minimalQuery as AnalyticsAggregateQueryDto);
+      const result = await analyticsService.getAggregates(
+        mockTenantId,
+        minimalQuery as AnalyticsAggregateQueryDto
+      );
 
       // Assert - Default values should be applied
       expect(result).toBeDefined();
@@ -185,17 +220,24 @@ describe('Analytics DTOs - Integration Tests', () => {
       };
 
       // Mock the service method
-      jest.spyOn(analyticsService, 'exportAnalytics').mockImplementation(async (tenantId: string, exportData: ExportAnalyticsDto) => {
-        return {
-          id: 'export-123',
-          status: 'pending',
-          format: exportData.format || 'json',
-          createdAt: new Date(),
-        };
-      });
+      jest
+        .spyOn(analyticsService, 'exportAnalytics')
+        .mockImplementation(
+          async (tenantId: string, exportData: ExportAnalyticsDto) => {
+            return {
+              id: 'export-123',
+              status: 'pending',
+              format: exportData.format || 'json',
+              createdAt: new Date(),
+            };
+          }
+        );
 
       // Act - Call the service method
-      const result = await analyticsService.exportAnalytics(mockTenantId, minimalExport as ExportAnalyticsDto);
+      const result = await analyticsService.exportAnalytics(
+        mockTenantId,
+        minimalExport as ExportAnalyticsDto
+      );
 
       // Assert - Default values should be applied
       expect(result).toBeDefined();

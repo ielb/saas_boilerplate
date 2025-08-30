@@ -6,7 +6,10 @@ import {
   ExportAnalyticsDto,
   TrackEventDto,
 } from './analytics.dto';
-import { AnalyticsEventType, AnalyticsMetricType } from '../entities/usage-analytics.entity';
+import {
+  AnalyticsEventType,
+  AnalyticsMetricType,
+} from '../entities/usage-analytics.entity';
 
 describe('Analytics DTOs - Default Values', () => {
   describe('AnalyticsQueryDto', () => {
