@@ -171,11 +171,6 @@
       "type": "string"
     },
     {
-      "key": "exportId",
-      "value": "",
-      "type": "string"
-    },
-    {
       "key": "fileKey",
       "value": "",
       "type": "string"
@@ -202,11 +197,6 @@
     },
     {
       "key": "brandingId",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "exportId",
       "value": "",
       "type": "string"
     },
