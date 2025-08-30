@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BullModule } from '@nestjs/bull';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 import { env } from '@app/config';
 
@@ -17,6 +18,7 @@ import { AuditModule } from './modules/audit/audit.module';
 import { TenantsModule } from './modules/tenants/tenants.module';
 import { FilesModule } from './modules/files/files.module';
 import { EmailModule } from './modules/email/email.module';
+import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { TenantMiddlewareModule } from './common/middleware/tenant-middleware.module';
 import { TenantIsolationMiddleware } from './common/middleware/tenant-isolation.middleware';
 
@@ -28,6 +30,9 @@ import { TenantIsolationMiddleware } from './common/middleware/tenant-isolation.
       envFilePath: ['.env.local', '.env'],
       load: [() => ({ env })],
     }),
+
+    // Event emitter
+    EventEmitterModule.forRoot(),
 
     // Database
     TypeOrmModule.forRoot({
@@ -89,6 +94,7 @@ import { TenantIsolationMiddleware } from './common/middleware/tenant-isolation.
     TenantMiddlewareModule,
     FilesModule,
     EmailModule,
+    AnalyticsModule,
   ],
   controllers: [],
   providers: [],
