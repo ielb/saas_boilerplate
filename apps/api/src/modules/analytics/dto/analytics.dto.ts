@@ -13,7 +13,7 @@ import {
   Max,
   IsNotEmpty,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 import {
   AnalyticsEventType,
   AnalyticsMetricType,
@@ -37,6 +37,7 @@ export class TrackEventDto {
   metricType?: AnalyticsMetricType;
 
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   metricValue?: number;
 
@@ -104,12 +105,14 @@ export class AnalyticsQueryDto {
   sortOrder?: 'ASC' | 'DESC' = 'DESC';
 
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   @Min(1)
   @Max(1000)
   limit?: number = 50;
 
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   @Min(0)
   offset?: number = 0;
@@ -133,6 +136,7 @@ export class AnalyticsAggregateQueryDto {
   endDate?: string;
 
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   @Min(1)
   @Max(1000)
@@ -308,6 +312,7 @@ export class CreateAlertDto {
   @IsEnum(['gt', 'lt', 'eq', 'gte', 'lte'])
   condition!: 'gt' | 'lt' | 'eq' | 'gte' | 'lte';
 
+  @Type(() => Number)
   @IsNumber()
   threshold!: number;
 
@@ -342,6 +347,7 @@ export class UpdateAlertDto {
   condition?: 'gt' | 'lt' | 'eq' | 'gte' | 'lte';
 
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   threshold?: number;
 
@@ -396,10 +402,20 @@ export class ExportAnalyticsDto {
   format?: 'json' | 'csv' | 'excel';
 
   @IsOptional()
+  @Transform(({ value }) => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return value;
+  })
   @IsBoolean()
   includeMetadata?: boolean = true;
 
   @IsOptional()
+  @Transform(({ value }) => {
+    if (value === 'true') return true;
+    if (value === 'false') return false;
+    return value;
+  })
   @IsBoolean()
   includeUserInfo?: boolean = false;
 }
