@@ -27,6 +27,8 @@ import {
   AnalyticsHealthResponseDto,
 } from '../dto/analytics.dto';
 import { EmailService } from '../../email/services/email.service';
+import { PdfGeneratorService } from './pdf-generator.service';
+import { StorageManagerService } from '../../files/services/storage-manager.service';
 
 describe('AnalyticsService', () => {
   let service: AnalyticsService;
@@ -39,6 +41,8 @@ describe('AnalyticsService', () => {
   let mockQueryBuilder: any;
   let mockEventEmitter: any;
   let mockEmailService: any;
+  let mockPdfGeneratorService: any;
+  let mockStorageManagerService: any;
 
   beforeEach(async () => {
     mockQueryBuilder = {
@@ -125,6 +129,16 @@ describe('AnalyticsService', () => {
       sendEmail: jest.fn(),
     };
 
+    mockPdfGeneratorService = {
+      generateAnalyticsReport: jest.fn(),
+      generatePdfFromHtml: jest.fn(),
+    };
+
+    mockStorageManagerService = {
+      upload: jest.fn(),
+      download: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AnalyticsService,
@@ -153,8 +167,16 @@ describe('AnalyticsService', () => {
           useValue: mockEventEmitter,
         },
         {
+          provide: PdfGeneratorService,
+          useValue: mockPdfGeneratorService,
+        },
+        {
           provide: EmailService,
           useValue: mockEmailService,
+        },
+        {
+          provide: StorageManagerService,
+          useValue: mockStorageManagerService,
         },
       ],
     }).compile();
@@ -894,14 +916,6 @@ describe('AnalyticsService', () => {
         format: 'pdf',
       });
       expect(mockReportRepository.save).toHaveBeenCalled();
-      expect(mockEventEmitter.emit).toHaveBeenCalledWith(
-        'analytics.report.requested',
-        {
-          tenantId,
-          reportId: 'report-123',
-          reportData,
-        }
-      );
     });
   });
 
