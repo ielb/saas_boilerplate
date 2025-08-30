@@ -8,10 +8,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource, QueryRunner } from 'typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { PdfGeneratorService } from './pdf-generator.service';
 import {
   UsageAnalytics,
   AnalyticsAggregate,
   AnalyticsAlert,
+  AnalyticsReport,
   AnalyticsEventType,
   AnalyticsMetricType,
 } from '../entities/usage-analytics.entity';
@@ -38,6 +40,7 @@ import {
   AnalyticsHealthResponseDto,
 } from '../dto/analytics.dto';
 import { EmailService } from '../../email/services/email.service';
+import { StorageManagerService } from '../../files/services/storage-manager.service';
 
 @Injectable()
 export class AnalyticsService {
@@ -50,9 +53,13 @@ export class AnalyticsService {
     private readonly aggregateRepository: Repository<AnalyticsAggregate>,
     @InjectRepository(AnalyticsAlert)
     private readonly alertRepository: Repository<AnalyticsAlert>,
+    @InjectRepository(AnalyticsReport)
+    private readonly reportRepository: Repository<AnalyticsReport>,
     private readonly dataSource: DataSource,
     private readonly eventEmitter: EventEmitter2,
-    private readonly emailService: EmailService
+    private readonly pdfGeneratorService: PdfGeneratorService,
+    private readonly emailService: EmailService,
+    private readonly storageManagerService: StorageManagerService
   ) {}
 
   // Event tracking methods
@@ -354,33 +361,341 @@ export class AnalyticsService {
     tenantId: string,
     reportData: GenerateReportDto
   ): Promise<ReportResponseDto> {
-    const reportId = `report_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-    const report: ReportResponseDto = {
-      id: reportId,
-      reportType: reportData.reportType,
-      reportName: reportData.reportName || `Report ${reportId}`,
-      description: reportData.description || '',
-      status: 'pending',
-      format: reportData.format || 'json',
-      createdAt: new Date(),
-      metadata: {
-        tenantId,
-        startDate: reportData.startDate,
-        endDate: reportData.endDate,
-        metrics: reportData.metrics,
-        filters: reportData.filters,
-      },
+    const report = new AnalyticsReport();
+    report.tenantId = tenantId;
+    report.reportType = reportData.reportType;
+    report.reportName = reportData.reportName || `Report ${Date.now()}`;
+    report.description = reportData.description || '';
+    report.status = 'processing';
+    report.format = reportData.format || 'json';
+    report.metadata = {
+      tenantId,
+      startDate: reportData.startDate,
+      endDate: reportData.endDate,
+      metrics: reportData.metrics,
+      filters: reportData.filters,
     };
 
-    // Emit event for background processing
-    this.eventEmitter.emit('analytics.report.requested', {
-      tenantId,
-      reportId,
-      reportData,
+    const savedReport = await this.reportRepository.save(report);
+
+    // Generate the report asynchronously
+    this.generateReportAsync(savedReport, reportData);
+
+    return this.mapToReportResponse(savedReport);
+  }
+
+  /**
+   * Generate report asynchronously
+   */
+  private async generateReportAsync(
+    report: AnalyticsReport,
+    reportData: GenerateReportDto
+  ): Promise<void> {
+    try {
+      this.logger.log(`Starting report generation for ${report.id}`);
+
+      // Gather analytics data based on report type
+      this.logger.log(`Gathering analytics data for report ${report.id}`);
+      const analyticsData = await this.gatherAnalyticsData(
+        report.tenantId,
+        report.reportType,
+        reportData
+      );
+      this.logger.log(`Analytics data gathered for report ${report.id}`);
+
+      // Generate PDF if format is pdf
+      if (report.format === 'pdf') {
+        this.logger.log(`Generating PDF for report ${report.id}`);
+
+        try {
+          const reportResponse = this.mapToReportResponse(report);
+          const { filePath, fileSize } =
+            await this.pdfGeneratorService.generateAnalyticsReport(
+              reportResponse,
+              analyticsData
+            );
+          this.logger.log(
+            `PDF generated successfully for report ${report.id} at ${filePath}`
+          );
+
+          // Upload PDF to storage
+          this.logger.log(`Uploading PDF to storage for report ${report.id}`);
+          const fs = require('fs');
+          const path = require('path');
+
+          if (!fs.existsSync(filePath)) {
+            throw new Error(`Generated PDF file not found at ${filePath}`);
+          }
+
+          const fileBuffer = fs.readFileSync(filePath);
+          const storageKey = `analytics/reports/${report.id}/${path.basename(filePath)}`;
+
+          this.logger.log(`Uploading to storage key: ${storageKey}`);
+
+          try {
+            const uploadResult = await this.storageManagerService.upload(
+              storageKey,
+              fileBuffer,
+              {
+                contentType: 'application/pdf',
+                metadata: {
+                  reportId: report.id,
+                  reportType: report.reportType,
+                  tenantId: report.tenantId,
+                  generatedAt: new Date().toISOString(),
+                },
+                public: false,
+                expiresIn: 7 * 24 * 60 * 60, // 7 days
+              }
+            );
+
+            this.logger.log(
+              `Storage upload result:`,
+              JSON.stringify(uploadResult, null, 2)
+            );
+            this.logger.log(
+              `PDF uploaded successfully for report ${report.id}`
+            );
+
+            // Clean up local file
+            fs.unlinkSync(filePath);
+            this.logger.log(`Local file cleaned up for report ${report.id}`);
+
+            // Update report with storage details
+            report.status = 'completed';
+
+            // Ensure we have a valid download URL
+            let downloadUrl = `/api/analytics/reports/${report.id}/download`;
+            if (
+              uploadResult &&
+              uploadResult.url &&
+              uploadResult.url.trim() !== ''
+            ) {
+              // Check if it's a valid HTTP URL
+              if (
+                uploadResult.url.startsWith('http://') ||
+                uploadResult.url.startsWith('https://')
+              ) {
+                downloadUrl = uploadResult.url;
+                this.logger.log(`Using storage URL: ${downloadUrl}`);
+              } else {
+                this.logger.log(
+                  `Storage URL is not HTTP, using API endpoint: ${downloadUrl}`
+                );
+              }
+            } else {
+              this.logger.log(
+                `Storage URL is empty, using API endpoint: ${downloadUrl}`
+              );
+            }
+
+            // For MinIO/S3, always use the API endpoint to avoid access issues
+            // The API endpoint will handle authentication and serve the file properly
+            downloadUrl = `/api/analytics/reports/${report.id}/download`;
+            this.logger.log(
+              `Using API endpoint for secure access: ${downloadUrl}`
+            );
+
+            report.downloadUrl = downloadUrl;
+            report.fileSize = fileSize;
+            report.recordCount = analyticsData.totalEvents || 0;
+            report.completedAt = new Date();
+            report.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+            report.storageKey = storageKey; // Store the storage key for future reference
+
+            this.logger.log(
+              `Report ${report.id} completed successfully with download URL: ${report.downloadUrl}`
+            );
+          } catch (storageError) {
+            this.logger.error(
+              `Storage upload failed for report ${report.id}: ${storageError instanceof Error ? storageError.message : 'Unknown error'}`
+            );
+            this.logger.log(
+              `Falling back to local storage for report ${report.id}`
+            );
+
+            // Fallback to local storage
+            const localDownloadUrl = `/api/analytics/reports/${report.id}/download`;
+
+            // Update report with local storage details
+            report.status = 'completed';
+            report.downloadUrl = localDownloadUrl;
+            report.fileSize = fileSize;
+            report.recordCount = analyticsData.totalEvents || 0;
+            report.completedAt = new Date();
+            report.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+            report.storageKey = filePath; // Store local file path as storage key
+
+            this.logger.log(
+              `Report ${report.id} completed with local storage fallback: ${localDownloadUrl}`
+            );
+          }
+        } catch (pdfError) {
+          this.logger.error(
+            `PDF generation failed for report ${report.id}: ${pdfError instanceof Error ? pdfError.message : 'Unknown error'}`
+          );
+          this.logger.error(
+            `PDF generation stack trace: ${pdfError instanceof Error ? pdfError.stack : 'No stack trace'}`
+          );
+
+          // Update report with error
+          report.status = 'failed';
+          report.error = `PDF generation failed: ${pdfError instanceof Error ? pdfError.message : 'Unknown error'}`;
+          await this.reportRepository.save(report);
+          return;
+        }
+      } else {
+        // For other formats, just mark as completed
+        this.logger.log(`Marking non-PDF report ${report.id} as completed`);
+        report.status = 'completed';
+        report.completedAt = new Date();
+        report.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+      }
+
+      await this.reportRepository.save(report);
+      this.logger.log(`Report generation completed for ${report.id}`);
+    } catch (error) {
+      this.logger.error(
+        `Report generation failed for ${report.id}: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+      this.logger.error(
+        `Full error stack: ${error instanceof Error ? error.stack : 'No stack trace'}`
+      );
+
+      // Update report with error
+      report.status = 'failed';
+      report.error = error instanceof Error ? error.message : 'Unknown error';
+      await this.reportRepository.save(report);
+    }
+  }
+
+  /**
+   * Gather analytics data for report generation
+   */
+  private async gatherAnalyticsData(
+    tenantId: string,
+    reportType: string,
+    reportData: GenerateReportDto
+  ): Promise<any> {
+    const query: AnalyticsQueryDto = {};
+    if (reportData.startDate) query.startDate = reportData.startDate;
+    if (reportData.endDate) query.endDate = reportData.endDate;
+
+    switch (reportType) {
+      case 'usage':
+        const usageEvents = await this.getEvents(tenantId, query);
+        const summary = await this.getSummary(tenantId);
+        const aggregates = await this.getAggregates(tenantId, {});
+
+        return {
+          totalEvents: usageEvents.length,
+          uniqueUsers: summary.uniqueUsers,
+          activeSessions: summary.activeSessions,
+          recentEvents: usageEvents.slice(0, 10), // Last 10 events
+          aggregates: aggregates.slice(0, 10), // Last 10 aggregates
+        };
+
+      case 'user_activity':
+        const allUserEvents = await this.getEvents(tenantId, query);
+        const userEvents = allUserEvents.filter(e => e.userId);
+        const userActivity = userEvents.reduce(
+          (acc, event) => {
+            const userId = event.userId!;
+            if (!acc[userId]) {
+              acc[userId] = {
+                userId: userId,
+                email: event.user?.email,
+                eventCount: 0,
+                lastActivity: event.timestamp,
+                eventTypes: new Set(),
+              };
+            }
+            acc[userId].eventCount++;
+            acc[userId].eventTypes.add(event.eventType);
+            if (event.timestamp > acc[userId].lastActivity) {
+              acc[userId].lastActivity = event.timestamp;
+            }
+            return acc;
+          },
+          {} as Record<string, any>
+        );
+
+        const activeUsers = Object.values(userActivity).length;
+        const totalUserEvents = userEvents.length;
+        const averageEventsPerUser =
+          activeUsers > 0 ? totalUserEvents / activeUsers : 0;
+
+        return {
+          activeUsers,
+          totalUserEvents,
+          averageEventsPerUser,
+          userActivity: Object.values(userActivity).map(user => ({
+            ...user,
+            eventTypes: Array.from(user.eventTypes),
+          })),
+        };
+
+      case 'feature_adoption':
+        const featureData = await this.getFeatureAdoptionData(tenantId, query);
+        return featureData;
+
+      case 'performance':
+        const performanceData = await this.getPerformanceData(tenantId);
+        return performanceData;
+
+      default:
+        return {
+          message: 'Report data will be generated based on type',
+        };
+    }
+  }
+
+  /**
+   * Get feature adoption data
+   */
+  private async getFeatureAdoptionData(
+    tenantId: string,
+    query: AnalyticsQueryDto
+  ): Promise<any> {
+    // Mock feature adoption data
+    return {
+      totalFeatures: 15,
+      adoptedFeatures: 12,
+      adoptionRate: 80,
+      topFeatures: [
+        { name: 'User Management', adoptionRate: 95 },
+        { name: 'Analytics Dashboard', adoptionRate: 85 },
+        { name: 'File Upload', adoptionRate: 75 },
+      ],
+    };
+  }
+
+  /**
+   * Get performance data
+   */
+  private async getPerformanceData(tenantId: string): Promise<any> {
+    // Mock performance data
+    return {
+      averageResponseTime: 150,
+      uptime: 99.9,
+      errorRate: 0.1,
+      activeConnections: 25,
+    };
+  }
+
+  async getReport(
+    tenantId: string,
+    reportId: string
+  ): Promise<ReportResponseDto> {
+    const report = await this.reportRepository.findOne({
+      where: { id: reportId, tenantId },
     });
 
-    return report;
+    if (!report) {
+      throw new NotFoundException('Report not found');
+    }
+
+    return this.mapToReportResponse(report);
   }
 
   async exportAnalytics(
@@ -406,6 +721,84 @@ export class AnalyticsService {
     });
 
     return exportJob;
+  }
+
+  /**
+   * Get export job status and details
+   */
+  async getExport(
+    tenantId: string,
+    exportId: string
+  ): Promise<ExportResponseDto> {
+    try {
+      // In a real implementation, this would query a job queue or database
+      // to get the status of an export job
+      const mockExport: ExportResponseDto = {
+        id: exportId,
+        status: 'completed', // Could be 'pending', 'processing', 'completed', 'failed'
+        format: 'json',
+        createdAt: new Date(),
+        recordCount: 1000,
+        fileSize: 1024 * 1024, // 1MB
+        downloadUrl: `https://api.example.com/exports/${exportId}/download`,
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours from now
+        error: '',
+      };
+
+      return mockExport;
+    } catch (error) {
+      throw new BadRequestException('Failed to get export details');
+    }
+  }
+
+  /**
+   * Clean up old analytics data
+   */
+  async cleanupData(tenantId: string, olderThan: string): Promise<void> {
+    try {
+      const cutoffDate = new Date(olderThan);
+
+      // Validate the date
+      if (isNaN(cutoffDate.getTime())) {
+        throw new BadRequestException(
+          'Invalid date format for olderThan parameter'
+        );
+      }
+
+      // Delete old analytics events
+      const deletedEvents = await this.analyticsRepository
+        .createQueryBuilder('event')
+        .delete()
+        .where('event.tenantId = :tenantId', { tenantId })
+        .andWhere('event.timestamp < :cutoffDate', { cutoffDate })
+        .execute();
+
+      // Delete old aggregates
+      const deletedAggregates = await this.aggregateRepository
+        .createQueryBuilder('aggregate')
+        .delete()
+        .where('aggregate.tenantId = :tenantId', { tenantId })
+        .andWhere('aggregate.timestamp < :cutoffDate', { cutoffDate })
+        .execute();
+
+      // Delete old reports (keep for 30 days)
+      const reportCutoffDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+      const deletedReports = await this.reportRepository
+        .createQueryBuilder('report')
+        .delete()
+        .where('report.tenantId = :tenantId', { tenantId })
+        .andWhere('report.createdAt < :reportCutoffDate', { reportCutoffDate })
+        .execute();
+
+      this.logger.log(
+        `Cleaned up analytics data for tenant ${tenantId}: ${deletedEvents.affected} events, ${deletedAggregates.affected} aggregates, ${deletedReports.affected} reports deleted`
+      );
+    } catch (error) {
+      this.logger.error(
+        `Failed to cleanup analytics data: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+      throw new BadRequestException('Failed to cleanup analytics data');
+    }
   }
 
   // Alert management methods
@@ -801,7 +1194,7 @@ export class AnalyticsService {
 
   private async getActiveAlerts(tenantId: string): Promise<number> {
     return this.alertRepository.count({
-      where: { tenantId, isActive: true, isTriggered: true },
+      where: { tenantId, isActive: true },
     });
   }
 
@@ -852,7 +1245,7 @@ export class AnalyticsService {
     return {
       id: event.id,
       tenantId: event.tenantId,
-      userId: event.userId || '',
+      userId: event.userId ?? '',
       eventType: event.eventType,
       eventName: event.eventName,
       description: event.description || '',
@@ -904,17 +1297,49 @@ export class AnalyticsService {
       id: alert.id,
       tenantId: alert.tenantId,
       alertName: alert.alertName,
-      description: alert.description,
+      description: alert.description || '',
       severity: alert.severity,
       metricName: alert.metricName,
       condition: alert.condition,
       threshold: alert.threshold,
       isActive: alert.isActive,
-      isTriggered: alert.isTriggered,
+      isTriggered: alert.triggerCount > 0,
       lastTriggeredAt: alert.lastTriggeredAt || undefined,
       metadata: alert.metadata || undefined,
       createdAt: alert.createdAt,
       updatedAt: alert.updatedAt,
     };
+  }
+
+  private mapToReportResponse(report: AnalyticsReport): ReportResponseDto {
+    return {
+      id: report.id,
+      reportType: report.reportType,
+      reportName: report.reportName,
+      description: report.description || '',
+      status: report.status,
+      format: report.format,
+      downloadUrl: report.downloadUrl || '',
+      expiresAt: report.expiresAt || new Date(),
+      metadata: report.metadata || {},
+      createdAt: report.createdAt,
+      completedAt: report.completedAt || new Date(),
+      error: report.error || '',
+      storageKey: report.storageKey || '',
+    };
+  }
+
+  /**
+   * Download report from storage
+   */
+  async downloadReportFromStorage(storageKey: string): Promise<Buffer> {
+    try {
+      return await this.storageManagerService.download(storageKey);
+    } catch (error) {
+      this.logger.error(
+        `Failed to download report from storage: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+      throw new NotFoundException('Report file not found in storage');
+    }
   }
 }

@@ -11,6 +11,9 @@ import {
   UseInterceptors,
   HttpCode,
   HttpStatus,
+  Res,
+  NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -21,7 +24,7 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { PermissionsGuard } from '../../rbac/guards/permissions.guard';
-import { RequirePermissions } from '@/common/decorators';
+import { RequirePermissions } from '../../../common/decorators/permissions.decorator';
 import {
   PermissionAction,
   PermissionResource,
@@ -49,8 +52,11 @@ import {
   BulkTrackEventsResponseDto,
   AnalyticsHealthResponseDto,
 } from '../dto/analytics.dto';
-import { TenantScopingInterceptor } from '@/common/interceptors/tenant-scoping.interceptor';
-import { TenantId } from '@/common/decorators/tenant.decorator';
+import { TenantScopingInterceptor } from '../../../common/interceptors/tenant-scoping.interceptor';
+import { TenantId } from '../../../common/decorators/tenant.decorator';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as glob from 'glob';
 
 @ApiTags('Analytics')
 @Controller('analytics')
@@ -58,6 +64,8 @@ import { TenantId } from '@/common/decorators/tenant.decorator';
 @UseInterceptors(TenantScopingInterceptor)
 @ApiBearerAuth()
 export class AnalyticsController {
+  private readonly logger = new Logger(AnalyticsController.name);
+
   constructor(private readonly analyticsService: AnalyticsService) {}
 
   // Event tracking endpoints
@@ -288,8 +296,96 @@ export class AnalyticsController {
     @TenantId() tenantId: string,
     @Param('reportId') reportId: string
   ): Promise<ReportResponseDto> {
-    // This would be implemented to check report status
-    throw new Error('Not implemented');
+    return this.analyticsService.getReport(tenantId, reportId);
+  }
+
+  @Get('reports/:reportId/download')
+  @RequirePermissions({
+    resource: PermissionResource.ANALYTICS,
+    action: PermissionAction.READ,
+  })
+  @ApiOperation({ summary: 'Download report file' })
+  @ApiResponse({
+    status: 200,
+    description: 'Report file downloaded successfully',
+  })
+  @ApiResponse({ status: 404, description: 'Report not found or not ready' })
+  @ApiResponse({ status: 403, description: 'Insufficient permissions' })
+  async downloadReport(
+    @TenantId() tenantId: string,
+    @Param('reportId') reportId: string,
+    @Res() res: any
+  ) {
+    const report = await this.analyticsService.getReport(tenantId, reportId);
+
+    if (report.status !== 'completed') {
+      throw new NotFoundException('Report is not ready for download');
+    }
+
+    if (!report.downloadUrl || report.downloadUrl === '') {
+      throw new NotFoundException('Report file not found');
+    }
+
+    // If the download URL is already a storage URL, redirect to it
+    if (report.downloadUrl.startsWith('http')) {
+      return res.redirect(report.downloadUrl);
+    }
+
+    // Otherwise, serve from storage using the storage key
+    if (report.storageKey) {
+      try {
+        // Check if storageKey is a local file path (fallback case)
+        if (
+          report.storageKey.includes('/') &&
+          !report.storageKey.startsWith('analytics/')
+        ) {
+          // Local file path fallback
+          const fs = require('fs');
+          const path = require('path');
+
+          if (fs.existsSync(report.storageKey)) {
+            const fileName = path.basename(report.storageKey);
+            const fileBuffer = fs.readFileSync(report.storageKey);
+
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader(
+              'Content-Disposition',
+              `attachment; filename="${fileName}"`
+            );
+            res.setHeader('Content-Length', fileBuffer.length);
+
+            res.send(fileBuffer);
+            return;
+          } else {
+            this.logger.error(`Local file not found: ${report.storageKey}`);
+            throw new NotFoundException('Local report file not found');
+          }
+        } else if (report.storageKey.startsWith('analytics/')) {
+          // Cloud storage key
+          const fileBuffer =
+            await this.analyticsService.downloadReportFromStorage(
+              report.storageKey
+            );
+          const fileName =
+            report.storageKey.split('/').pop() || `report-${reportId}.pdf`;
+
+          res.setHeader('Content-Type', 'application/pdf');
+          res.setHeader(
+            'Content-Disposition',
+            `attachment; filename="${fileName}"`
+          );
+          res.setHeader('Content-Length', fileBuffer.length);
+
+          res.send(fileBuffer);
+        } else {
+          throw new NotFoundException('Invalid storage key format');
+        }
+      } catch (error) {
+        throw new NotFoundException('Report file not found in storage');
+      }
+    } else {
+      throw new NotFoundException('Report file not found');
+    }
   }
 
   // Alert management endpoints
@@ -433,8 +529,7 @@ export class AnalyticsController {
     @TenantId() tenantId: string,
     @Param('exportId') exportId: string
   ): Promise<ExportResponseDto> {
-    // This would be implemented to check export status
-    throw new Error('Not implemented');
+    return this.analyticsService.getExport(tenantId, exportId);
   }
 
   // Health check endpoint
@@ -541,19 +636,20 @@ export class AnalyticsController {
     const userEvents = events.filter(e => e.userId);
     const userActivity = userEvents.reduce(
       (acc, event) => {
-        if (!acc[event.userId]) {
-          acc[event.userId] = {
-            userId: event.userId,
+        const userId = event.userId!;
+        if (!acc[userId]) {
+          acc[userId] = {
+            userId: userId,
             email: event.user?.email,
             eventCount: 0,
             lastActivity: event.timestamp,
             eventTypes: new Set(),
           };
         }
-        acc[event.userId].eventCount++;
-        acc[event.userId].eventTypes.add(event.eventType);
-        if (event.timestamp > acc[event.userId].lastActivity) {
-          acc[event.userId].lastActivity = event.timestamp;
+        acc[userId].eventCount++;
+        acc[userId].eventTypes.add(event.eventType);
+        if (event.timestamp > acc[userId].lastActivity) {
+          acc[userId].lastActivity = event.timestamp;
         }
         return acc;
       },
@@ -672,7 +768,6 @@ export class AnalyticsController {
     @TenantId() tenantId: string,
     @Query('olderThan') olderThan: string
   ): Promise<void> {
-    // This would implement data cleanup logic
-    throw new Error('Not implemented');
+    await this.analyticsService.cleanupData(tenantId, olderThan);
   }
 }

@@ -143,7 +143,7 @@ export class AnalyticsAggregateQueryDto {
 export class AnalyticsEventResponseDto {
   id!: string;
   tenantId!: string;
-  userId!: string;
+  userId?: string;
   eventType!: AnalyticsEventType;
   eventName!: string;
   description!: string;
@@ -285,6 +285,7 @@ export class ReportResponseDto {
   createdAt!: Date;
   completedAt?: Date;
   error?: string;
+  storageKey?: string;
 }
 
 // Alert DTOs

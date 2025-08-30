@@ -252,14 +252,14 @@ export class AnalyticsAlert {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ type: 'uuid' })
+  @Column()
   tenantId!: string;
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column()
   alertName!: string;
 
-  @Column({ type: 'text' })
-  description!: string;
+  @Column({ type: 'text', nullable: true })
+  description?: string;
 
   @Column({
     type: 'enum',
@@ -268,7 +268,7 @@ export class AnalyticsAlert {
   })
   severity!: 'low' | 'medium' | 'high' | 'critical';
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column()
   metricName!: string;
 
   @Column({
@@ -277,20 +277,14 @@ export class AnalyticsAlert {
   })
   condition!: 'gt' | 'lt' | 'eq' | 'gte' | 'lte';
 
-  @Column({ type: 'decimal', precision: 15, scale: 2 })
+  @Column({ type: 'decimal', precision: 10, scale: 2 })
   threshold!: number;
 
-  @Column({ type: 'boolean', default: true })
+  @Column({ default: true })
   isActive!: boolean;
 
-  @Column({ type: 'boolean', default: false })
-  isTriggered!: boolean;
-
-  @Column({ type: 'timestamp with time zone', nullable: true })
-  lastTriggeredAt!: Date | null;
-
   @Column({ type: 'jsonb', nullable: true })
-  metadata!: Record<string, any> | null;
+  metadata?: Record<string, any>;
 
   @CreateDateColumn()
   createdAt!: Date;
@@ -298,9 +292,11 @@ export class AnalyticsAlert {
   @UpdateDateColumn()
   updatedAt!: Date;
 
-  @ManyToOne(() => Tenant, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'tenantId' })
-  tenant!: Tenant;
+  @Column({ nullable: true })
+  lastTriggeredAt?: Date;
+
+  @Column({ default: 0 })
+  triggerCount!: number;
 
   // Business logic methods
   isThresholdExceeded(value: number): boolean {
@@ -321,16 +317,70 @@ export class AnalyticsAlert {
   }
 
   shouldTriggerAlert(): boolean {
-    return this.isActive && !this.isTriggered;
+    return this.isActive;
   }
 
   markAsTriggered(): void {
-    this.isTriggered = true;
     this.lastTriggeredAt = new Date();
+    this.triggerCount += 1;
   }
+}
 
-  resetAlert(): void {
-    this.isTriggered = false;
-    this.lastTriggeredAt = null;
-  }
+@Entity('analytics_reports')
+export class AnalyticsReport {
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
+
+  @Column()
+  tenantId!: string;
+
+  @Column()
+  reportType!: string;
+
+  @Column()
+  reportName!: string;
+
+  @Column({ type: 'text', nullable: true })
+  description?: string;
+
+  @Column({
+    type: 'enum',
+    enum: ['pending', 'processing', 'completed', 'failed'],
+    default: 'pending',
+  })
+  status!: 'pending' | 'processing' | 'completed' | 'failed';
+
+  @Column({
+    type: 'enum',
+    enum: ['json', 'csv', 'pdf', 'excel'],
+    default: 'json',
+  })
+  format!: string;
+
+  @Column({ nullable: true })
+  downloadUrl?: string;
+
+  @Column({ nullable: true })
+  expiresAt?: Date;
+
+  @Column({ type: 'jsonb', nullable: true })
+  metadata?: Record<string, any>;
+
+  @CreateDateColumn()
+  createdAt!: Date;
+
+  @Column({ nullable: true })
+  completedAt?: Date;
+
+  @Column({ type: 'text', nullable: true })
+  error?: string;
+
+  @Column({ nullable: true })
+  fileSize?: number;
+
+  @Column({ nullable: true })
+  recordCount?: number;
+
+  @Column({ nullable: true })
+  storageKey?: string;
 }
