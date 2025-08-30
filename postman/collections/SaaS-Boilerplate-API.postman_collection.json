@@ -161,6 +161,11 @@
       "type": "string"
     },
     {
+      "key": "exportId",
+      "value": "",
+      "type": "string"
+    },
+    {
       "key": "reportId",
       "value": "",
       "type": "string"
@@ -9252,6 +9257,106 @@
           ]
         },
         {
+          "name": "Get Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/reports/{{reportId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "reports", "{{reportId}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has report details', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('id');",
+                  "  pm.expect(response).to.have.property('reportType');",
+                  "  pm.expect(response).to.have.property('status');",
+                  "  pm.expect(response).to.have.property('format');",
+                  "});",
+                  "",
+                  "pm.test('Report belongs to correct tenant', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.metadata.tenantId).to.eql(pm.environment.get('tenantId'));",
+                  "});",
+                  "",
+                  "pm.test('Check if PDF download URL is available', function () {",
+                  "  const response = pm.response.json();",
+                  "  if (response.status === 'completed' && response.format === 'pdf') {",
+                  "    pm.expect(response.downloadUrl).to.not.be.empty;",
+                  "    pm.expect(response.storageKey).to.not.be.empty;",
+                  "  }",
+                  "});",
+                  "",
+                  "pm.test('Check if storage URL is provided', function () {",
+                  "  const response = pm.response.json();",
+                  "  if (response.status === 'completed' && response.format === 'pdf') {",
+                  "    if (response.downloadUrl.startsWith('http')) {",
+                  "      pm.expect(response.downloadUrl).to.include('http');",
+                  "    }",
+                  "  }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Download Report",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/reports/{{reportId}}/download",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "reports", "{{reportId}}", "download"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is PDF content', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/pdf');",
+                  "});",
+                  "",
+                  "pm.test('Response has Content-Disposition header', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Disposition')).to.include('attachment');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
           "name": "Export Analytics",
           "request": {
             "method": "POST",
@@ -9517,6 +9622,91 @@
                   "  pm.expect(response).to.have.property('metricName');",
                   "  pm.expect(response).to.have.property('data');",
                   "  pm.expect(response).to.have.property('period');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Export by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/export/{{exportId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "export", "{{exportId}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has export details', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('id');",
+                  "  pm.expect(response).to.have.property('status');",
+                  "  pm.expect(response).to.have.property('format');",
+                  "  pm.expect(response).to.have.property('downloadUrl');",
+                  "});",
+                  "",
+                  "pm.test('Export belongs to correct tenant', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response.metadata.tenantId).to.eql(pm.environment.get('tenantId'));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Data Cleanup",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/cleanup?olderThan=2024-01-01",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "cleanup"],
+              "query": [
+                {
+                  "key": "olderThan",
+                  "value": "2024-01-01"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204', function () {",
+                  "  pm.response.to.have.status(204);",
+                  "});",
+                  "",
+                  "pm.test('Data cleanup completed successfully', function () {",
+                  "  pm.expect(pm.response.code).to.equal(204);",
                   "});"
                 ],
                 "type": "text/javascript"
