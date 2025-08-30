@@ -236,9 +236,11 @@ export class TenantUsageRepository extends TenantScopedRepository<TenantUsage> {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
 
-    const result = await this.deleteWithTenantScope({
-      date: { $lt: cutoffDate },
-    });
+    const result = await this.createQueryBuilder('usage')
+      .delete()
+      .where('usage.tenantId = :tenantId', { tenantId: this.tenantId })
+      .andWhere('usage.date < :cutoffDate', { cutoffDate })
+      .execute();
 
     return result.affected || 0;
   }

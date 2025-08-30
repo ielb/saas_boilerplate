@@ -622,12 +622,12 @@ export class AnalyticsService {
       const startDate = this.getStartDateForPeriod(period);
       const endDate = new Date();
 
-      const events = await this.analyticsRepository.find({
-        where: {
-          tenantId,
-          timestamp: { $gte: startDate, $lte: endDate } as any,
-        },
-      });
+      const events = await this.analyticsRepository
+        .createQueryBuilder('analytics')
+        .where('analytics.tenantId = :tenantId', { tenantId })
+        .andWhere('analytics.timestamp >= :startDate', { startDate })
+        .andWhere('analytics.timestamp <= :endDate', { endDate })
+        .getMany();
 
       // Group events by metric name
       const groupedEvents = events.reduce(
@@ -706,23 +706,21 @@ export class AnalyticsService {
 
   private async getActiveSessions(tenantId: string): Promise<number> {
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-    return this.analyticsRepository.count({
-      where: {
-        tenantId,
-        timestamp: { $gte: oneHourAgo } as any,
-      },
-    });
+    return this.analyticsRepository
+      .createQueryBuilder('analytics')
+      .where('analytics.tenantId = :tenantId', { tenantId })
+      .andWhere('analytics.timestamp >= :oneHourAgo', { oneHourAgo })
+      .getCount();
   }
 
   private async getEventsToday(tenantId: string): Promise<number> {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    return this.analyticsRepository.count({
-      where: {
-        tenantId,
-        timestamp: { $gte: today } as any,
-      },
-    });
+    return this.analyticsRepository
+      .createQueryBuilder('analytics')
+      .where('analytics.tenantId = :tenantId', { tenantId })
+      .andWhere('analytics.timestamp >= :today', { today })
+      .getCount();
   }
 
   private async getActiveUsers(tenantId: string): Promise<number> {
@@ -738,13 +736,11 @@ export class AnalyticsService {
 
   private async getEventsPerMinute(tenantId: string): Promise<number> {
     const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
-    const count = await this.analyticsRepository.count({
-      where: {
-        tenantId,
-        timestamp: { $gte: oneMinuteAgo } as any,
-      },
-    });
-    return count;
+    return this.analyticsRepository
+      .createQueryBuilder('analytics')
+      .where('analytics.tenantId = :tenantId', { tenantId })
+      .andWhere('analytics.timestamp >= :oneMinuteAgo', { oneMinuteAgo })
+      .getCount();
   }
 
   private async getTopEvents(

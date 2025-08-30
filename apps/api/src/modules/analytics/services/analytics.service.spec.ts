@@ -461,13 +461,16 @@ describe('AnalyticsService', () => {
 
     it('should get analytics summary', async () => {
       // Mock getTotalEvents (uses count)
-      mockAnalyticsRepository.count
-        .mockResolvedValueOnce(100) // getTotalEvents
-        .mockResolvedValueOnce(10) // getActiveSessions
-        .mockResolvedValueOnce(25); // getEventsToday
+      mockAnalyticsRepository.count.mockResolvedValueOnce(100); // getTotalEvents
 
       // Mock getUniqueUsers (uses getRawOne)
       mockQueryBuilder.getRawOne.mockResolvedValueOnce({ count: '50' }); // getUniqueUsers
+
+      // Mock getActiveSessions (uses getCount)
+      mockQueryBuilder.getCount.mockResolvedValueOnce(10); // getActiveSessions
+
+      // Mock getEventsToday (uses getCount)
+      mockQueryBuilder.getCount.mockResolvedValueOnce(25); // getEventsToday
 
       // Mock getTopEvents (uses getRawMany)
       mockQueryBuilder.getRawMany.mockResolvedValue([
@@ -492,10 +495,11 @@ describe('AnalyticsService', () => {
       // Mock getActiveUsers (uses getRawOne)
       mockQueryBuilder.getRawOne.mockResolvedValueOnce({ count: '10' }); // getActiveUsers
 
-      // Mock getActiveSessions and getEventsPerMinute (use count)
-      mockAnalyticsRepository.count
-        .mockResolvedValueOnce(5) // getActiveSessions
-        .mockResolvedValueOnce(2); // getEventsPerMinute
+      // Mock getActiveSessions (uses getCount)
+      mockQueryBuilder.getCount.mockResolvedValueOnce(5); // getActiveSessions
+
+      // Mock getEventsPerMinute (uses getCount)
+      mockQueryBuilder.getCount.mockResolvedValueOnce(2); // getEventsPerMinute
 
       // Mock getTopEvents (uses getRawMany)
       mockQueryBuilder.getRawMany.mockResolvedValue([
@@ -521,13 +525,16 @@ describe('AnalyticsService', () => {
 
     it('should get analytics summary', async () => {
       // Mock getTotalEvents (uses count)
-      mockAnalyticsRepository.count
-        .mockResolvedValueOnce(100) // getTotalEvents
-        .mockResolvedValueOnce(10) // getActiveSessions
-        .mockResolvedValueOnce(25); // getEventsToday
+      mockAnalyticsRepository.count.mockResolvedValueOnce(100); // getTotalEvents
 
       // Mock getUniqueUsers (uses getRawOne)
       mockQueryBuilder.getRawOne.mockResolvedValueOnce({ count: '50' }); // getUniqueUsers
+
+      // Mock getActiveSessions (uses getCount)
+      mockQueryBuilder.getCount.mockResolvedValueOnce(10); // getActiveSessions
+
+      // Mock getEventsToday (uses getCount)
+      mockQueryBuilder.getCount.mockResolvedValueOnce(25); // getEventsToday
 
       // Mock getTopEvents (uses getRawMany)
       mockQueryBuilder.getRawMany.mockResolvedValue([
@@ -561,10 +568,11 @@ describe('AnalyticsService', () => {
       // Mock getActiveUsers (uses getRawOne)
       mockQueryBuilder.getRawOne.mockResolvedValueOnce({ count: '10' }); // getActiveUsers
 
-      // Mock getActiveSessions and getEventsPerMinute (use count)
-      mockAnalyticsRepository.count
-        .mockResolvedValueOnce(5) // getActiveSessions
-        .mockResolvedValueOnce(2); // getEventsPerMinute
+      // Mock getActiveSessions (uses getCount)
+      mockQueryBuilder.getCount.mockResolvedValueOnce(5); // getActiveSessions
+
+      // Mock getEventsPerMinute (uses getCount)
+      mockQueryBuilder.getCount.mockResolvedValueOnce(2); // getEventsPerMinute
 
       // Mock getTopEvents (uses getRawMany)
       mockQueryBuilder.getRawMany.mockResolvedValue([
@@ -872,6 +880,7 @@ describe('AnalyticsService', () => {
     it('should get healthy system status', async () => {
       mockQueryBuilder.getRawOne.mockResolvedValue({ count: '100' });
       mockAnalyticsRepository.count.mockResolvedValue(100);
+      mockQueryBuilder.getCount.mockResolvedValue(25); // getEventsToday
       mockAlertRepository.count.mockResolvedValue(5);
 
       const result = await service.getHealth(tenantId);
@@ -897,6 +906,7 @@ describe('AnalyticsService', () => {
     it('should get unhealthy system status', async () => {
       mockQueryBuilder.getRawOne.mockRejectedValue(new Error('Database error'));
       mockAnalyticsRepository.count.mockResolvedValue(0);
+      mockQueryBuilder.getCount.mockResolvedValue(0); // getEventsToday
       mockAlertRepository.count.mockResolvedValue(0);
 
       const result = await service.getHealth(tenantId);
@@ -929,8 +939,8 @@ describe('AnalyticsService', () => {
         { eventType: 'user_logout', count: '3' },
       ]);
 
-      // Mock the analytics repository find method for aggregation
-      mockAnalyticsRepository.find.mockResolvedValue([
+      // Mock the analytics repository getMany method for aggregation
+      mockQueryBuilder.getMany.mockResolvedValue([
         { id: '1', eventType: 'user_login', metricValue: 1 },
         { id: '2', eventType: 'user_logout', metricValue: 1 },
       ]);
@@ -949,7 +959,7 @@ describe('AnalyticsService', () => {
         { eventType: 'user_logout', count: '15' },
       ]);
 
-      mockAnalyticsRepository.find.mockResolvedValue([
+      mockQueryBuilder.getMany.mockResolvedValue([
         { id: '1', eventType: 'user_login', metricValue: 1 },
         { id: '2', eventType: 'user_logout', metricValue: 1 },
       ]);
@@ -968,7 +978,7 @@ describe('AnalyticsService', () => {
         { eventType: 'user_logout', count: '30' },
       ]);
 
-      mockAnalyticsRepository.find.mockResolvedValue([
+      mockQueryBuilder.getMany.mockResolvedValue([
         { id: '1', eventType: 'user_login', metricValue: 1 },
         { id: '2', eventType: 'user_logout', metricValue: 1 },
       ]);
@@ -987,7 +997,7 @@ describe('AnalyticsService', () => {
         { eventType: 'user_logout', count: '150' },
       ]);
 
-      mockAnalyticsRepository.find.mockResolvedValue([
+      mockQueryBuilder.getMany.mockResolvedValue([
         { id: '1', eventType: 'user_login', metricValue: 1 },
         { id: '2', eventType: 'user_logout', metricValue: 1 },
       ]);
@@ -1061,7 +1071,7 @@ describe('AnalyticsService', () => {
         { eventType: 'user_logout', count: '15' },
       ]);
 
-      mockAnalyticsRepository.find.mockResolvedValue([
+      mockQueryBuilder.getMany.mockResolvedValue([
         { id: '1', eventType: 'user_login', metricValue: 1 },
         { id: '2', eventType: 'user_logout', metricValue: 1 },
       ]);
