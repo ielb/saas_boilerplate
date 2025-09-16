@@ -101,6 +101,41 @@
       "type": "string"
     },
     {
+      "key": "subscriptionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "planId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "targetPlanId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "stripeSubscriptionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "invoiceId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "customerId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "planName",
+      "value": "",
+      "type": "string"
+    },
+    {
       "key": "delegationId",
       "value": "",
       "type": "string"
@@ -204,6 +239,16 @@
       "key": "profileId",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "subscriptionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "customerId",
+      "value": "",
+      "type": "string"
     }
   ],
   "auth": {
@@ -281,8 +326,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/register",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "register"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
             }
           },
           "response": []
@@ -319,8 +369,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "login"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
             }
           },
           "response": []
@@ -364,8 +419,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/verify-email",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "verify-email"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "verify-email"
+              ]
             }
           },
           "response": []
@@ -409,8 +469,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/resend-verification",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "resend-verification"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "resend-verification"
+              ]
             }
           },
           "response": []
@@ -431,8 +496,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/forgot-password",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "forgot-password"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "forgot-password"
+              ]
             }
           },
           "response": []
@@ -453,8 +523,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/reset-password",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "reset-password"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "reset-password"
+              ]
             }
           },
           "response": []
@@ -489,8 +564,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/refresh",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "refresh"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "refresh"
+              ]
             }
           },
           "response": []
@@ -502,8 +582,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/auth/profile",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "profile"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "profile"
+              ]
             }
           },
           "response": []
@@ -524,8 +609,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/logout",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "logout"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
             }
           },
           "response": []
@@ -551,8 +641,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/mfa/setup",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "mfa", "setup"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "mfa",
+                "setup"
+              ]
             }
           },
           "response": []
@@ -573,8 +669,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/mfa/enable",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "mfa", "enable"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "mfa",
+                "enable"
+              ]
             }
           },
           "response": []
@@ -595,8 +697,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/mfa/disable",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "mfa", "disable"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "mfa",
+                "disable"
+              ]
             }
           },
           "response": []
@@ -617,8 +725,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/mfa/verify",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "mfa", "verify"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "mfa",
+                "verify"
+              ]
             }
           },
           "response": []
@@ -630,8 +744,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/auth/mfa/status",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "mfa", "status"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "mfa",
+                "status"
+              ]
             }
           },
           "response": []
@@ -652,8 +772,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/mfa/backup-codes/regenerate",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "mfa", "backup-codes", "regenerate"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "mfa",
+                "backup-codes",
+                "regenerate"
+              ]
             }
           },
           "response": []
@@ -716,8 +843,12 @@
             },
             "url": {
               "raw": "{{baseUrl}}/profiles",
-              "host": ["{{baseUrl}}"],
-              "path": ["profiles"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profiles"
+              ]
             }
           },
           "response": []
@@ -754,8 +885,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/profiles/me",
-              "host": ["{{baseUrl}}"],
-              "path": ["profiles", "me"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profiles",
+                "me"
+              ]
             }
           },
           "response": []
@@ -800,8 +936,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/profiles/me",
-              "host": ["{{baseUrl}}"],
-              "path": ["profiles", "me"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profiles",
+                "me"
+              ]
             }
           },
           "response": []
@@ -837,8 +978,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/profiles/me/completion",
-              "host": ["{{baseUrl}}"],
-              "path": ["profiles", "me", "completion"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profiles",
+                "me",
+                "completion"
+              ]
             }
           },
           "response": []
@@ -883,8 +1030,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/profiles/me/avatar",
-              "host": ["{{baseUrl}}"],
-              "path": ["profiles", "me", "avatar"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profiles",
+                "me",
+                "avatar"
+              ]
             }
           },
           "response": []
@@ -919,8 +1072,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/profiles/me/avatar",
-              "host": ["{{baseUrl}}"],
-              "path": ["profiles", "me", "avatar"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profiles",
+                "me",
+                "avatar"
+              ]
             }
           },
           "response": []
@@ -953,8 +1112,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/profiles/me",
-              "host": ["{{baseUrl}}"],
-              "path": ["profiles", "me"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "profiles",
+                "me"
+              ]
             }
           },
           "response": []
@@ -980,8 +1144,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/recovery/initiate",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "recovery", "initiate"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "recovery",
+                "initiate"
+              ]
             }
           },
           "response": []
@@ -1002,8 +1172,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/recovery/verify",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "recovery", "verify"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "recovery",
+                "verify"
+              ]
             }
           },
           "response": []
@@ -1024,8 +1200,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/recovery/complete",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "recovery", "complete"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "recovery",
+                "complete"
+              ]
             }
           },
           "response": []
@@ -1037,8 +1219,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/auth/recovery/status?recoverySessionToken=recovery-session-token-here",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "recovery", "status"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "recovery",
+                "status"
+              ],
               "query": [
                 {
                   "key": "recoverySessionToken",
@@ -1065,8 +1253,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/recovery/attempt",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "recovery", "attempt"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "recovery",
+                "attempt"
+              ]
             }
           },
           "response": []
@@ -1099,8 +1293,12 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/sessions",
-              "host": ["{{baseUrl}}"],
-              "path": ["sessions"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions"
+              ]
             }
           },
           "response": []
@@ -1112,8 +1310,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/sessions/active",
-              "host": ["{{baseUrl}}"],
-              "path": ["sessions", "active"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions",
+                "active"
+              ]
             }
           },
           "response": []
@@ -1125,8 +1328,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/sessions/{{sessionId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["sessions", "{{sessionId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions",
+                "{{sessionId}}"
+              ]
             }
           },
           "response": []
@@ -1147,8 +1355,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/sessions/{{sessionId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["sessions", "{{sessionId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions",
+                "{{sessionId}}"
+              ]
             }
           },
           "response": []
@@ -1169,8 +1382,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/sessions/{{sessionId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["sessions", "{{sessionId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions",
+                "{{sessionId}}"
+              ]
             }
           },
           "response": []
@@ -1191,8 +1409,12 @@
             },
             "url": {
               "raw": "{{baseUrl}}/sessions",
-              "host": ["{{baseUrl}}"],
-              "path": ["sessions"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions"
+              ]
             }
           },
           "response": []
@@ -1217,8 +1439,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/sessions/others",
-              "host": ["{{baseUrl}}"],
-              "path": ["sessions", "others"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions",
+                "others"
+              ]
             }
           },
           "response": []
@@ -1230,8 +1457,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/sessions/{{sessionId}}/trust",
-              "host": ["{{baseUrl}}"],
-              "path": ["sessions", "{{sessionId}}", "trust"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions",
+                "{{sessionId}}",
+                "trust"
+              ]
             }
           },
           "response": []
@@ -1243,8 +1476,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/sessions/{{sessionId}}/activity",
-              "host": ["{{baseUrl}}"],
-              "path": ["sessions", "{{sessionId}}", "activity"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions",
+                "{{sessionId}}",
+                "activity"
+              ]
             }
           },
           "response": []
@@ -1265,8 +1504,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/sessions/{{sessionId}}/extend",
-              "host": ["{{baseUrl}}"],
-              "path": ["sessions", "{{sessionId}}", "extend"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions",
+                "{{sessionId}}",
+                "extend"
+              ]
             }
           },
           "response": []
@@ -1278,8 +1523,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/sessions/{{sessionId}}/suspicious",
-              "host": ["{{baseUrl}}"],
-              "path": ["sessions", "{{sessionId}}", "suspicious"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions",
+                "{{sessionId}}",
+                "suspicious"
+              ]
             }
           },
           "response": []
@@ -1291,8 +1542,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/sessions/stats/summary",
-              "host": ["{{baseUrl}}"],
-              "path": ["sessions", "stats", "summary"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "sessions",
+                "stats",
+                "summary"
+              ]
             }
           },
           "response": []
@@ -1358,8 +1615,12 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/permissions?page=1&limit=50",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["permissions"],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "permissions"
+                  ],
                   "query": [
                     {
                       "key": "page",
@@ -1381,8 +1642,13 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/permissions/{{permissionId}}",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["permissions", "{{permissionId}}"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "permissions",
+                    "{{permissionId}}"
+                  ]
                 }
               },
               "response": []
@@ -1443,8 +1709,12 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/permissions",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["permissions"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "permissions"
+                  ]
                 }
               },
               "response": []
@@ -1465,8 +1735,13 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/permissions/{{permissionId}}",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["permissions", "{{permissionId}}"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "permissions",
+                    "{{permissionId}}"
+                  ]
                 }
               },
               "response": []
@@ -1478,8 +1753,13 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/permissions/{{permissionId}}",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["permissions", "{{permissionId}}"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "permissions",
+                    "{{permissionId}}"
+                  ]
                 }
               },
               "response": []
@@ -1491,8 +1771,13 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/permissions/system",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["permissions", "system"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "permissions",
+                    "system"
+                  ]
                 }
               },
               "response": []
@@ -1504,8 +1789,13 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/permissions/custom",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["permissions", "custom"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "permissions",
+                    "custom"
+                  ]
                 }
               },
               "response": []
@@ -1569,8 +1859,12 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/roles?page=1&limit=50",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["roles"],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "roles"
+                  ],
                   "query": [
                     {
                       "key": "page",
@@ -1626,8 +1920,13 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/roles/{{roleId}}",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["roles", "{{roleId}}"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "roles",
+                    "{{roleId}}"
+                  ]
                 }
               },
               "response": []
@@ -1698,8 +1997,12 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/roles",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["roles"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "roles"
+                  ]
                 }
               },
               "response": []
@@ -1762,8 +2065,13 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/roles/{{roleId}}",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["roles", "{{roleId}}"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "roles",
+                    "{{roleId}}"
+                  ]
                 }
               },
               "response": []
@@ -1791,8 +2099,13 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/roles/{{roleId}}",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["roles", "{{roleId}}"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "roles",
+                    "{{roleId}}"
+                  ]
                 }
               },
               "response": []
@@ -1843,8 +2156,13 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/roles/system",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["roles", "system"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "roles",
+                    "system"
+                  ]
                 }
               },
               "response": []
@@ -1895,8 +2213,13 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/roles/custom",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["roles", "custom"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "roles",
+                    "custom"
+                  ]
                 }
               },
               "response": []
@@ -1931,8 +2254,13 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/roles/default",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["roles", "default"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "roles",
+                    "default"
+                  ]
                 }
               },
               "response": []
@@ -1974,8 +2302,14 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/roles/super-admin/update-permissions",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["roles", "super-admin", "update-permissions"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "roles",
+                    "super-admin",
+                    "update-permissions"
+                  ]
                 }
               },
               "response": []
@@ -2027,8 +2361,14 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/roles/super-admin/permissions",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["roles", "super-admin", "permissions"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "roles",
+                    "super-admin",
+                    "permissions"
+                  ]
                 }
               },
               "response": []
@@ -2081,8 +2421,14 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/roles/{{roleId}}/permissions",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["roles", "{{roleId}}", "permissions"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "roles",
+                    "{{roleId}}",
+                    "permissions"
+                  ]
                 }
               },
               "response": []
@@ -2119,8 +2465,14 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/roles/{{roleId}}/permissions",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["roles", "{{roleId}}", "permissions"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "roles",
+                    "{{roleId}}",
+                    "permissions"
+                  ]
                 }
               },
               "response": []
@@ -2172,8 +2524,15 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/roles/users/{{userId}}/roles",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["roles", "users", "{{userId}}", "roles"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "roles",
+                    "users",
+                    "{{userId}}",
+                    "roles"
+                  ]
                 }
               },
               "response": []
@@ -2201,7 +2560,9 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/roles/users/{{userId}}/roles/{{roleId}}",
-                  "host": ["{{baseUrl}}"],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
                   "path": [
                     "roles",
                     "users",
@@ -2255,8 +2616,15 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/roles/users/{{userId}}/roles",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["roles", "users", "{{userId}}", "roles"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "roles",
+                    "users",
+                    "{{userId}}",
+                    "roles"
+                  ]
                 }
               },
               "response": []
@@ -2307,8 +2675,15 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/roles/users/{{userId}}/permissions",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["roles", "users", "{{userId}}", "permissions"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "roles",
+                    "users",
+                    "{{userId}}",
+                    "permissions"
+                  ]
                 }
               },
               "response": []
@@ -2369,7 +2744,9 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/roles/users/{{userId}}/permissions/check",
-                  "host": ["{{baseUrl}}"],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
                   "path": [
                     "roles",
                     "users",
@@ -2435,8 +2812,12 @@
             },
             "url": {
               "raw": "{{baseUrl}}/tenants",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants"
+              ]
             }
           },
           "response": []
@@ -2472,8 +2853,12 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/tenants?page=1&limit=10&search=test&plan=basic&isActive=true",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants"
+              ],
               "query": [
                 {
                   "key": "page",
@@ -2530,8 +2915,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/tenants/statistics",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "statistics"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "statistics"
+              ]
             }
           },
           "response": []
@@ -2569,8 +2959,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/tenants/{{tenantId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "{{tenantId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "{{tenantId}}"
+              ]
             }
           },
           "response": []
@@ -2603,8 +2998,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/tenants/domain/test-tenant.com",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "domain", "test-tenant.com"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "domain",
+                "test-tenant.com"
+              ]
             }
           },
           "response": []
@@ -2646,8 +3047,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/tenants/{{tenantId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "{{tenantId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "{{tenantId}}"
+              ]
             }
           },
           "response": []
@@ -2671,8 +3077,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/tenants/{{tenantId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "{{tenantId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "{{tenantId}}"
+              ]
             }
           },
           "response": []
@@ -2704,8 +3115,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/tenants/{{tenantId}}/restore",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "{{tenantId}}", "restore"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "{{tenantId}}",
+                "restore"
+              ]
             }
           },
           "response": []
@@ -2737,8 +3154,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/tenants/{{tenantId}}/verify",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "{{tenantId}}", "verify"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "{{tenantId}}",
+                "verify"
+              ]
             }
           },
           "response": []
@@ -2772,8 +3195,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/tenants/{{tenantId}}/usage",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "{{tenantId}}", "usage"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "{{tenantId}}",
+                "usage"
+              ]
             }
           },
           "response": []
@@ -2816,8 +3245,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/tenants/{{tenantId}}/usage/apiCalls",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "{{tenantId}}", "usage", "apiCalls"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "{{tenantId}}",
+                "usage",
+                "apiCalls"
+              ]
             }
           },
           "response": []
@@ -2846,8 +3282,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/tenants/{{tenantId}}/features",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "{{tenantId}}", "features"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "{{tenantId}}",
+                "features"
+              ]
             }
           },
           "response": []
@@ -2877,7 +3319,9 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/tenants/{{tenantId}}/features/ADVANCED_ANALYTICS",
-              "host": ["{{baseUrl}}"],
+              "host": [
+                "{{baseUrl}}"
+              ],
               "path": [
                 "tenants",
                 "{{tenantId}}",
@@ -2926,7 +3370,9 @@
             },
             "url": {
               "raw": "{{baseUrl}}/tenants/{{tenantId}}/features/ADVANCED_ANALYTICS",
-              "host": ["{{baseUrl}}"],
+              "host": [
+                "{{baseUrl}}"
+              ],
               "path": [
                 "tenants",
                 "{{tenantId}}",
@@ -2979,8 +3425,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/tenants/{{tenantId}}/features/bulk",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "{{tenantId}}", "features", "bulk"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "{{tenantId}}",
+                "features",
+                "bulk"
+              ]
             }
           },
           "response": []
@@ -3022,8 +3475,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/tenants/{{tenantId}}/features/stats",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "{{tenantId}}", "features", "stats"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "{{tenantId}}",
+                "features",
+                "stats"
+              ]
             }
           },
           "response": []
@@ -3053,8 +3513,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/tenants/{{tenantId}}/features/MFA_ENFORCEMENT",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "{{tenantId}}", "features", "MFA_ENFORCEMENT"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "{{tenantId}}",
+                "features",
+                "MFA_ENFORCEMENT"
+              ]
             }
           },
           "response": []
@@ -3092,8 +3559,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/tenants/{{tenantId}}/features/invalid_feature",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "{{tenantId}}", "features", "invalid_feature"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "{{tenantId}}",
+                "features",
+                "invalid_feature"
+              ]
             }
           },
           "response": []
@@ -3158,8 +3632,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/tenants/onboarding",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "onboarding"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "onboarding"
+              ]
             }
           }
         },
@@ -3197,8 +3676,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/tenants/onboarding/{{onboardingId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "onboarding", "{{onboardingId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "onboarding",
+                "{{onboardingId}}"
+              ]
             }
           }
         },
@@ -3242,8 +3727,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/tenants/onboarding/{{onboardingId}}/verify",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "onboarding", "{{onboardingId}}", "verify"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "onboarding",
+                "{{onboardingId}}",
+                "verify"
+              ]
             }
           }
         },
@@ -3281,7 +3773,9 @@
             },
             "url": {
               "raw": "{{baseUrl}}/tenants/onboarding/{{onboardingId}}/resend-verification",
-              "host": ["{{baseUrl}}"],
+              "host": [
+                "{{baseUrl}}"
+              ],
               "path": [
                 "tenants",
                 "onboarding",
@@ -3325,8 +3819,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/tenants/onboarding/{{onboardingId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "onboarding", "{{onboardingId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "onboarding",
+                "{{onboardingId}}"
+              ]
             }
           }
         },
@@ -3364,8 +3864,15 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/tenants/onboarding/{{onboardingId}}/health",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "onboarding", "{{onboardingId}}", "health"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "onboarding",
+                "{{onboardingId}}",
+                "health"
+              ]
             }
           }
         }
@@ -3407,8 +3914,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/tenants/onboarding",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "onboarding"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "onboarding"
+              ]
             }
           }
         },
@@ -3446,8 +3958,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/tenants/onboarding",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "onboarding"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "onboarding"
+              ]
             }
           }
         },
@@ -3485,8 +4002,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/tenants/onboarding/{{onboardingId}}/verify",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "onboarding", "{{onboardingId}}", "verify"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "onboarding",
+                "{{onboardingId}}",
+                "verify"
+              ]
             }
           }
         },
@@ -3515,8 +4039,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/tenants/onboarding/invalid-uuid",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "onboarding", "invalid-uuid"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "onboarding",
+                "invalid-uuid"
+              ]
             }
           }
         }
@@ -3590,8 +4120,14 @@
                 ],
                 "url": {
                   "raw": "{{baseUrl}}/tenants/user/memberships",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["tenants", "user", "memberships"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "tenants",
+                    "user",
+                    "memberships"
+                  ]
                 }
               }
             },
@@ -3648,8 +4184,13 @@
                 ],
                 "url": {
                   "raw": "{{baseUrl}}/tenants/current",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["tenants", "current"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "tenants",
+                    "current"
+                  ]
                 }
               }
             }
@@ -3716,8 +4257,13 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/tenants/switch",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["tenants", "switch"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "tenants",
+                    "switch"
+                  ]
                 }
               }
             }
@@ -3781,8 +4327,14 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/tenants/{{tenantId}}/verify-access",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["tenants", "{{tenantId}}", "verify-access"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "tenants",
+                    "{{tenantId}}",
+                    "verify-access"
+                  ]
                 }
               }
             },
@@ -3849,8 +4401,14 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/tenants/verify-access/bulk",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["tenants", "verify-access", "bulk"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "tenants",
+                    "verify-access",
+                    "bulk"
+                  ]
                 }
               }
             }
@@ -3892,8 +4450,14 @@
                 ],
                 "url": {
                   "raw": "{{baseUrl}}/tenants/cache/clear",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["tenants", "cache", "clear"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "tenants",
+                    "cache",
+                    "clear"
+                  ]
                 }
               }
             }
@@ -3954,8 +4518,14 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/tenants/admin/memberships",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["tenants", "admin", "memberships"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "tenants",
+                    "admin",
+                    "memberships"
+                  ]
                 }
               }
             },
@@ -3992,7 +4562,9 @@
                 ],
                 "url": {
                   "raw": "{{baseUrl}}/tenants/admin/memberships/{{userId}}/{{tenantId}}/remove",
-                  "host": ["{{baseUrl}}"],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
                   "path": [
                     "tenants",
                     "admin",
@@ -4039,8 +4611,13 @@
                 "header": [],
                 "url": {
                   "raw": "{{baseUrl}}/tenants/health",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["tenants", "health"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "tenants",
+                    "health"
+                  ]
                 }
               }
             },
@@ -4076,8 +4653,14 @@
                 ],
                 "url": {
                   "raw": "{{baseUrl}}/tenants/memberships/{{membershipId}}",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["tenants", "memberships", "{{membershipId}}"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "tenants",
+                    "memberships",
+                    "{{membershipId}}"
+                  ]
                 }
               }
             }
@@ -4101,8 +4684,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/tenants/branding",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "branding"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "branding"
+              ]
             }
           },
           "response": [],
@@ -4160,8 +4748,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/tenants/branding",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "branding"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "branding"
+              ]
             }
           },
           "response": [],
@@ -4203,8 +4796,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/tenants/branding/validate",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "branding", "validate"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "branding",
+                "validate"
+              ]
             }
           },
           "response": [],
@@ -4245,8 +4844,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/tenants/branding/preview",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "branding", "preview"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "branding",
+                "preview"
+              ]
             }
           },
           "response": [],
@@ -4283,8 +4888,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/tenants/branding/css",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "branding", "css"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "branding",
+                "css"
+              ]
             }
           },
           "response": [],
@@ -4323,8 +4934,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/tenants/branding/export",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "branding", "export"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "branding",
+                "export"
+              ]
             }
           },
           "response": [],
@@ -4358,8 +4975,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/tenants/branding/default",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "branding", "default"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "branding",
+                "default"
+              ]
             }
           },
           "response": [],
@@ -4397,8 +5020,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/tenants/branding",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "branding"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "branding"
+              ]
             }
           },
           "response": [],
@@ -4445,8 +5073,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/tenants/branding/import",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "branding", "import"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "branding",
+                "import"
+              ]
             }
           },
           "response": [],
@@ -4488,8 +5122,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/tenants/branding/validate",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "branding", "validate"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "branding",
+                "validate"
+              ]
             }
           },
           "response": [],
@@ -4523,8 +5163,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/tenants/branding/health",
-              "host": ["{{baseUrl}}"],
-              "path": ["tenants", "branding", "health"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "tenants",
+                "branding",
+                "health"
+              ]
             }
           },
           "response": [],
@@ -4578,8 +5224,12 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/users",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["users"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "users"
+                  ]
                 }
               },
               "response": [],
@@ -4634,8 +5284,12 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/users",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["users"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "users"
+                  ]
                 }
               },
               "response": [],
@@ -4683,8 +5337,15 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/users/lifecycle/{{newUserId}}/activate",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["users", "lifecycle", "{{newUserId}}", "activate"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "users",
+                    "lifecycle",
+                    "{{newUserId}}",
+                    "activate"
+                  ]
                 }
               },
               "response": [],
@@ -4728,8 +5389,15 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/users/lifecycle/{{userId}}/activate",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["users", "lifecycle", "{{userId}}", "activate"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "users",
+                    "lifecycle",
+                    "{{userId}}",
+                    "activate"
+                  ]
                 }
               },
               "response": [],
@@ -4777,8 +5445,15 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/users/lifecycle/{{userId}}/suspend",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["users", "lifecycle", "{{userId}}", "suspend"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "users",
+                    "lifecycle",
+                    "{{userId}}",
+                    "suspend"
+                  ]
                 }
               },
               "response": [],
@@ -4821,8 +5496,15 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/users/lifecycle/{{newUserId}}/suspend",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["users", "lifecycle", "{{newUserId}}", "suspend"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "users",
+                    "lifecycle",
+                    "{{newUserId}}",
+                    "suspend"
+                  ]
                 }
               },
               "response": [],
@@ -4870,8 +5552,15 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/users/lifecycle/{{newUserId}}/reactivate",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["users", "lifecycle", "{{newUserId}}", "reactivate"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "users",
+                    "lifecycle",
+                    "{{newUserId}}",
+                    "reactivate"
+                  ]
                 }
               },
               "response": [],
@@ -4911,8 +5600,14 @@
                 ],
                 "url": {
                   "raw": "{{baseUrl}}/users/{{userId}}/lifecycle",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["users", "{{userId}}", "lifecycle"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "users",
+                    "{{userId}}",
+                    "lifecycle"
+                  ]
                 }
               },
               "response": [],
@@ -4963,8 +5658,13 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/users/{{newUserId}}",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["users", "{{newUserId}}"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "users",
+                    "{{newUserId}}"
+                  ]
                 }
               },
               "response": [],
@@ -5007,8 +5707,14 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/users/lifecycle/activate",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["users", "lifecycle", "activate"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "users",
+                    "lifecycle",
+                    "activate"
+                  ]
                 }
               },
               "response": [],
@@ -5054,8 +5760,14 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/users/lifecycle/suspend",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["users", "lifecycle", "suspend"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "users",
+                    "lifecycle",
+                    "suspend"
+                  ]
                 }
               },
               "response": [],
@@ -5099,8 +5811,14 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/users/lifecycle/reactivate",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["users", "lifecycle", "reactivate"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "users",
+                    "lifecycle",
+                    "reactivate"
+                  ]
                 }
               },
               "response": [],
@@ -5144,8 +5862,14 @@
                 },
                 "url": {
                   "raw": "{{baseUrl}}/users/lifecycle/delete",
-                  "host": ["{{baseUrl}}"],
-                  "path": ["users", "lifecycle", "delete"]
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "users",
+                    "lifecycle",
+                    "delete"
+                  ]
                 }
               },
               "response": [],
@@ -5203,8 +5927,14 @@
                     },
                     "url": {
                       "raw": "{{baseUrl}}/users/bulk/import",
-                      "host": ["{{baseUrl}}"],
-                      "path": ["users", "bulk", "import"]
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "users",
+                        "bulk",
+                        "import"
+                      ]
                     }
                   },
                   "response": [],
@@ -5254,7 +5984,9 @@
                     ],
                     "url": {
                       "raw": "{{baseUrl}}/users/bulk/import/{{importJobId}}/progress",
-                      "host": ["{{baseUrl}}"],
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
                       "path": [
                         "users",
                         "bulk",
@@ -5313,7 +6045,9 @@
                     ],
                     "url": {
                       "raw": "{{baseUrl}}/users/bulk/import/{{importJobId}}/errors?page=1&limit=10",
-                      "host": ["{{baseUrl}}"],
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
                       "path": [
                         "users",
                         "bulk",
@@ -5380,7 +6114,9 @@
                     ],
                     "url": {
                       "raw": "{{baseUrl}}/users/bulk/import/{{importJobId}}/errors/summary",
-                      "host": ["{{baseUrl}}"],
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
                       "path": [
                         "users",
                         "bulk-import",
@@ -5426,7 +6162,9 @@
                     ],
                     "url": {
                       "raw": "{{baseUrl}}/users/bulk/import/{{importJobId}}/errors/export",
-                      "host": ["{{baseUrl}}"],
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
                       "path": [
                         "users",
                         "bulk-import",
@@ -5475,7 +6213,9 @@
                     ],
                     "url": {
                       "raw": "{{baseUrl}}/users/bulk/import/{{importJobId}}/cancel",
-                      "host": ["{{baseUrl}}"],
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
                       "path": [
                         "users",
                         "bulk-import",
@@ -5517,7 +6257,9 @@
                     ],
                     "url": {
                       "raw": "{{baseUrl}}/users/bulk/import/{{importJobId}}/retry",
-                      "host": ["{{baseUrl}}"],
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
                       "path": [
                         "users",
                         "bulk-import",
@@ -5560,8 +6302,16 @@
                     ],
                     "url": {
                       "raw": "{{baseUrl}}/users/bulk/import/jobs/recent?limit=5",
-                      "host": ["{{baseUrl}}"],
-                      "path": ["users", "bulk", "import", "jobs", "recent"],
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "users",
+                        "bulk",
+                        "import",
+                        "jobs",
+                        "recent"
+                      ],
                       "query": [
                         {
                           "key": "limit",
@@ -5604,8 +6354,16 @@
                     ],
                     "url": {
                       "raw": "{{baseUrl}}/users/bulk/import/jobs/statistics",
-                      "host": ["{{baseUrl}}"],
-                      "path": ["users", "bulk", "import", "jobs", "statistics"]
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "users",
+                        "bulk",
+                        "import",
+                        "jobs",
+                        "statistics"
+                      ]
                     }
                   },
                   "response": [],
@@ -5664,8 +6422,15 @@
                     },
                     "url": {
                       "raw": "{{baseUrl}}/users/bulk/import/validate",
-                      "host": ["{{baseUrl}}"],
-                      "path": ["users", "bulk", "import", "validate"]
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "users",
+                        "bulk",
+                        "import",
+                        "validate"
+                      ]
                     }
                   },
                   "response": [],
@@ -5710,8 +6475,14 @@
                     ],
                     "url": {
                       "raw": "{{baseUrl}}/users/bulk/export?format=csv&fields=email,firstName,lastName,role,status&role=user&status=active",
-                      "host": ["{{baseUrl}}"],
-                      "path": ["users", "bulk", "export"],
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "users",
+                        "bulk",
+                        "export"
+                      ],
                       "query": [
                         {
                           "key": "format",
@@ -5772,8 +6543,14 @@
                     ],
                     "url": {
                       "raw": "{{baseUrl}}/users/bulk/export?format=xlsx&fields=email,firstName,lastName,role,status,createdAt&includeInactive=true",
-                      "host": ["{{baseUrl}}"],
-                      "path": ["users", "bulk", "export"],
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "users",
+                        "bulk",
+                        "export"
+                      ],
                       "query": [
                         {
                           "key": "format",
@@ -5830,8 +6607,15 @@
                     ],
                     "url": {
                       "raw": "{{baseUrl}}/users/bulk/export/template?fields=email,firstName,lastName,role,status,phone,team",
-                      "host": ["{{baseUrl}}"],
-                      "path": ["users", "bulk", "export", "template"],
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "users",
+                        "bulk",
+                        "export",
+                        "template"
+                      ],
                       "query": [
                         {
                           "key": "fields",
@@ -5883,8 +6667,15 @@
                     ],
                     "url": {
                       "raw": "{{baseUrl}}/users/bulk/export/statistics?fields=email,firstName,lastName,role,status&role=user&status=active",
-                      "host": ["{{baseUrl}}"],
-                      "path": ["users", "bulk", "export", "statistics"],
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "users",
+                        "bulk",
+                        "export",
+                        "statistics"
+                      ],
                       "query": [
                         {
                           "key": "fields",
@@ -5951,8 +6742,14 @@
                     ],
                     "url": {
                       "raw": "{{baseUrl}}/users/bulk/dashboard",
-                      "host": ["{{baseUrl}}"],
-                      "path": ["users", "bulk", "dashboard"]
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "users",
+                        "bulk",
+                        "dashboard"
+                      ]
                     }
                   },
                   "response": [],
@@ -6020,8 +6817,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/files/upload",
-              "host": ["{{baseUrl}}"],
-              "path": ["files", "upload"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "files",
+                "upload"
+              ]
             }
           },
           "response": [],
@@ -6065,8 +6867,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/files/download?key={{fileKey}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["files", "download"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "files",
+                "download"
+              ],
               "query": [
                 {
                   "key": "key",
@@ -6106,8 +6913,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/files/metadata?key={{fileKey}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["files", "metadata"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "files",
+                "metadata"
+              ],
               "query": [
                 {
                   "key": "key",
@@ -6151,8 +6963,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/files/stream?key={{fileKey}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["files", "stream"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "files",
+                "stream"
+              ],
               "query": [
                 {
                   "key": "key",
@@ -6200,8 +7017,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/files/signed-url",
-              "host": ["{{baseUrl}}"],
-              "path": ["files", "signed-url"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "files",
+                "signed-url"
+              ]
             }
           },
           "response": [],
@@ -6242,8 +7064,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/files/public-url?key={{fileKey}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["files", "public-url"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "files",
+                "public-url"
+              ],
               "query": [
                 {
                   "key": "key",
@@ -6293,8 +7120,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/files/copy",
-              "host": ["{{baseUrl}}"],
-              "path": ["files", "copy"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "files",
+                "copy"
+              ]
             }
           },
           "response": [],
@@ -6343,8 +7175,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/files/move",
-              "host": ["{{baseUrl}}"],
-              "path": ["files", "move"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "files",
+                "move"
+              ]
             }
           },
           "response": [],
@@ -6385,8 +7222,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/files/list?prefix=uploads&maxKeys=10",
-              "host": ["{{baseUrl}}"],
-              "path": ["files", "list"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "files",
+                "list"
+              ],
               "query": [
                 {
                   "key": "prefix",
@@ -6435,8 +7277,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/files/exists?key={{fileKey}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["files", "exists"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "files",
+                "exists"
+              ],
               "query": [
                 {
                   "key": "key",
@@ -6478,8 +7325,12 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/files?key={{fileKey}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["files"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "files"
+              ],
               "query": [
                 {
                   "key": "key",
@@ -6519,8 +7370,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/files/health",
-              "host": ["{{baseUrl}}"],
-              "path": ["files", "health"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "files",
+                "health"
+              ]
             }
           },
           "response": [],
@@ -6560,8 +7416,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/files/providers",
-              "host": ["{{baseUrl}}"],
-              "path": ["files", "providers"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "files",
+                "providers"
+              ]
             }
           },
           "response": [],
@@ -6638,8 +7499,12 @@
             },
             "url": {
               "raw": "{{baseUrl}}/teams",
-              "host": ["{{baseUrl}}"],
-              "path": ["teams"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams"
+              ]
             }
           },
           "response": []
@@ -6676,8 +7541,12 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/teams?page=1&limit=10&search=development&status=active",
-              "host": ["{{baseUrl}}"],
-              "path": ["teams"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams"
+              ],
               "query": [
                 {
                   "key": "page",
@@ -6730,8 +7599,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/teams/my-teams",
-              "host": ["{{baseUrl}}"],
-              "path": ["teams", "my-teams"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "my-teams"
+              ]
             }
           },
           "response": []
@@ -6771,8 +7645,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/teams/{{teamId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["teams", "{{teamId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "{{teamId}}"
+              ]
             }
           },
           "response": []
@@ -6819,8 +7698,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/teams/{{teamId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["teams", "{{teamId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "{{teamId}}"
+              ]
             }
           },
           "response": []
@@ -6850,8 +7734,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/teams/{{teamId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["teams", "{{teamId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "{{teamId}}"
+              ]
             }
           },
           "response": []
@@ -6888,8 +7777,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/teams/{{teamId}}/analytics",
-              "host": ["{{baseUrl}}"],
-              "path": ["teams", "{{teamId}}", "analytics"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "{{teamId}}",
+                "analytics"
+              ]
             }
           },
           "response": []
@@ -6941,8 +7836,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/teams/{{teamId}}/members",
-              "host": ["{{baseUrl}}"],
-              "path": ["teams", "{{teamId}}", "members"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "{{teamId}}",
+                "members"
+              ]
             }
           },
           "response": []
@@ -6979,8 +7880,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/teams/{{teamId}}/members?page=1&limit=10",
-              "host": ["{{baseUrl}}"],
-              "path": ["teams", "{{teamId}}", "members"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "{{teamId}}",
+                "members"
+              ],
               "query": [
                 {
                   "key": "page",
@@ -7035,8 +7942,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/teams/{{teamId}}/members/{{userId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["teams", "{{teamId}}", "members", "{{userId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "{{teamId}}",
+                "members",
+                "{{userId}}"
+              ]
             }
           },
           "response": []
@@ -7066,8 +7980,15 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/teams/{{teamId}}/members/{{userId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["teams", "{{teamId}}", "members", "{{userId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "{{teamId}}",
+                "members",
+                "{{userId}}"
+              ]
             }
           },
           "response": []
@@ -7121,8 +8042,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/teams/{{teamId}}/invitations",
-              "host": ["{{baseUrl}}"],
-              "path": ["teams", "{{teamId}}", "invitations"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "{{teamId}}",
+                "invitations"
+              ]
             }
           },
           "response": []
@@ -7159,8 +8086,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/teams/{{teamId}}/invitations?page=1&limit=10&status=pending",
-              "host": ["{{baseUrl}}"],
-              "path": ["teams", "{{teamId}}", "invitations"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "{{teamId}}",
+                "invitations"
+              ],
               "query": [
                 {
                   "key": "page",
@@ -7204,7 +8137,9 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/teams/{{teamId}}/invitations/{{teamInvitationId}}/cancel",
-              "host": ["{{baseUrl}}"],
+              "host": [
+                "{{baseUrl}}"
+              ],
               "path": [
                 "teams",
                 "{{teamId}}",
@@ -7258,8 +8193,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/teams/invitations/accept",
-              "host": ["{{baseUrl}}"],
-              "path": ["teams", "invitations", "accept"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "invitations",
+                "accept"
+              ]
             }
           },
           "response": []
@@ -7315,8 +8256,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/teams/switch/memberships",
-              "host": ["{{baseUrl}}"],
-              "path": ["teams", "switch", "memberships"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "switch",
+                "memberships"
+              ]
             }
           },
           "response": []
@@ -7366,8 +8313,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/teams/switch/current",
-              "host": ["{{baseUrl}}"],
-              "path": ["teams", "switch", "current"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "switch",
+                "current"
+              ]
             }
           },
           "response": []
@@ -7437,8 +8390,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/teams/switch",
-              "host": ["{{baseUrl}}"],
-              "path": ["teams", "switch"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "switch"
+              ]
             }
           },
           "response": []
@@ -7484,8 +8442,15 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/teams/switch/{{teamId}}/verify-access",
-              "host": ["{{baseUrl}}"],
-              "path": ["teams", "switch", "{{teamId}}", "verify-access"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "switch",
+                "{{teamId}}",
+                "verify-access"
+              ]
             }
           },
           "response": []
@@ -7531,8 +8496,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/teams/switch/available",
-              "host": ["{{baseUrl}}"],
-              "path": ["teams", "switch", "available"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "switch",
+                "available"
+              ]
             }
           },
           "response": []
@@ -7576,8 +8547,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/teams/switch",
-              "host": ["{{baseUrl}}"],
-              "path": ["teams", "switch"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "switch"
+              ]
             }
           },
           "response": []
@@ -7620,8 +8596,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/teams/switch",
-              "host": ["{{baseUrl}}"],
-              "path": ["teams", "switch"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "switch"
+              ]
             }
           },
           "response": []
@@ -7664,8 +8645,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/teams/switch",
-              "host": ["{{baseUrl}}"],
-              "path": ["teams", "switch"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "teams",
+                "switch"
+              ]
             }
           },
           "response": []
@@ -7729,8 +8715,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/invitations",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "invitations"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "invitations"
+              ]
             }
           },
           "response": []
@@ -7781,8 +8772,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/auth/invitations?page=1&limit=10",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "invitations"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "invitations"
+              ],
               "query": [
                 {
                   "key": "page",
@@ -7832,8 +8828,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/auth/invitations/{{invitationId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "invitations", "{{invitationId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "invitations",
+                "{{invitationId}}"
+              ]
             }
           },
           "response": []
@@ -7878,8 +8880,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/invitations/{{invitationId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "invitations", "{{invitationId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "invitations",
+                "{{invitationId}}"
+              ]
             }
           },
           "response": []
@@ -7917,8 +8925,15 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/auth/invitations/{{invitationId}}/resend",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "invitations", "{{invitationId}}", "resend"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "invitations",
+                "{{invitationId}}",
+                "resend"
+              ]
             }
           },
           "response": []
@@ -7948,8 +8963,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/auth/invitations/{{invitationId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "invitations", "{{invitationId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "invitations",
+                "{{invitationId}}"
+              ]
             }
           },
           "response": []
@@ -7991,8 +9012,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/auth/invitations/stats",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "invitations", "stats"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "invitations",
+                "stats"
+              ]
             }
           },
           "response": []
@@ -8042,8 +9069,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/invitations/accept/{{invitationToken}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "invitations", "accept", "{{invitationToken}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "invitations",
+                "accept",
+                "{{invitationToken}}"
+              ]
             }
           },
           "response": []
@@ -8082,8 +9116,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/auth/invitations/accept/invalid-token",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "invitations", "accept", "invalid-token"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "invitations",
+                "accept",
+                "invalid-token"
+              ]
             }
           },
           "response": []
@@ -8109,8 +9150,12 @@
             },
             "url": {
               "raw": "{{baseUrl}}/delegations",
-              "host": ["{{baseUrl}}"],
-              "path": ["delegations"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "delegations"
+              ]
             }
           },
           "response": [],
@@ -8148,8 +9193,12 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/delegations?page=1&limit=10",
-              "host": ["{{baseUrl}}"],
-              "path": ["delegations"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "delegations"
+              ],
               "query": [
                 {
                   "key": "page",
@@ -8198,8 +9247,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/delegations/{{delegationId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["delegations", "{{delegationId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "delegations",
+                "{{delegationId}}"
+              ]
             }
           },
           "response": [],
@@ -8242,8 +9296,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/delegations/{{delegationId}}/approve",
-              "host": ["{{baseUrl}}"],
-              "path": ["delegations", "{{delegationId}}", "approve"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "delegations",
+                "{{delegationId}}",
+                "approve"
+              ]
             }
           },
           "response": [],
@@ -8284,8 +9344,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/delegations/{{delegationId}}/reject",
-              "host": ["{{baseUrl}}"],
-              "path": ["delegations", "{{delegationId}}", "reject"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "delegations",
+                "{{delegationId}}",
+                "reject"
+              ]
             }
           },
           "response": [],
@@ -8326,8 +9392,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/delegations/{{delegationId}}/activate",
-              "host": ["{{baseUrl}}"],
-              "path": ["delegations", "{{delegationId}}", "activate"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "delegations",
+                "{{delegationId}}",
+                "activate"
+              ]
             }
           },
           "response": [],
@@ -8367,8 +9439,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/delegations/{{delegationId}}/revoke",
-              "host": ["{{baseUrl}}"],
-              "path": ["delegations", "{{delegationId}}", "revoke"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "delegations",
+                "{{delegationId}}",
+                "revoke"
+              ]
             }
           },
           "response": [],
@@ -8400,8 +9478,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/delegations/my-active",
-              "host": ["{{baseUrl}}"],
-              "path": ["delegations", "my-active"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "delegations",
+                "my-active"
+              ]
             }
           },
           "response": [],
@@ -8438,8 +9521,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/delegations/pending-approvals",
-              "host": ["{{baseUrl}}"],
-              "path": ["delegations", "pending-approvals"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "delegations",
+                "pending-approvals"
+              ]
             }
           },
           "response": [],
@@ -8476,8 +9564,13 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/delegations/stats",
-              "host": ["{{baseUrl}}"],
-              "path": ["delegations", "stats"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "delegations",
+                "stats"
+              ]
             }
           },
           "response": [],
@@ -8514,8 +9607,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/delegations/{{delegationId}}/audit-logs",
-              "host": ["{{baseUrl}}"],
-              "path": ["delegations", "{{delegationId}}", "audit-logs"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "delegations",
+                "{{delegationId}}",
+                "audit-logs"
+              ]
             }
           },
           "response": [],
@@ -8555,8 +9654,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/delegations/delegator/{{delegatorId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["delegations", "delegator", "{{delegatorId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "delegations",
+                "delegator",
+                "{{delegatorId}}"
+              ]
             }
           },
           "response": [],
@@ -8593,8 +9698,14 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/delegations/delegate/{{delegateId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["delegations", "delegate", "{{delegateId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "delegations",
+                "delegate",
+                "{{delegateId}}"
+              ]
             }
           },
           "response": [],
@@ -8640,8 +9751,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/delegations/check-permissions",
-              "host": ["{{baseUrl}}"],
-              "path": ["delegations", "check-permissions"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "delegations",
+                "check-permissions"
+              ]
             }
           },
           "response": [],
@@ -8690,8 +9806,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/analytics/events/track",
-              "host": ["{{baseUrl}}"],
-              "path": ["analytics", "events", "track"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "events",
+                "track"
+              ]
             }
           },
           "response": [],
@@ -8740,8 +9862,15 @@
             },
             "url": {
               "raw": "{{baseUrl}}/analytics/events/track/bulk",
-              "host": ["{{baseUrl}}"],
-              "path": ["analytics", "events", "track", "bulk"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "events",
+                "track",
+                "bulk"
+              ]
             }
           },
           "response": [],
@@ -8778,8 +9907,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/analytics/events?limit=10&offset=0&sortBy=timestamp&sortOrder=DESC",
-              "host": ["{{baseUrl}}"],
-              "path": ["analytics", "events"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "events"
+              ],
               "query": [
                 {
                   "key": "limit",
@@ -8832,8 +9966,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/analytics/aggregates?period=day&limit=20",
-              "host": ["{{baseUrl}}"],
-              "path": ["analytics", "aggregates"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "aggregates"
+              ],
               "query": [
                 {
                   "key": "period",
@@ -8878,8 +10017,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/analytics/dashboard?period=day",
-              "host": ["{{baseUrl}}"],
-              "path": ["analytics", "dashboard"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "dashboard"
+              ],
               "query": [
                 {
                   "key": "period",
@@ -8924,8 +10068,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/analytics/summary?period=day",
-              "host": ["{{baseUrl}}"],
-              "path": ["analytics", "summary"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "summary"
+              ],
               "query": [
                 {
                   "key": "period",
@@ -8968,8 +10117,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/analytics/realtime",
-              "host": ["{{baseUrl}}"],
-              "path": ["analytics", "realtime"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "realtime"
+              ]
             }
           },
           "response": [],
@@ -9015,8 +10169,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/analytics/alerts",
-              "host": ["{{baseUrl}}"],
-              "path": ["analytics", "alerts"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "alerts"
+              ]
             }
           },
           "response": [],
@@ -9057,8 +10216,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/analytics/alerts",
-              "host": ["{{baseUrl}}"],
-              "path": ["analytics", "alerts"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "alerts"
+              ]
             }
           },
           "response": [],
@@ -9093,8 +10257,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/analytics/alerts/{{analyticsAlertId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["analytics", "alerts", "{{analyticsAlertId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "alerts",
+                "{{analyticsAlertId}}"
+              ]
             }
           },
           "response": [],
@@ -9139,8 +10309,14 @@
             },
             "url": {
               "raw": "{{baseUrl}}/analytics/alerts/{{analyticsAlertId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["analytics", "alerts", "{{analyticsAlertId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "alerts",
+                "{{analyticsAlertId}}"
+              ]
             }
           },
           "response": [],
@@ -9177,8 +10353,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/analytics/alerts/{{analyticsAlertId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["analytics", "alerts", "{{analyticsAlertId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "alerts",
+                "{{analyticsAlertId}}"
+              ]
             }
           },
           "response": [],
@@ -9216,8 +10398,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/analytics/reports",
-              "host": ["{{baseUrl}}"],
-              "path": ["analytics", "reports"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "reports"
+              ]
             }
           },
           "response": [],
@@ -9258,8 +10445,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/analytics/reports/{{reportId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["analytics", "reports", "{{reportId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "reports",
+                "{{reportId}}"
+              ]
             }
           },
           "response": [],
@@ -9319,8 +10512,15 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/analytics/reports/{{reportId}}/download",
-              "host": ["{{baseUrl}}"],
-              "path": ["analytics", "reports", "{{reportId}}", "download"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "reports",
+                "{{reportId}}",
+                "download"
+              ]
             }
           },
           "response": [],
@@ -9366,8 +10566,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/analytics/export",
-              "host": ["{{baseUrl}}"],
-              "path": ["analytics", "export"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "export"
+              ]
             }
           },
           "response": [],
@@ -9408,8 +10613,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/analytics/health",
-              "host": ["{{baseUrl}}"],
-              "path": ["analytics", "health"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "health"
+              ]
             }
           },
           "response": [],
@@ -9446,8 +10656,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/analytics/stats/events?startDate=2024-01-01&endDate=2024-01-31",
-              "host": ["{{baseUrl}}"],
-              "path": ["analytics", "stats", "events"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "stats",
+                "events"
+              ],
               "query": [
                 {
                   "key": "startDate",
@@ -9494,8 +10710,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/analytics/stats/users?startDate=2024-01-01&endDate=2024-01-31",
-              "host": ["{{baseUrl}}"],
-              "path": ["analytics", "stats", "users"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "stats",
+                "users"
+              ],
               "query": [
                 {
                   "key": "startDate",
@@ -9542,8 +10764,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/analytics/stats/performance",
-              "host": ["{{baseUrl}}"],
-              "path": ["analytics", "stats", "performance"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "stats",
+                "performance"
+              ]
             }
           },
           "response": [],
@@ -9579,8 +10807,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/analytics/custom/user_login?startDate=2024-01-01&endDate=2024-01-31&groupBy=hour",
-              "host": ["{{baseUrl}}"],
-              "path": ["analytics", "custom", "user_login"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "custom",
+                "user_login"
+              ],
               "query": [
                 {
                   "key": "startDate",
@@ -9631,8 +10865,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/analytics/export/{{exportId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["analytics", "export", "{{exportId}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "export",
+                "{{exportId}}"
+              ]
             }
           },
           "response": [],
@@ -9675,8 +10915,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/analytics/cleanup?olderThan=2024-01-01",
-              "host": ["{{baseUrl}}"],
-              "path": ["analytics", "cleanup"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "analytics",
+                "cleanup"
+              ],
               "query": [
                 {
                   "key": "olderThan",
@@ -9707,6 +10952,1967 @@
       ]
     },
     {
+      "name": "Subscription Plans",
+      "item": [
+        {
+          "name": "Get All Subscription Plans",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscription-plans?isActive=true&planType=premium&billingCycle=monthly",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscription-plans"
+              ],
+              "query": [
+                {
+                  "key": "isActive",
+                  "value": "true"
+                },
+                {
+                  "key": "planType",
+                  "value": "premium"
+                },
+                {
+                  "key": "billingCycle",
+                  "value": "monthly"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is array', function () {",
+                  "  pm.expect(pm.response.json()).to.be.an('array');",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "  const plans = pm.response.json();",
+                  "  if (plans.length > 0) {",
+                  "    pm.environment.set('planId', plans[0].id);",
+                  "    pm.environment.set('planName', plans[0].name);",
+                  "  }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Subscription Plan by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscription-plans/{{planId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscription-plans",
+                "{{planId}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has plan data', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('id');",
+                  "  pm.expect(response).to.have.property('name');",
+                  "  pm.expect(response).to.have.property('price');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Popular Plans",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscription-plans/popular/plans",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscription-plans",
+                "popular",
+                "plans"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is array', function () {",
+                  "  pm.expect(pm.response.json()).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Subscription Plans Health Check",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscription-plans/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscription-plans",
+                "health"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has health status', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('status', 'healthy');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Subscription Usage Tracking",
+      "item": [
+        {
+          "name": "Record Usage",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subscriptionId\": \"{{subscriptionId}}\",\n  \"tenantId\": \"{{tenantId}}\",\n  \"metricType\": \"api_calls\",\n  \"metricName\": \"api_calls\",\n  \"quantity\": 100,\n  \"unitPrice\": 0.01,\n  \"periodStart\": \"2024-01-01\",\n  \"periodEnd\": \"2024-02-01\",\n  \"metadata\": {\n    \"source\": \"api\",\n    \"endpoint\": \"/api/users\"\n  },\n  \"tags\": {\n    \"environment\": \"production\",\n    \"service\": \"user-service\"\n  },\n  \"notes\": \"API usage tracking for user management\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/usage/record",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscriptions",
+                "usage",
+                "record"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has success property', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('success');",
+                  "  pm.expect(response.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Response has usage data', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('usage');",
+                  "  pm.expect(response.usage).to.have.property('id');",
+                  "  pm.expect(response.usage).to.have.property('quantity');",
+                  "});",
+                  "",
+                  "pm.test('Response has alerts array', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('alerts');",
+                  "  pm.expect(response.alerts).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Bulk Record Usage",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usageRecords\": [\n    {\n      \"subscriptionId\": \"{{subscriptionId}}\",\n      \"tenantId\": \"{{tenantId}}\",\n      \"metricType\": \"api_calls\",\n      \"metricName\": \"api_calls\",\n      \"quantity\": 150,\n      \"unitPrice\": 0.01,\n      \"periodStart\": \"2024-01-01\",\n      \"periodEnd\": \"2024-02-01\",\n      \"metadata\": {\n        \"source\": \"api\"\n      }\n    },\n    {\n      \"subscriptionId\": \"{{subscriptionId}}\",\n      \"tenantId\": \"{{tenantId}}\",\n      \"metricType\": \"storage\",\n      \"metricName\": \"storage\",\n      \"quantity\": 500,\n      \"unitPrice\": 0.05,\n      \"periodStart\": \"2024-01-01\",\n      \"periodEnd\": \"2024-02-01\",\n      \"metadata\": {\n        \"source\": \"file-upload\"\n      }\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/usage/bulk-record",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscriptions",
+                "usage",
+                "bulk-record"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has success property', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('success');",
+                  "  pm.expect(response.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Response has usage records array', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('usageRecords');",
+                  "  pm.expect(response.usageRecords).to.be.an('array');",
+                  "  pm.expect(response.usageRecords.length).to.be.greaterThan(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Current Usage",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/usage/{{subscriptionId}}/current",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscriptions",
+                "usage",
+                "{{subscriptionId}}",
+                "current"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has success property', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('success');",
+                  "  pm.expect(response.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Response has usage data', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('usage');",
+                  "  pm.expect(response.usage).to.be.an('object');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Usage Limits",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/usage/{{subscriptionId}}/limits",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscriptions",
+                "usage",
+                "{{subscriptionId}}",
+                "limits"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has success property', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('success');",
+                  "  pm.expect(response.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Response has limits array', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('limits');",
+                  "  pm.expect(response.limits).to.be.an('array');",
+                  "});",
+                  "",
+                  "pm.test('Each limit has required properties', function () {",
+                  "  const response = pm.response.json();",
+                  "  if (response.limits.length > 0) {",
+                  "    const limit = response.limits[0];",
+                  "    pm.expect(limit).to.have.property('metricName');",
+                  "    pm.expect(limit).to.have.property('limit');",
+                  "    pm.expect(limit).to.have.property('currentUsage');",
+                  "    pm.expect(limit).to.have.property('percentage');",
+                  "  }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Check Usage Alerts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/usage/{{subscriptionId}}/alerts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscriptions",
+                "usage",
+                "{{subscriptionId}}",
+                "alerts"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has success property', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('success');",
+                  "  pm.expect(response.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Response has alerts array', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('alerts');",
+                  "  pm.expect(response.alerts).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Usage Analytics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/usage/{{subscriptionId}}/analytics?startDate=2024-01-01&endDate=2024-02-01",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscriptions",
+                "usage",
+                "{{subscriptionId}}",
+                "analytics"
+              ],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-02-01"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has success property', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('success');",
+                  "  pm.expect(response.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Response has analytics data', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('analytics');",
+                  "  pm.expect(response.analytics).to.have.property('totalUsage');",
+                  "  pm.expect(response.analytics).to.have.property('usageByMetric');",
+                  "  pm.expect(response.analytics).to.have.property('usageTrends');",
+                  "  pm.expect(response.analytics).to.have.property('topMetrics');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Usage History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/usage/{{subscriptionId}}/history?limit=50",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscriptions",
+                "usage",
+                "{{subscriptionId}}",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has success property', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('success');",
+                  "  pm.expect(response.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Response has history array', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('history');",
+                  "  pm.expect(response.history).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Usage History by Metric",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/usage/{{subscriptionId}}/history?metricName=api_calls&limit=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscriptions",
+                "usage",
+                "{{subscriptionId}}",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "metricName",
+                  "value": "api_calls"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has success property', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('success');",
+                  "  pm.expect(response.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Response has filtered history', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('history');",
+                  "  pm.expect(response.history).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Tenant Usage Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/usage/tenant/summary?startDate=2024-01-01&endDate=2024-02-01",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscriptions",
+                "usage",
+                "tenant",
+                "summary"
+              ],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-02-01"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has success property', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('success');",
+                  "  pm.expect(response.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('Response has summary data', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('summary');",
+                  "  pm.expect(response.summary).to.have.property('totalSubscriptions');",
+                  "  pm.expect(response.summary).to.have.property('activeSubscriptions');",
+                  "  pm.expect(response.summary).to.have.property('totalUsage');",
+                  "  pm.expect(response.summary).to.have.property('usageByMetric');",
+                  "  pm.expect(response.summary).to.have.property('topSubscriptions');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Billing & Invoices",
+      "item": [
+        {
+          "name": "Create Invoice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"subscription\",\n  \"customerId\": \"{{customerId}}\",\n  \"subscriptionId\": \"{{subscriptionId}}\",\n  \"billingAddress\": {\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"addressLine1\": \"123 Main St\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"postalCode\": \"10001\",\n    \"country\": \"US\"\n  },\n  \"lineItems\": [\n    {\n      \"type\": \"subscription\",\n      \"description\": \"Monthly subscription plan\",\n      \"quantity\": 1,\n      \"unitPrice\": 99.99,\n      \"taxRate\": 0.1\n    }\n  ],\n  \"paymentTerms\": \"net_30\",\n  \"notes\": \"Thank you for your business!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/billing/invoices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "billing",
+                "invoices"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has invoice data', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('success', true);",
+                  "  pm.expect(response).to.have.property('data');",
+                  "  pm.expect(response.data).to.have.property('id');",
+                  "  pm.expect(response.data).to.have.property('invoiceNumber');",
+                  "  pm.environment.set('invoiceId', response.data.id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Invoices",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/billing/invoices?page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "billing",
+                "invoices"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has invoices data', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('success', true);",
+                  "  pm.expect(response).to.have.property('data');",
+                  "  pm.expect(response).to.have.property('pagination');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Billing Analytics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/billing/analytics?startDate=2024-01-01&endDate=2024-12-31",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "billing",
+                "analytics"
+              ],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has analytics data', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('success', true);",
+                  "  pm.expect(response).to.have.property('data');",
+                  "  pm.expect(response.data).to.have.property('totalRevenue');",
+                  "  pm.expect(response.data).to.have.property('totalInvoices');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Subscriptions",
+      "item": [
+        {
+          "name": "Create Subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tenantId\": \"{{tenantId}}\",\n  \"userId\": \"{{userId}}\",\n  \"name\": \"Premium Subscription\",\n  \"description\": \"Premium plan with advanced features\",\n  \"status\": \"active\",\n  \"billingCycle\": \"monthly\",\n  \"amount\": 99.99,\n  \"currency\": \"USD\",\n  \"quantity\": 1,\n  \"unitPrice\": 99.99,\n  \"startDate\": \"2024-01-01T00:00:00.000Z\",\n  \"trialEndDate\": \"2024-01-15T00:00:00.000Z\",\n  \"trialDays\": 14,\n  \"isTrial\": true,\n  \"autoRenew\": true,\n  \"planId\": \"{{planId}}\",\n  \"metadata\": {\n    \"source\": \"api\",\n    \"campaign\": \"premium_upgrade\"\n  },\n  \"features\": {\n    \"api_calls\": 10000,\n    \"storage_gb\": 100,\n    \"users\": 50\n  },\n  \"limits\": {\n    \"max_projects\": 25,\n    \"max_team_members\": 50\n  },\n  \"gracePeriodDays\": 7,\n  \"notes\": \"Premium subscription created via API\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscriptions"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "  const response = pm.response.json();",
+                  "  pm.environment.set('subscriptionId', response.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get All Subscriptions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions?tenantId={{tenantId}}&status=active",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscriptions"
+              ],
+              "query": [
+                {
+                  "key": "tenantId",
+                  "value": "{{tenantId}}"
+                },
+                {
+                  "key": "status",
+                  "value": "active"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is array', function () {",
+                  "  pm.expect(pm.response.json()).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Subscription by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscriptions",
+                "{{subscriptionId}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has subscription data', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('id');",
+                  "  pm.expect(response).to.have.property('status');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Subscription",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Premium Subscription\",\n  \"description\": \"Updated premium plan with enhanced features\",\n  \"status\": \"active\",\n  \"billingCycle\": \"annually\",\n  \"amount\": 999.99,\n  \"currency\": \"USD\",\n  \"quantity\": 1,\n  \"unitPrice\": 999.99,\n  \"autoRenew\": true,\n  \"metadata\": {\n    \"source\": \"api\",\n    \"updated_at\": \"2024-01-15T10:30:00.000Z\"\n  },\n  \"features\": {\n    \"api_calls\": 50000,\n    \"storage_gb\": 500,\n    \"users\": 100\n  },\n  \"limits\": {\n    \"max_projects\": 50,\n    \"max_team_members\": 100\n  },\n  \"gracePeriodDays\": 14,\n  \"notes\": \"Subscription upgraded to annual billing\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscriptions",
+                "{{subscriptionId}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cancel Subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"user_request\",\n  \"customReason\": \"User requested cancellation due to budget constraints\",\n  \"cancelAtPeriodEnd\": true,\n  \"prorate\": false,\n  \"invoiceNow\": false,\n  \"notes\": \"Customer requested cancellation at period end\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscriptions",
+                "{{subscriptionId}}",
+                "cancel"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reactivate Subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/reactivate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscriptions",
+                "{{subscriptionId}}",
+                "reactivate"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Suspend Subscription",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Payment failed - card declined\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/suspend",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscriptions",
+                "{{subscriptionId}}",
+                "suspend"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Subscription",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscriptions",
+                "{{subscriptionId}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204', function () {",
+                  "  pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Subscription by Stripe ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/stripe/{{stripeSubscriptionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscriptions",
+                "stripe",
+                "{{stripeSubscriptionId}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Check Can Upgrade",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/can-upgrade/{{targetPlanId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscriptions",
+                "{{subscriptionId}}",
+                "can-upgrade",
+                "{{targetPlanId}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has upgrade info', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('canUpgrade');",
+                  "  pm.expect(response).to.have.property('message');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Check Can Downgrade",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/can-downgrade/{{targetPlanId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscriptions",
+                "{{subscriptionId}}",
+                "can-downgrade",
+                "{{targetPlanId}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has downgrade info', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('canDowngrade');",
+                  "  pm.expect(response).to.have.property('message');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Calculate Proration",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newAmount\": 149.99,\n  \"effectiveDate\": \"2024-01-15T00:00:00.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/calculate-proration",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscriptions",
+                "{{subscriptionId}}",
+                "calculate-proration"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has proration data', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('prorationAmount');",
+                  "  pm.expect(response).to.have.property('creditAmount');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Validate Limits",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usageData\": {\n    \"api_calls\": 1500,\n    \"storage_gb\": 5.2,\n    \"users\": 25,\n    \"projects\": 8,\n    \"features\": 12\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/{{subscriptionId}}/validate-limits",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscriptions",
+                "{{subscriptionId}}",
+                "validate-limits"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has validation data', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('isValid');",
+                  "  pm.expect(response).to.have.property('errors');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Subscription Health Check",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/subscriptions/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "subscriptions",
+                "health"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has health status', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('status', 'healthy');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Billing Management",
+      "item": [
+        {
+          "name": "Create Invoice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"subscription\",\n  \"customerId\": \"{{customerId}}\",\n  \"subscriptionId\": \"{{subscriptionId}}\",\n  \"billingAddress\": {\n    \"name\": \"John Doe\",\n    \"company\": \"Acme Corp\",\n    \"addressLine1\": \"123 Main St\",\n    \"addressLine2\": \"Suite 100\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"postalCode\": \"10001\",\n    \"country\": \"US\",\n    \"phone\": \"+1-555-123-4567\",\n    \"email\": \"john.doe@acme.com\"\n  },\n  \"shippingAddress\": {\n    \"name\": \"John Doe\",\n    \"company\": \"Acme Corp\",\n    \"addressLine1\": \"123 Main St\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"postalCode\": \"10001\",\n    \"country\": \"US\"\n  },\n  \"lineItems\": [\n    {\n      \"type\": \"subscription\",\n      \"description\": \"Premium Monthly Subscription\",\n      \"quantity\": 1,\n      \"unitPrice\": 99.99,\n      \"taxRate\": 8.25,\n      \"discountAmount\": 0,\n      \"metadata\": {\n        \"plan_id\": \"premium_monthly\",\n        \"billing_period\": \"2024-01-01 to 2024-01-31\"\n      },\n      \"subscriptionId\": \"{{subscriptionId}}\",\n      \"periodStart\": \"2024-01-01\",\n      \"periodEnd\": \"2024-01-31\"\n    }\n  ],\n  \"paymentTerms\": \"net_30\",\n  \"dueDate\": \"2024-02-15T00:00:00.000Z\",\n  \"notes\": \"Monthly subscription invoice for premium plan\",\n  \"footer\": \"Thank you for your business!\",\n  \"metadata\": {\n    \"invoice_source\": \"api\",\n    \"campaign\": \"monthly_billing\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/billing/invoices",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "billing",
+                "invoices"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 201) {",
+                  "  const response = pm.response.json();",
+                  "  pm.environment.set('invoiceId', response.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get All Invoices",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/billing/invoices?tenantId={{tenantId}}&status=PAID&limit=20&offset=0",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "billing",
+                "invoices"
+              ],
+              "query": [
+                {
+                  "key": "tenantId",
+                  "value": "{{tenantId}}"
+                },
+                {
+                  "key": "status",
+                  "value": "PAID"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is array', function () {",
+                  "  pm.expect(pm.response.json()).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Invoice by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/billing/invoices/{{invoiceId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "billing",
+                "invoices",
+                "{{invoiceId}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has invoice data', function () {",
+                  "  const response = pm.response.json();",
+                  "  pm.expect(response).to.have.property('id');",
+                  "  pm.expect(response).to.have.property('status');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Invoice",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"sent\",\n  \"billingAddress\": {\n    \"name\": \"John Doe\",\n    \"company\": \"Acme Corp Updated\",\n    \"addressLine1\": \"456 Updated St\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"postalCode\": \"10001\",\n    \"country\": \"US\",\n    \"email\": \"john.doe@acme.com\"\n  },\n  \"lineItems\": [\n    {\n      \"type\": \"subscription\",\n      \"description\": \"Premium Monthly Subscription - Updated\",\n      \"quantity\": 1,\n      \"unitPrice\": 99.99,\n      \"taxRate\": 8.25,\n      \"discountAmount\": 10.00,\n      \"metadata\": {\n        \"plan_id\": \"premium_monthly\",\n        \"discount_applied\": \"early_payment\"\n      }\n    }\n  ],\n  \"paymentTerms\": \"net_15\",\n  \"dueDate\": \"2024-02-20T00:00:00.000Z\",\n  \"notes\": \"Updated invoice with early payment discount\",\n  \"footer\": \"Thank you for your business! Early payment discount applied.\",\n  \"metadata\": {\n    \"invoice_source\": \"api\",\n    \"updated_at\": \"2024-01-15T14:30:00.000Z\",\n    \"discount_reason\": \"early_payment\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/billing/invoices/{{invoiceId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "billing",
+                "invoices",
+                "{{invoiceId}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Mark Invoice as Paid",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"paidDate\": \"2024-01-15T10:30:00.000Z\",\n  \"paymentMethod\": \"credit_card\",\n  \"transactionId\": \"txn_123456789\",\n  \"notes\": \"Payment processed successfully via Stripe\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/billing/invoices/{{invoiceId}}/mark-paid",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "billing",
+                "invoices",
+                "{{invoiceId}}",
+                "mark-paid"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cancel Invoice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Customer requested cancellation due to service issues\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/billing/invoices/{{invoiceId}}/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "billing",
+                "invoices",
+                "{{invoiceId}}",
+                "cancel"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Send Invoice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"customer@example.com\",\n  \"subject\": \"Invoice #{{invoiceId}} - Payment Due\",\n  \"message\": \"Dear Customer,\\n\\nPlease find your invoice attached. Payment is due within 30 days.\\n\\nThank you for your business!\\n\\nBest regards,\\nThe Billing Team\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/billing/invoices/{{invoiceId}}/send",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "billing",
+                "invoices",
+                "{{invoiceId}}",
+                "send"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Generate Invoice PDF",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/billing/invoices/{{invoiceId}}/pdf",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "billing",
+                "invoices",
+                "{{invoiceId}}",
+                "pdf"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is PDF', function () {",
+                  "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/pdf');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Invoice",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/billing/invoices/{{invoiceId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "billing",
+                "invoices",
+                "{{invoiceId}}"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 204', function () {",
+                  "  pm.response.to.have.status(204);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "Health Check",
       "item": [
         {
@@ -9716,8 +12922,12 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/health",
-              "host": ["{{baseUrl}}"],
-              "path": ["health"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
             }
           },
           "response": []

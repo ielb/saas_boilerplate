@@ -1,4 +1,10 @@
 import { z } from 'zod';
+import { config } from 'dotenv';
+
+// Load environment variables from .env file
+config({
+  path: '../../.env',
+});
 
 // Environment variable schema validation
 const envSchema = z.object({
@@ -73,9 +79,9 @@ const envSchema = z.object({
   GOOGLE_CLOUD_KEY_FILE: z.string().optional(),
 
   // Payment Configuration (Stripe)
-  STRIPE_SECRET_KEY: z.string().optional(),
-  STRIPE_PUBLISHABLE_KEY: z.string().optional(),
-  STRIPE_WEBHOOK_SECRET: z.string().optional(),
+  STRIPE_SECRET_KEY: z.string().min(1),
+  STRIPE_PUBLISHABLE_KEY: z.string().min(1),
+  STRIPE_WEBHOOK_SECRET: z.string().min(1),
   STRIPE_PRICE_ID: z.string().optional(),
 
   // Push Notifications
@@ -212,6 +218,7 @@ const env = (() => {
   const nodeEnv = process.env.NODE_ENV || 'development';
 
   try {
+    console.log('process.env', process.env);
     return envSchema.parse(process.env);
   } catch (error) {
     if (nodeEnv === 'development') {
@@ -229,6 +236,9 @@ const env = (() => {
           'your-super-secret-session-key-for-development-only-change-in-production',
         COOKIE_SECRET:
           'your-super-secret-cookie-key-for-development-only-change-in-production',
+        STRIPE_SECRET_KEY: 'sk_test_your_stripe_secret_key_here',
+        STRIPE_PUBLISHABLE_KEY: 'pk_test_your_stripe_publishable_key_here',
+        STRIPE_WEBHOOK_SECRET: 'whsec_your_webhook_secret_here',
         ...process.env,
       };
       return envSchema.parse(defaultEnv);
