@@ -19,6 +19,9 @@ import { TenantsModule } from './modules/tenants/tenants.module';
 import { FilesModule } from './modules/files/files.module';
 import { EmailModule } from './modules/email/email.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
+import { PaymentsModule } from './modules/payments/payments.module';
+import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
+import { BillingModule } from './modules/billing/billing.module';
 import { TenantMiddlewareModule } from './common/middleware/tenant-middleware.module';
 import { TenantIsolationMiddleware } from './common/middleware/tenant-isolation.middleware';
 
@@ -95,6 +98,9 @@ import { TenantIsolationMiddleware } from './common/middleware/tenant-isolation.
     FilesModule,
     EmailModule,
     AnalyticsModule,
+    PaymentsModule,
+    SubscriptionsModule,
+    BillingModule,
   ],
   controllers: [],
   providers: [],

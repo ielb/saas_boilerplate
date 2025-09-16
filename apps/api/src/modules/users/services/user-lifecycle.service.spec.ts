@@ -384,8 +384,16 @@ describe('UserLifecycleService', () => {
           }),
         })
       );
-      const emailCall = mockEmailService.sendUserSuspensionNotification.mock.calls[0];
-      expect(emailCall[0]).toEqual(suspendedUser);
+      const emailCall =
+        mockEmailService.sendUserSuspensionNotification.mock.calls[0];
+      expect(emailCall[0]).toMatchObject({
+        ...suspendedUser,
+        metadata: expect.objectContaining({
+          suspendedAt: expect.any(Date),
+          suspensionReason: 'Test suspension',
+          suspensionExpiresAt: null,
+        }),
+      });
       expect(emailCall[1]).toMatchObject({
         suspendedAt: expect.any(Date),
         suspensionReason: 'Test suspension',

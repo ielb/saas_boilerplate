@@ -10,9 +10,9 @@ export const TestDataSource = new DataSource({
   database: process.env.POSTGRES_TEST_DB || 'test_db', // Use test database name
   entities: [join(__dirname, '../**/*.entity{.ts,.js}')],
   migrations: [join(__dirname, 'migrations/*{.ts,.js}')],
-  synchronize: true, // Enable synchronize for tests
+  synchronize: false, // Disable global synchronize
   logging: false, // Disable logging for tests
-  dropSchema: true, // Drop schema before each test run
+  dropSchema: false, // Disable global drop schema
   ssl: false,
   extra: {
     connectionLimit: 5,
