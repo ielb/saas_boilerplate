@@ -110,13 +110,13 @@ This document outlines the comprehensive implementation plan for the Payment & B
   - [x] 2.5 Create subscription validation and business rules
   - [x] 2.6 Implement subscription usage tracking and limits
 
-- [ ] 3.0 Billing and Invoice System
-  - [ ] 3.1 Design billing entities and invoice data models
-  - [ ] 3.2 Implement invoice generation service with PDF creation
-  - [ ] 3.3 Create customizable invoice templates using MJML
-  - [ ] 3.4 Implement usage-based billing calculations
-  - [ ] 3.5 Set up automated billing cycles and recurring invoices
-  - [ ] 3.6 Create billing history and audit trail
+- [x] 3.0 Billing and Invoice System
+  - [x] 3.1 Design billing entities and invoice data models
+  - [x] 3.2 Implement invoice generation service with PDF creation
+  - [x] 3.3 Create customizable invoice templates using MJML
+  - [x] 3.4 Implement usage-based billing calculations
+  - [x] 3.5 Set up automated billing cycles and recurring invoices
+  - [x] 3.6 Create billing history and audit trail
 
 - [ ] 4.0 Tax Calculation and Compliance
   - [ ] 4.1 Integrate tax calculation service (Stripe Tax or external provider)
