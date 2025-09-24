@@ -231,7 +231,7 @@ Based on PRD: `docs/prd.md`
   - [x] 4.5 Create invoice generation with PDF templates
   - [x] 4.6 Implement dunning management for failed payments
   - [x] 4.7 Set up usage-based billing for metered services
-  - [x] 4.8 Create tax calculation for global compliance
+  - [x] 4.8 Create tax calculation for global compliancels
   - [ ] 4.9 Implement revenue analytics (MRR, churn, growth)
   - [ ] 4.10 Add billing portal for customer self-service
   - [ ] 4.11 Create subscription upgrade/downgrade workflows

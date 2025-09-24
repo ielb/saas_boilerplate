@@ -83,6 +83,7 @@ This document outlines the comprehensive implementation plan for the Payment & B
 - `apps/api/src/modules/billing/dto/tax.dto.ts` - Tax-related DTOs for API requests/responses
 
 **Tax Features Implemented:**
+
 - Multi-jurisdiction tax rate management (US, Canada, EU)
 - Tax exemption handling with validation and expiration tracking
 - Multi-provider tax calculation (Stripe Tax, external providers, manual)
