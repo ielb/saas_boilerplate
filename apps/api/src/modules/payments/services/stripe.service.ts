@@ -778,6 +778,104 @@ export class StripeService {
     return this.stripe;
   }
 
+  async calculateTax(params: {
+    currency: string;
+    line_items: Array<{
+      amount: number;
+      reference?: string;
+      tax_code?: string;
+    }>;
+    customer_details: {
+      address: {
+        country: string;
+        state?: string;
+        city?: string;
+        postal_code?: string;
+      };
+      address_source?: 'billing' | 'shipping';
+    };
+    expand?: string[];
+  }): Promise<Stripe.Tax.Calculation> {
+    try {
+      const taxCalculation = await this.stripe.tax.calculations.create({
+        currency: params.currency,
+        line_items: params.line_items,
+        customer_details: params.customer_details,
+        ...(params.expand && { expand: params.expand }),
+      });
+
+      this.logger.log(`Calculated tax using Stripe: ${taxCalculation.id}`);
+      return taxCalculation;
+    } catch (error: any) {
+      this.logger.error(`Failed to calculate tax with Stripe: ${error.message}`);
+      throw error;
+    }
+  }
+
+  async createTaxTransaction(params: {
+    calculation: string; // Tax calculation ID
+    reference: string;
+    metadata?: Record<string, string>;
+  }): Promise<Stripe.Tax.Transaction> {
+    try {
+      const transaction = await this.stripe.tax.transactions.createFromCalculation({
+        calculation: params.calculation,
+        reference: params.reference,
+        ...(params.metadata && { metadata: params.metadata }),
+      });
+
+      this.logger.log(`Created tax transaction: ${transaction.id}`);
+      return transaction;
+    } catch (error: any) {
+      this.logger.error(`Failed to create tax transaction: ${error.message}`);
+      throw error;
+    }
+  }
+
+  async getTaxRates(params?: {
+    active?: boolean;
+    created?: Stripe.RangeQueryParam | number;
+    inclusive?: boolean;
+    limit?: number;
+    starting_after?: string;
+    ending_before?: string;
+  }): Promise<Stripe.ApiList<Stripe.TaxRate>> {
+    try {
+      const taxRates = await this.stripe.taxRates.list(params);
+      this.logger.log(`Retrieved ${taxRates.data.length} tax rates from Stripe`);
+      return taxRates;
+    } catch (error: any) {
+      this.logger.error(`Failed to retrieve tax rates: ${error.message}`);
+      throw error;
+    }
+  }
+
+  async createTaxRate(params: {
+    display_name: string;
+    percentage: number;
+    inclusive: boolean;
+    jurisdiction?: string;
+    description?: string;
+    metadata?: Record<string, string>;
+  }): Promise<Stripe.TaxRate> {
+    try {
+      const taxRate = await this.stripe.taxRates.create({
+        display_name: params.display_name,
+        percentage: params.percentage,
+        inclusive: params.inclusive,
+        ...(params.jurisdiction && { jurisdiction: params.jurisdiction }),
+        ...(params.description && { description: params.description }),
+        ...(params.metadata && { metadata: params.metadata }),
+      });
+
+      this.logger.log(`Created tax rate in Stripe: ${taxRate.id}`);
+      return taxRate;
+    } catch (error: any) {
+      this.logger.error(`Failed to create tax rate: ${error.message}`);
+      throw error;
+    }
+  }
+
   getConfig() {
     return stripeConfig;
   }

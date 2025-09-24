@@ -5,4 +5,6 @@ export * from './billing-history.entity';
 export * from './usage-billing.entity';
 export * from './usage-billing-record.entity';
 export * from './billing-template.entity';
+export * from './tax-rate.entity';
+export * from './tax-exemption.entity';
 

@@ -84,6 +84,34 @@ const envSchema = z.object({
   STRIPE_WEBHOOK_SECRET: z.string().min(1),
   STRIPE_PRICE_ID: z.string().optional(),
 
+  // Tax Configuration
+  TAX_PROVIDER: z.enum(['stripe', 'manual', 'external']).default('manual'),
+  STRIPE_TAX_ENABLED: z
+    .string()
+    .transform((val: string) => val === 'true')
+    .default('false'),
+  STRIPE_AUTOMATIC_TAX: z
+    .string()
+    .transform((val: string) => val === 'true')
+    .default('false'),
+  STRIPE_TAX_BEHAVIOR: z.enum(['inclusive', 'exclusive']).default('exclusive'),
+  DEFAULT_TAX_RATE: z.string().default('0.08'),
+  ENABLE_REGIONAL_TAX: z
+    .string()
+    .transform((val: string) => val === 'true')
+    .default('false'),
+  EXTERNAL_TAX_API_URL: z.string().optional(),
+  EXTERNAL_TAX_API_KEY: z.string().optional(),
+  EXTERNAL_TAX_PROVIDER: z.string().optional(),
+  ENABLE_TAX_REPORTING: z
+    .string()
+    .transform((val: string) => val === 'true')
+    .default('false'),
+  TAX_REPORTING_FREQUENCY: z
+    .enum(['monthly', 'quarterly', 'annually'])
+    .default('quarterly'),
+  TAX_RETENTION_PERIOD: z.string().default('7'),
+
   // Push Notifications
   FIREBASE_PROJECT_ID: z.string().optional(),
   FIREBASE_PRIVATE_KEY: z.string().optional(),
