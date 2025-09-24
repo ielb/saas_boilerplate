@@ -12,7 +12,14 @@ Based on PRD: `docs/prd.md`
 - `apps/api/src/modules/auth/` - Authentication module directory
 - `apps/api/src/modules/users/` - User management module directory
 - `apps/api/src/modules/tenants/` - Multi-tenant module directory
-- `apps/api/src/modules/billing/` - Payment and billing module directory
+- `apps/api/src/modules/billing/` - Payment and billing module directory with tax infrastructure
+- `apps/api/src/config/tax.config.ts` - Tax configuration with multi-jurisdiction support
+- `apps/api/src/modules/billing/entities/tax-rate.entity.ts` - Tax rate entity with jurisdiction support
+- `apps/api/src/modules/billing/entities/tax-exemption.entity.ts` - Tax exemption entity with validation
+- `apps/api/src/modules/billing/services/tax-calculation.service.ts` - Multi-provider tax calculation service
+- `apps/api/src/modules/billing/services/tax-reporting.service.ts` - Tax reporting and compliance service
+- `apps/api/src/modules/billing/controllers/tax.controller.ts` - Tax API controller with CRUD operations
+- `apps/api/src/modules/billing/dto/tax.dto.ts` - Tax-related DTOs for API requests/responses
 - `apps/api/src/modules/notifications/` - Communication module directory
 - `apps/api/src/modules/files/` - File management module directory
 - `apps/api/src/modules/websocket/` - Real-time features module directory
@@ -216,15 +223,15 @@ Based on PRD: `docs/prd.md`
   - [x] 3.14 Implement access delegation and temporary permissions (#38)
   - [x] 3.15 Set up tenant usage analytics and reporting (#39)
 
-- [ ] 4.0 Payment & Billing Infrastructure
-  - [ ] 4.1 Set up Stripe integration and webhook handling (#11)
-  - [ ] 4.2 Create subscription plan configuration system (#22)
-  - [ ] 4.3 Implement subscription management (create, update, cancel)
-  - [ ] 4.4 Add payment method management (cards, ACH, international)
-  - [ ] 4.5 Create invoice generation with PDF templates
-  - [ ] 4.6 Implement dunning management for failed payments
-  - [ ] 4.7 Set up usage-based billing for metered services
-  - [ ] 4.8 Create tax calculation for global compliance
+- [x] 4.0 Payment & Billing Infrastructure
+  - [x] 4.1 Set up Stripe integration and webhook handling (#11)
+  - [x] 4.2 Create subscription plan configuration system (#22)
+  - [x] 4.3 Implement subscription management (create, update, cancel)
+  - [x] 4.4 Add payment method management (cards, ACH, international)
+  - [x] 4.5 Create invoice generation with PDF templates
+  - [x] 4.6 Implement dunning management for failed payments
+  - [x] 4.7 Set up usage-based billing for metered services
+  - [x] 4.8 Create tax calculation for global compliance
   - [ ] 4.9 Implement revenue analytics (MRR, churn, growth)
   - [ ] 4.10 Add billing portal for customer self-service
   - [ ] 4.11 Create subscription upgrade/downgrade workflows
