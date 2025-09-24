@@ -20,11 +20,11 @@ This document outlines the comprehensive implementation plan for the Payment & B
 ### Billing Module
 
 - `apps/api/src/modules/billing/` - Main billing module directory
-- `apps/api/src/modules/billing/billing.module.ts` - Module configuration
-- `apps/api/src/modules/billing/entities/` - Billing entities
-- `apps/api/src/modules/billing/dto/` - Billing DTOs
-- `apps/api/src/modules/billing/services/` - Billing services
-- `apps/api/src/modules/billing/controllers/` - Billing controllers
+- `apps/api/src/modules/billing/billing.module.ts` - Module configuration with tax services
+- `apps/api/src/modules/billing/entities/` - Billing entities including tax entities
+- `apps/api/src/modules/billing/dto/` - Billing DTOs including tax DTOs
+- `apps/api/src/modules/billing/services/` - Billing services including tax services
+- `apps/api/src/modules/billing/controllers/` - Billing controllers including tax controller
 - `apps/api/src/modules/billing/templates/` - Invoice templates
 
 ### Subscriptions Module
@@ -70,8 +70,26 @@ This document outlines the comprehensive implementation plan for the Payment & B
 
 - `apps/api/src/config/payment.config.ts` - Payment configuration
 - `apps/api/src/config/stripe.config.ts` - Stripe configuration
-- `apps/api/src/config/tax.config.ts` - Tax configuration
+- `apps/api/src/config/tax.config.ts` - Tax configuration with multi-jurisdiction support
 - `.env.example` - Environment variables template
+
+### Tax Infrastructure (Recently Implemented)
+
+- `apps/api/src/modules/billing/entities/tax-rate.entity.ts` - Tax rate entity with jurisdiction support
+- `apps/api/src/modules/billing/entities/tax-exemption.entity.ts` - Tax exemption entity with validation
+- `apps/api/src/modules/billing/services/tax-calculation.service.ts` - Multi-provider tax calculation service
+- `apps/api/src/modules/billing/services/tax-reporting.service.ts` - Tax reporting and compliance service
+- `apps/api/src/modules/billing/controllers/tax.controller.ts` - Tax API controller with CRUD operations
+- `apps/api/src/modules/billing/dto/tax.dto.ts` - Tax-related DTOs for API requests/responses
+
+**Tax Features Implemented:**
+- Multi-jurisdiction tax rate management (US, Canada, EU)
+- Tax exemption handling with validation and expiration tracking
+- Multi-provider tax calculation (Stripe Tax, external providers, manual)
+- Comprehensive tax reporting with CSV export
+- Tax compliance features with audit trails
+- Configurable tax jurisdictions and rates
+- Tax exemption certificate management
 
 ### Testing Files
 
@@ -102,7 +120,7 @@ This document outlines the comprehensive implementation plan for the Payment & B
   - [x] 1.5 Create payment security guards and interceptors
   - [x] 1.6 Implement payment error handling and logging
 
-- [ ] 2.0 Subscription Management System
+- [x] 2.0 Subscription Management System
   - [x] 2.1 Design and implement subscription entities and relationships
   - [x] 2.2 Create subscription service with Stripe integration
   - [x] 2.3 Implement subscription lifecycle management (create, update, cancel)
