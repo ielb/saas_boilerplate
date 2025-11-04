@@ -15,38 +15,10 @@ import {
 } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 import { TaxType } from '@app/shared';
-import { TaxExemptionType, TaxExemptionStatus } from '../entities/tax-exemption.entity';
-
-export class TaxCalculationRequestDto {
-  @IsNumber()
-  @Min(0)
-  amount!: number;
-
-  @IsString()
-  @IsNotEmpty()
-  currency!: string;
-
-  @IsUUID()
-  tenantId!: string;
-
-  @IsOptional()
-  @IsUUID()
-  customerId?: string;
-
-  @ValidateNested()
-  @Type(() => TaxBillingAddressDto)
-  billingAddress!: TaxBillingAddressDto;
-
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => TaxLineItemDto)
-  lineItems?: TaxLineItemDto[];
-
-  @IsOptional()
-  @IsUUID()
-  exemptionId?: string;
-}
+import {
+  TaxExemptionType,
+  TaxExemptionStatus,
+} from '../entities/tax-exemption.entity';
 
 export class TaxBillingAddressDto {
   @IsString()
@@ -82,6 +54,37 @@ export class TaxLineItemDto {
   @IsOptional()
   @IsString()
   taxCode?: string;
+}
+
+export class TaxCalculationRequestDto {
+  @IsNumber()
+  @Min(0)
+  amount!: number;
+
+  @IsString()
+  @IsNotEmpty()
+  currency!: string;
+
+  @IsUUID()
+  tenantId!: string;
+
+  @IsOptional()
+  @IsUUID()
+  customerId?: string;
+
+  @ValidateNested()
+  @Type(() => TaxBillingAddressDto)
+  billingAddress!: TaxBillingAddressDto;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => TaxLineItemDto)
+  lineItems?: TaxLineItemDto[];
+
+  @IsOptional()
+  @IsUUID()
+  exemptionId?: string;
 }
 
 export class CreateTaxRateDto {

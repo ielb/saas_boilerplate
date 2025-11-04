@@ -108,5 +108,82 @@ export class BillingAnalyticsController {
       },
     };
   }
-}
 
+  @Get('mrr')
+  async getMRRAnalytics(
+    @Request() req: any,
+    @Query() query: BillingAnalyticsQueryDto
+  ) {
+    const tenantId = req.user.tenantId;
+    const analytics = await this.billingAnalyticsService.getBillingAnalytics(
+      tenantId,
+      query
+    );
+
+    return {
+      success: true,
+      data: {
+        mrr: analytics.mrr,
+      },
+    };
+  }
+
+  @Get('churn')
+  async getChurnAnalytics(
+    @Request() req: any,
+    @Query() query: BillingAnalyticsQueryDto
+  ) {
+    const tenantId = req.user.tenantId;
+    const analytics = await this.billingAnalyticsService.getBillingAnalytics(
+      tenantId,
+      query
+    );
+
+    return {
+      success: true,
+      data: {
+        churn: analytics.churn,
+      },
+    };
+  }
+
+  @Get('growth')
+  async getGrowthAnalytics(
+    @Request() req: any,
+    @Query() query: BillingAnalyticsQueryDto
+  ) {
+    const tenantId = req.user.tenantId;
+    const analytics = await this.billingAnalyticsService.getBillingAnalytics(
+      tenantId,
+      query
+    );
+
+    return {
+      success: true,
+      data: {
+        growth: analytics.growth,
+      },
+    };
+  }
+
+  @Get('saas-metrics')
+  async getSaaSMetrics(
+    @Request() req: any,
+    @Query() query: BillingAnalyticsQueryDto
+  ) {
+    const tenantId = req.user.tenantId;
+    const analytics = await this.billingAnalyticsService.getBillingAnalytics(
+      tenantId,
+      query
+    );
+
+    return {
+      success: true,
+      data: {
+        mrr: analytics.mrr,
+        churn: analytics.churn,
+        growth: analytics.growth,
+      },
+    };
+  }
+}
