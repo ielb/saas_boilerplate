@@ -28,6 +28,8 @@
       "@/utils/*": ["./src/utils/*"],
       "@/types/*": ["./src/types/*"],
       "@/styles/*": ["./src/styles/*"],
+      "@/services/*": ["./src/services/*"],
+      "@/store/*": ["./src/store/*"],
       "@shared/*": ["../../packages/shared/src/*"],
       "@ui/*": ["../../packages/ui/src/*"],
       "@config/*": ["../../packages/config/src/*"]

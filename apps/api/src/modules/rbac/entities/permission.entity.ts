@@ -6,7 +6,6 @@ import {
   UpdateDateColumn,
   Index,
   ManyToMany,
-  JoinTable,
 } from 'typeorm';
 
 import { UserTenantMembership } from '../../tenants/entities/user-tenant-membership.entity';
@@ -107,12 +106,7 @@ export class Permission {
   updatedAt!: Date;
 
   @ManyToMany(() => Role, (role: Role) => role.permissions)
-  @JoinTable({
-    name: 'role_permissions',
-    joinColumn: { name: 'permissionId', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'roleId', referencedColumnName: 'id' },
-  })
-  roles!: any[];
+  roles!: Role[];
 
   @ManyToMany(
     () => UserTenantMembership,

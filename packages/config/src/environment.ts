@@ -246,7 +246,6 @@ const env = (() => {
   const nodeEnv = process.env.NODE_ENV || 'development';
 
   try {
-    console.log('process.env', process.env);
     return envSchema.parse(process.env);
   } catch (error) {
     if (nodeEnv === 'development') {

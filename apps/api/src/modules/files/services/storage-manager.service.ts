@@ -358,7 +358,7 @@ export class StorageManagerService implements OnModuleInit, OnModuleDestroy {
 
     this.healthCheckInterval = setInterval(async () => {
       await this.performHealthChecks();
-    }, interval);
+    }, interval) as unknown as NodeJS.Timeout;
 
     this.logger.log(`Health checks started with interval: ${interval}ms`);
   }

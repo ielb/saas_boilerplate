@@ -23,10 +23,12 @@ import { LoginDto } from '../dto/login.dto';
 import { RefreshTokenDto } from '../dto/refresh-token.dto';
 import { ForgotPasswordDto } from '../dto/forgot-password.dto';
 import { ResetPasswordDto } from '../dto/reset-password.dto';
+import { ValidateResetTokenDto } from '../dto/validate-reset-token.dto';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { LoginRequest, LoginResponse } from '@app/shared';
 import { VerifyMfaDto } from '../dto/mfa.dto';
 import { ThrottlerGuard, Throttle } from '@nestjs/throttler';
+import { Public } from '../decorators/auth.decorator';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -34,6 +36,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
+  @Public()
   @ApiOperation({ summary: 'Register a new user and tenant' })
   @ApiResponse({
     status: 201,
@@ -148,7 +151,33 @@ export class AuthController {
     return this.authService.forgotPassword(forgotPasswordDto.email);
   }
 
+  @Post('validate-reset-token')
+  @Public()
+  @UseInterceptors(ThrottlerGuard)
+  @Throttle({ default: { ttl: 60000, limit: 10 } }) // 10 requests per minute
+  @ApiOperation({ summary: 'Validate password reset token' })
+  @ApiResponse({
+    status: 200,
+    description: 'Token validation result',
+    schema: {
+      type: 'object',
+      properties: {
+        valid: { type: 'boolean' },
+        message: { type: 'string' },
+      },
+    },
+  })
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 429, description: 'Too many requests' })
+  async validateResetToken(
+    @Body() validateResetTokenDto: ValidateResetTokenDto
+  ) {
+    return this.authService.validateResetToken(validateResetTokenDto.token);
+  }
+
   @Post('reset-password')
+  @Public()
   @UseInterceptors(ThrottlerGuard)
   @Throttle({ default: { ttl: 300000, limit: 5 } }) // 5 requests per 5 minutes
   @ApiOperation({ summary: 'Reset password with token' })

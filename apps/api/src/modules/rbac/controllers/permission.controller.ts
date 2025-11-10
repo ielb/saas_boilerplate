@@ -309,7 +309,9 @@ export class PermissionController {
     description: 'Forbidden - insufficient permissions',
   })
   async initializeDefaultPermissions(): Promise<{ message: string }> {
-    await this.permissionService.createDefaultPermissions();
-    return { message: 'Default permissions initialized successfully' };
+    const permissions = await this.permissionService.createDefaultPermissions();
+    return { 
+      message: `Default permissions initialized successfully. ${permissions.length} permissions created/found.` 
+    };
   }
 }

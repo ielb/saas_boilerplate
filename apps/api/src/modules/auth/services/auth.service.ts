@@ -4,8 +4,8 @@ import {
   BadRequestException,
   Logger,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
+import { Repository, IsNull, DataSource } from 'typeorm';
 import * as argon2 from 'argon2';
 
 import { User } from '../../users/entities/user.entity';
@@ -34,6 +34,8 @@ export class AuthService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(Tenant)
     private readonly tenantRepository: Repository<Tenant>,
+    @InjectDataSource()
+    private readonly dataSource: DataSource,
     private readonly jwtService: JwtService,
     private readonly refreshTokenService: RefreshTokenService,
     private readonly mfaService: MfaService,
@@ -56,17 +58,90 @@ export class AuthService {
       throw new BadRequestException('User already exists');
     }
 
-    // Get or create default tenant
+    // Create tenant from registration data
+    // Check if tenant with this name already exists (excluding soft-deleted)
     let tenant = await this.tenantRepository.findOne({
-      where: { name: 'Default Tenant' },
+      where: { name: registerDto.tenantName, deletedAt: IsNull() },
     });
 
-    if (!tenant) {
-      tenant = this.tenantRepository.create({
-        name: 'Default Tenant',
-        domain: 'default',
+    if (tenant) {
+      throw new BadRequestException(
+        `Tenant with name "${registerDto.tenantName}" already exists`
+      );
+    }
+
+    // Check for domain uniqueness if provided (excluding soft-deleted)
+    if (registerDto.domain) {
+      const existingTenantByDomain = await this.tenantRepository.findOne({
+        where: { domain: registerDto.domain, deletedAt: IsNull() },
       });
-      await this.tenantRepository.save(tenant);
+
+      if (existingTenantByDomain) {
+        throw new BadRequestException(
+          `Tenant with domain "${registerDto.domain}" already exists`
+        );
+      }
+    }
+
+    // Create new tenant with error handling for constraint violations
+    tenant = this.tenantRepository.create({
+      name: registerDto.tenantName,
+      ...(registerDto.domain && { domain: registerDto.domain }),
+      ...(registerDto.description && { description: registerDto.description }),
+      ...(registerDto.contactEmail && { contactEmail: registerDto.contactEmail }),
+      ...(registerDto.contactPhone && { contactPhone: registerDto.contactPhone }),
+      ...(registerDto.address && { address: registerDto.address }),
+      ...(registerDto.city && { city: registerDto.city }),
+      ...(registerDto.state && { state: registerDto.state }),
+      ...(registerDto.postalCode && { postalCode: registerDto.postalCode }),
+      ...(registerDto.country && { country: registerDto.country }),
+      ...(registerDto.timezone && { timezone: registerDto.timezone }),
+      ...(registerDto.locale && { locale: registerDto.locale }),
+      ...(registerDto.currency && { currency: registerDto.currency }),
+      isActive: true,
+      plan: 'free',
+    });
+
+    try {
+      tenant = await this.tenantRepository.save(tenant);
+    } catch (error: any) {
+      // Handle database constraint violations (unique key violations)
+      if (error.code === '23505') {
+        // PostgreSQL unique violation error code
+        this.logger.error(
+          `Tenant creation failed due to unique constraint: ${error.constraint || 'unknown'}. Message: ${error.message}`
+        );
+        
+        // Check constraint name or error message to determine which field caused the violation
+        const constraintName = error.constraint || '';
+        const errorMessage = error.message || '';
+        
+        if (
+          constraintName.includes('name') ||
+          constraintName.includes('IDX_tenants_name') ||
+          errorMessage.toLowerCase().includes('name')
+        ) {
+          throw new BadRequestException(
+            `Tenant with name "${registerDto.tenantName}" already exists. Please choose a different name.`
+          );
+        } else if (
+          constraintName.includes('domain') ||
+          constraintName.includes('IDX_tenants_domain') ||
+          errorMessage.toLowerCase().includes('domain')
+        ) {
+          throw new BadRequestException(
+            `Tenant with domain "${registerDto.domain}" already exists. Please choose a different domain.`
+          );
+        } else {
+          // Generic error for any unique constraint violation
+          throw new BadRequestException(
+            'A tenant with this name or domain already exists. Please choose a different name or domain.'
+          );
+        }
+      }
+      // Re-throw other errors
+      this.logger.error(`Error creating tenant: ${error.message}`, error.stack);
+      throw error;
     }
 
     // Create user
@@ -82,12 +157,40 @@ export class AuthService {
     await user.hashPassword();
     await this.userRepository.save(user);
 
-    // Create default permissions and roles for the tenant if they don't exist
-    await this.permissionService.createDefaultPermissions();
-    await this.roleService.createDefaultRoles();
+    // Set tenant context for role and permission creation
+    // This is needed because these services use tenant-scoped repositories
+    const previousTenantId = (global as any).__currentTenantId;
+    (global as any).__currentTenantId = tenant.id;
 
-    // Ensure Super Admin has all permissions
-    await this.roleService.updateSuperAdminPermissions();
+    try {
+      // Create default permissions first (permissions are global, not tenant-scoped)
+      // Permissions must exist before we can assign them to roles
+      const createdPermissions = await this.permissionService.createDefaultPermissions();
+      
+      if (createdPermissions.length === 0) {
+        this.logger.warn('No permissions were created or found. This may cause role assignment to fail.');
+      } else {
+        this.logger.log(`Successfully created/found ${createdPermissions.length} permissions`);
+      }
+      
+      // Small delay to ensure permissions are committed to database
+      // This helps avoid foreign key constraint violations
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Create default roles for the tenant (roles are tenant-scoped)
+      // Roles will automatically assign permissions via assignDefaultPermissionsToRole
+      await this.roleService.createDefaultRoles();
+
+      // Ensure Super Admin has all permissions
+      await this.roleService.updateSuperAdminPermissions();
+    } finally {
+      // Restore previous tenant context or clear it
+      if (previousTenantId) {
+        (global as any).__currentTenantId = previousTenantId;
+      } else {
+        delete (global as any).__currentTenantId;
+      }
+    }
 
     // Assign "Member" role to the new user
     const memberRole = await this.roleService.getRoleByName('Member');
@@ -609,6 +712,58 @@ export class AuthService {
     return {
       message: 'Password reset successfully',
       status: 'success',
+    };
+  }
+
+  /**
+   * Validate reset token
+   * Checks if a password reset token is valid without resetting the password
+   */
+  async validateResetToken(token: string): Promise<{ valid: boolean; message: string }> {
+    this.logger.log(
+      `Validating reset token: ${token.substring(0, 8)}...`
+    );
+
+    const user = await this.userRepository.findOne({
+      where: { passwordResetToken: token },
+    });
+
+    if (!user) {
+      this.logger.warn(
+        `Invalid password reset token validation attempted: ${token.substring(0, 8)}...`
+      );
+      return {
+        valid: false,
+        message: 'Invalid reset token',
+      };
+    }
+
+    if (!user.isPasswordResetTokenValid()) {
+      this.logger.warn(
+        `Expired password reset token validation attempted for user: ${user.email}`
+      );
+      return {
+        valid: false,
+        message: 'Reset token has expired',
+      };
+    }
+
+    // Check if user is active
+    if (user.status !== UserStatus.ACTIVE) {
+      this.logger.warn(
+        `Reset token validation attempted for inactive user: ${user.email}`
+      );
+      return {
+        valid: false,
+        message: 'Account is not active',
+      };
+    }
+
+    this.logger.log(`Reset token is valid for user: ${user.email}`);
+
+    return {
+      valid: true,
+      message: 'Reset token is valid',
     };
   }
 }

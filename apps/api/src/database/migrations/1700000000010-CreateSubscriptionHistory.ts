@@ -1,6 +1,14 @@
-import { MigrationInterface, QueryRunner, Table, Index, ForeignKey } from 'typeorm';
+import {
+  MigrationInterface,
+  QueryRunner,
+  Table,
+  TableIndex,
+  TableForeignKey,
+} from 'typeorm';
 
-export class CreateSubscriptionHistory1700000000010 implements MigrationInterface {
+export class CreateSubscriptionHistory1700000000010
+  implements MigrationInterface
+{
   name = 'CreateSubscriptionHistory1700000000010';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -13,7 +21,7 @@ export class CreateSubscriptionHistory1700000000010 implements MigrationInterfac
             type: 'uuid',
             isPrimary: true,
             generationStrategy: 'uuid',
-            default: 'gen_random_uuid()',
+            default: 'uuid_generate_v4()',
           },
           {
             name: 'tenantId',
@@ -124,52 +132,61 @@ export class CreateSubscriptionHistory1700000000010 implements MigrationInterfac
     // Create indexes for performance
     await queryRunner.createIndex(
       'subscription_history',
-      new Index('IDX_subscription_history_subscription_change_date', [
-        'subscriptionId',
-        'changeDate',
-      ])
+      new TableIndex({
+        name: 'IDX_subscription_history_subscription_change_date',
+        columnNames: ['subscriptionId', 'changeDate'],
+      })
     );
 
     await queryRunner.createIndex(
       'subscription_history',
-      new Index('IDX_subscription_history_tenant_change_date', [
-        'tenantId',
-        'changeDate',
-      ])
+      new TableIndex({
+        name: 'IDX_subscription_history_tenant_change_date',
+        columnNames: ['tenantId', 'changeDate'],
+      })
     );
 
     await queryRunner.createIndex(
       'subscription_history',
-      new Index('IDX_subscription_history_change_type_date', [
-        'changeType',
-        'changeDate',
-      ])
+      new TableIndex({
+        name: 'IDX_subscription_history_change_type_date',
+        columnNames: ['changeType', 'changeDate'],
+      })
     );
 
     await queryRunner.createIndex(
       'subscription_history',
-      new Index('IDX_subscription_history_tenant_id', ['tenantId'])
+      new TableIndex({
+        name: 'IDX_subscription_history_tenant_id',
+        columnNames: ['tenantId'],
+      })
     );
 
     await queryRunner.createIndex(
       'subscription_history',
-      new Index('IDX_subscription_history_subscription_id', ['subscriptionId'])
+      new TableIndex({
+        name: 'IDX_subscription_history_subscription_id',
+        columnNames: ['subscriptionId'],
+      })
     );
 
     await queryRunner.createIndex(
       'subscription_history',
-      new Index('IDX_subscription_history_change_date', ['changeDate'])
+      new TableIndex({
+        name: 'IDX_subscription_history_change_date',
+        columnNames: ['changeDate'],
+      })
     );
 
     // Create foreign key constraint to subscriptions table
     await queryRunner.createForeignKey(
       'subscription_history',
-      new ForeignKey({
+      new TableForeignKey({
+        name: 'FK_subscription_history_subscription',
         columnNames: ['subscriptionId'],
         referencedTableName: 'subscriptions',
         referencedColumnNames: ['id'],
         onDelete: 'CASCADE',
-        name: 'FK_subscription_history_subscription',
       })
     );
   }

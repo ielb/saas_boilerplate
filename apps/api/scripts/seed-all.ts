@@ -352,10 +352,13 @@ class MasterSeeder {
       // Step 5: Create users
       await this.createUsers();
 
-      // Step 6: Create user-tenant memberships
+      // Step 6: Assign roles to users
+      await this.assignRolesToUsers();
+
+      // Step 7: Create user-tenant memberships
       await this.createUserTenantMemberships();
 
-      // Step 7: Create subscription plans with Stripe integration
+      // Step 8: Create subscription plans with Stripe integration
       await this.createSubscriptionPlans();
 
       logHeader('🎉 COMPREHENSIVE DATABASE SEEDING COMPLETED!');
@@ -389,8 +392,17 @@ class MasterSeeder {
       }
     }
 
-    await this.permissionRepository.save(permissions);
-    logSuccess(`Created ${permissions.length} permissions`);
+    const savedPermissions = await this.permissionRepository.save(permissions);
+    
+    // Verify all permissions were saved with IDs
+    const invalidPermissions = savedPermissions.filter((p: Permission) => !p.id);
+    if (invalidPermissions.length > 0) {
+      logError(`Failed to save ${invalidPermissions.length} permissions`);
+      throw new Error('Some permissions were not saved correctly');
+    }
+
+    logSuccess(`Created ${savedPermissions.length} permissions`);
+    return savedPermissions;
   }
 
   private async createRoles() {
@@ -463,6 +475,18 @@ class MasterSeeder {
     const roles = await this.roleRepository.find();
     const permissions = await this.permissionRepository.find();
 
+    if (roles.length === 0) {
+      logError('No roles found. Please create roles first.');
+      throw new Error('No roles found');
+    }
+
+    if (permissions.length === 0) {
+      logError('No permissions found. Please create permissions first.');
+      throw new Error('No permissions found');
+    }
+
+    log(`Found ${roles.length} roles and ${permissions.length} permissions`, 'cyan');
+
     for (const role of roles) {
       let rolePermissions: Permission[] = [];
 
@@ -509,10 +533,39 @@ class MasterSeeder {
               p.action === PermissionAction.READ
           );
           break;
+        default:
+          log(`⚠️  Unknown role name: ${role.name}, skipping permission assignment`, 'yellow');
+          continue;
       }
 
-      role.permissions = rolePermissions;
-      await this.roleRepository.save(role);
+      if (rolePermissions.length === 0) {
+        log(`⚠️  No permissions assigned to role: ${role.name}`, 'yellow');
+        continue;
+      }
+
+      // Verify all permissions have valid IDs
+      const invalidPermissions = rolePermissions.filter((p: Permission) => !p.id);
+      if (invalidPermissions.length > 0) {
+        logError(`Found ${invalidPermissions.length} permissions without IDs for role: ${role.name}`);
+        throw new Error(`Invalid permissions found for role: ${role.name}`);
+      }
+
+      // Verify role has valid ID
+      if (!role.id) {
+        logError(`Role ${role.name} does not have a valid ID`);
+        throw new Error(`Invalid role ID for role: ${role.name}`);
+      }
+
+      try {
+        role.permissions = rolePermissions;
+        await this.roleRepository.save(role);
+        log(`✅ Assigned ${rolePermissions.length} permissions to role: ${role.name}`, 'green');
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        logError(`Failed to assign permissions to role ${role.name}: ${errorMessage}`);
+        logError(`Role ID: ${role.id}, Permissions count: ${rolePermissions.length}`);
+        throw error;
+      }
     }
 
     logSuccess('Permissions assigned to roles');
@@ -550,6 +603,22 @@ class MasterSeeder {
 
   private async createUsers() {
     logStep('Creating Users');
+
+    // Fetch tenants to assign tenantId to users
+    const tenants = await this.tenantRepository.find();
+    if (tenants.length === 0) {
+      logError('No tenants found. Please create tenants first.');
+      throw new Error('No tenants found');
+    }
+
+    const systemTenant = tenants.find((t: Tenant) => t.name === 'System');
+    const acmacTenant = tenants.find((t: Tenant) => t.name === 'Acmac');
+
+    if (!systemTenant || !acmacTenant) {
+      logError('Required tenants (System or Acmac) not found.');
+      throw new Error('Required tenants not found');
+    }
+
     const users = [
       {
         email: 'superadmin@example.com',
@@ -558,8 +627,9 @@ class MasterSeeder {
         lastName: 'Admin',
         role: UserRole.OWNER,
         status: UserStatus.ACTIVE,
-        isEmailVerified: true,
+        emailVerified: true,
         authProvider: AuthProvider.LOCAL,
+        tenantId: systemTenant.id, // Super admin belongs to System tenant
       },
       {
         email: 'admin@example.com',
@@ -568,8 +638,9 @@ class MasterSeeder {
         lastName: 'User',
         role: UserRole.ADMIN,
         status: UserStatus.ACTIVE,
-        isEmailVerified: true,
+        emailVerified: true,
         authProvider: AuthProvider.LOCAL,
+        tenantId: acmacTenant.id,
       },
       {
         email: 'manager@example.com',
@@ -578,8 +649,9 @@ class MasterSeeder {
         lastName: 'User',
         role: UserRole.MANAGER,
         status: UserStatus.ACTIVE,
-        isEmailVerified: true,
+        emailVerified: true,
         authProvider: AuthProvider.LOCAL,
+        tenantId: acmacTenant.id,
       },
       {
         email: 'member@example.com',
@@ -588,8 +660,9 @@ class MasterSeeder {
         lastName: 'User',
         role: UserRole.MEMBER,
         status: UserStatus.ACTIVE,
-        isEmailVerified: true,
+        emailVerified: true,
         authProvider: AuthProvider.LOCAL,
+        tenantId: acmacTenant.id,
       },
       {
         email: 'viewer@example.com',
@@ -598,14 +671,89 @@ class MasterSeeder {
         lastName: 'User',
         role: UserRole.VIEWER,
         status: UserStatus.ACTIVE,
-        isEmailVerified: true,
+        emailVerified: true,
         authProvider: AuthProvider.LOCAL,
+        tenantId: acmacTenant.id,
       },
     ];
 
     const createdUsers = await this.userRepository.save(users);
     logSuccess(`Created ${createdUsers.length} users`);
     return createdUsers;
+  }
+
+  private async assignRolesToUsers() {
+    logStep('Assigning Roles to Users');
+
+    const users = await this.userRepository.find();
+    const roles = await this.roleRepository.find();
+
+    if (users.length === 0) {
+      logError('No users found. Please create users first.');
+      throw new Error('No users found');
+    }
+
+    if (roles.length === 0) {
+      logError('No roles found. Please create roles first.');
+      throw new Error('No roles found');
+    }
+
+    log(`Found ${users.length} users and ${roles.length} roles`, 'cyan');
+
+    for (const user of users) {
+      let userRole: Role | undefined;
+
+      // Map UserRole enum to Role entity name
+      switch (user.role) {
+        case UserRole.OWNER:
+          userRole = roles.find((r: Role) => r.name === 'Super Admin');
+          break;
+        case UserRole.ADMIN:
+          userRole = roles.find((r: Role) => r.name === 'Admin');
+          break;
+        case UserRole.MANAGER:
+          userRole = roles.find((r: Role) => r.name === 'Manager');
+          break;
+        case UserRole.MEMBER:
+          userRole = roles.find((r: Role) => r.name === 'Member');
+          break;
+        case UserRole.VIEWER:
+          userRole = roles.find((r: Role) => r.name === 'Viewer');
+          break;
+        default:
+          log(`⚠️  Unknown user role: ${user.role}, skipping role assignment`, 'yellow');
+          continue;
+      }
+
+      if (!userRole) {
+        logError(`Role not found for user role: ${user.role}`);
+        throw new Error(`Role not found for user role: ${user.role}`);
+      }
+
+      // Verify user and role have valid IDs
+      if (!user.id) {
+        logError(`User ${user.email} does not have a valid ID`);
+        throw new Error(`Invalid user ID for user: ${user.email}`);
+      }
+
+      if (!userRole.id) {
+        logError(`Role ${userRole.name} does not have a valid ID`);
+        throw new Error(`Invalid role ID for role: ${userRole.name}`);
+      }
+
+      try {
+        user.roles = [userRole];
+        await this.userRepository.save(user);
+        log(`✅ Assigned role "${userRole.name}" to user: ${user.email}`, 'green');
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        logError(`Failed to assign role to user ${user.email}: ${errorMessage}`);
+        logError(`User ID: ${user.id}, Role ID: ${userRole.id}`);
+        throw error;
+      }
+    }
+
+    logSuccess('Roles assigned to users');
   }
 
   private async createUserTenantMemberships() {
