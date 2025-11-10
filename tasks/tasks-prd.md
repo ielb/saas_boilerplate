@@ -19,6 +19,11 @@ Based on PRD: `docs/prd.md`
 - `apps/api/src/modules/billing/services/tax-calculation.service.ts` - Multi-provider tax calculation service
 - `apps/api/src/modules/billing/services/tax-reporting.service.ts` - Tax reporting and compliance service
 - `apps/api/src/modules/billing/controllers/tax.controller.ts` - Tax API controller with CRUD operations
+- `apps/api/src/modules/billing/controllers/billing-analytics.controller.ts` - Billing analytics controller with comprehensive revenue analytics endpoints
+- `apps/api/src/modules/billing/services/billing-analytics.service.spec.ts` - Comprehensive unit tests for billing analytics service (11 tests passing)
+- `apps/api/src/modules/billing/controllers/billing-analytics.controller.spec.ts` - Unit tests for billing analytics controller
+- `apps/api/src/modules/billing/entities/subscription-history.entity.ts` - Subscription history entity for tracking MRR changes and plan upgrades/downgrades
+- `apps/api/src/database/migrations/1700000000010-CreateSubscriptionHistory.ts` - Database migration for subscription history table
 - `apps/api/src/modules/billing/dto/tax.dto.ts` - Tax-related DTOs for API requests/responses
 - `apps/api/src/modules/notifications/` - Communication module directory
 - `apps/api/src/modules/files/` - File management module directory
@@ -232,7 +237,7 @@ Based on PRD: `docs/prd.md`
   - [x] 4.6 Implement dunning management for failed payments
   - [x] 4.7 Set up usage-based billing for metered services
   - [x] 4.8 Create tax calculation for global compliancels
-  - [ ] 4.9 Implement revenue analytics (MRR, churn, growth)
+  - [x] 4.9 Implement revenue analytics (MRR, churn, growth)
   - [ ] 4.10 Add billing portal for customer self-service
   - [ ] 4.11 Create subscription upgrade/downgrade workflows
   - [ ] 4.12 Implement proration and billing adjustments

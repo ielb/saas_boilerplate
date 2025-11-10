@@ -12,7 +12,7 @@ import { SubscriptionBillingCycle, SubscriptionPlanType } from '@app/shared';
 
 @Entity('subscription_plans')
 @Index(['isActive', 'planType'])
-@Index(['stripeProductId'], { unique: true })
+@Index(['stripeProductId'])
 export class SubscriptionPlan {
   @PrimaryGeneratedColumn('uuid')
   id!: string;

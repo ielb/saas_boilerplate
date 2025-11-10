@@ -431,29 +431,149 @@ export class RoleService {
   private async assignDefaultPermissionsToRole(role: Role): Promise<void> {
     // For Super Admin, assign ALL available permissions
     if (role.name === 'Super Admin') {
+      // Reload permissions from database to ensure they exist
       const allPermissions = await this.permissionRepository.find({
         where: { isActive: true },
       });
 
       if (allPermissions && allPermissions.length > 0) {
-        role.permissions = allPermissions;
-        await this.roleRepository.saveWithTenantScope(role);
-        this.logger.log(
-          `Assigned ${allPermissions.length} permissions to Super Admin role`
-        );
+        // Verify permissions exist by checking their IDs
+        const validPermissions = allPermissions.filter(p => p.id);
+        if (validPermissions.length > 0) {
+          // Use query builder to insert into junction table directly
+          // This avoids issues with saveWithTenantScope and ManyToMany relationships
+          const permissionIds = validPermissions.map(p => p.id);
+          
+          // Delete existing permissions for this role first
+          await this.roleRepository.manager
+            .createQueryBuilder()
+            .delete()
+            .from('role_permissions')
+            .where('roleId = :roleId', { roleId: role.id })
+            .execute();
+
+          // Insert new permissions using raw query to ensure foreign keys exist
+          if (permissionIds.length > 0) {
+            // Verify all permission IDs exist in the database before inserting
+            const existingPermissions = await this.permissionRepository.find({
+              where: { id: In(permissionIds) },
+            });
+            
+            const existingPermissionIds = existingPermissions.map(p => p.id);
+            const missingPermissionIds = permissionIds.filter(
+              id => !existingPermissionIds.includes(id)
+            );
+            
+            if (missingPermissionIds.length > 0) {
+              this.logger.error(
+                `Cannot assign permissions that don't exist: ${missingPermissionIds.join(', ')}`
+              );
+              throw new Error(
+                `Cannot assign permissions that don't exist: ${missingPermissionIds.join(', ')}`
+              );
+            }
+
+            // Insert using query builder
+            await this.roleRepository.manager
+              .createQueryBuilder()
+              .insert()
+              .into('role_permissions')
+              .values(
+                existingPermissionIds.map(permissionId => ({
+                  roleId: role.id,
+                  permissionId: permissionId,
+                  assignedAt: () => 'NOW()',
+                }))
+              )
+              .execute();
+
+            this.logger.log(
+              `Assigned ${validPermissions.length} permissions to Super Admin role`
+            );
+          }
+        } else {
+          this.logger.warn(
+            'No valid permissions found to assign to Super Admin role'
+          );
+        }
+      } else {
+        this.logger.warn('No active permissions found in the system');
       }
     } else {
       // For other roles, use the predefined permission mapping
       const permissionNames = this.getDefaultPermissionsForRole(role.name);
+      if (permissionNames.length === 0) {
+        this.logger.warn(`No default permissions defined for role: ${role.name}`);
+        return;
+      }
+
+      // Reload permissions from database to ensure they're committed
       const permissions = await this.permissionRepository.find({
-        where: { name: In(permissionNames) },
+        where: { name: In(permissionNames), isActive: true },
       });
 
       if (permissions && permissions.length > 0) {
-        role.permissions = permissions;
-        await this.roleRepository.saveWithTenantScope(role);
-        this.logger.log(
-          `Assigned ${permissions.length} permissions to ${role.name} role`
+        // Verify permissions exist by checking their IDs
+        const validPermissions = permissions.filter(p => p.id);
+        if (validPermissions.length > 0) {
+          // Use query builder to insert into junction table directly
+          const permissionIds = validPermissions.map(p => p.id);
+          
+          // Delete existing permissions for this role first
+          await this.roleRepository.manager
+            .createQueryBuilder()
+            .delete()
+            .from('role_permissions')
+            .where('roleId = :roleId', { roleId: role.id })
+            .execute();
+
+          // Insert new permissions using raw query to ensure foreign keys exist
+          if (permissionIds.length > 0) {
+            // Verify all permission IDs exist in the database before inserting
+            const existingPermissions = await this.permissionRepository.find({
+              where: { id: In(permissionIds) },
+            });
+            
+            const existingPermissionIds = existingPermissions.map(p => p.id);
+            const missingPermissionIds = permissionIds.filter(
+              id => !existingPermissionIds.includes(id)
+            );
+            
+            if (missingPermissionIds.length > 0) {
+              this.logger.error(
+                `Cannot assign permissions that don't exist for role ${role.name}: ${missingPermissionIds.join(', ')}`
+              );
+              throw new Error(
+                `Cannot assign permissions that don't exist: ${missingPermissionIds.join(', ')}`
+              );
+            }
+
+            // Insert using query builder
+            await this.roleRepository.manager
+              .createQueryBuilder()
+              .insert()
+              .into('role_permissions')
+              .values(
+                existingPermissionIds.map(permissionId => ({
+                  roleId: role.id,
+                  permissionId: permissionId,
+                  assignedAt: () => 'NOW()',
+                }))
+              )
+              .execute();
+
+            this.logger.log(
+              `Assigned ${validPermissions.length} permissions to ${role.name} role`
+            );
+          }
+        } else {
+          this.logger.warn(
+            `No valid permissions found to assign to ${role.name} role`
+          );
+        }
+      } else {
+        this.logger.warn(
+          `No permissions found for role ${role.name}. Expected: ${permissionNames.join(', ')}`
         );
       }
     }

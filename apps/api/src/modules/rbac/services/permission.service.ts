@@ -180,8 +180,9 @@ export class PermissionService {
     });
   }
 
-  async createDefaultPermissions(): Promise<void> {
+  async createDefaultPermissions(): Promise<Permission[]> {
     const defaultPermissions = this.generateDefaultPermissions();
+    const createdPermissions: Permission[] = [];
 
     for (const permissionData of defaultPermissions) {
       const existingPermission = await this.getPermissionByName(
@@ -195,12 +196,25 @@ export class PermissionService {
           isActive: true,
         });
 
-        await this.permissionRepository.save(permission);
-        this.logger.log(`Created default permission: ${permission.name}`);
+        const savedPermission = await this.permissionRepository.save(permission);
+        // Reload the permission to ensure it's fully persisted and has an ID
+        const reloadedPermission = await this.permissionRepository.findOne({
+          where: { id: savedPermission.id },
+        });
+        
+        if (reloadedPermission) {
+          createdPermissions.push(reloadedPermission);
+          this.logger.log(`Created default permission: ${reloadedPermission.name} (ID: ${reloadedPermission.id})`);
+        } else {
+          this.logger.warn(`Failed to reload permission after creation: ${savedPermission.name}`);
+        }
+      } else {
+        createdPermissions.push(existingPermission);
       }
     }
 
-    this.logger.log('Default permissions creation completed');
+    this.logger.log(`Default permissions creation completed. Total: ${createdPermissions.length}`);
+    return createdPermissions;
   }
 
   private generateDefaultPermissions(): Partial<Permission>[] {

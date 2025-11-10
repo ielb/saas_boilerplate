@@ -45,7 +45,7 @@ export class Session {
   @Column({ type: 'varchar', length: 255, nullable: true })
   deviceFingerprint!: string | null;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column({ type: 'varchar', length: 255 })
   deviceName!: string;
 
   @Column({ type: 'varchar', length: 50 })
@@ -66,7 +66,7 @@ export class Session {
   @Column({ type: 'varchar', length: 45 })
   ipAddress!: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
+  @Column({ type: 'text', nullable: true })
   userAgent!: string | null;
 
   @Column({ type: 'varchar', length: 100, nullable: true })

@@ -12,6 +12,7 @@ import {
   UseGuards,
   UseInterceptors,
   BadRequestException,
+  Request,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -22,6 +23,7 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { TenantService } from '../services/tenant.service';
+import { TenantSwitchingService } from '../services/tenant-switching.service';
 import {
   CreateTenantDto,
   UpdateTenantDto,
@@ -39,11 +41,7 @@ import {
   convertFeatureToEnum,
   getValidFeatures,
 } from '../utils/feature-converter.util';
-import {
-  Tenant,
-  TenantUsage,
-  TenantFeatureFlag,
-} from '../entities';
+import { Tenant, TenantUsage, TenantFeatureFlag } from '../entities';
 import { TenantFeature } from '../entities/tenant-feature-flag.entity';
 import { TenantUsageMetric } from '../entities/tenant-usage.entity';
 import { AuthGuard } from '../../auth/guards/auth.guard';
@@ -61,7 +59,10 @@ import { UserRole } from '@app/shared';
 @UseGuards(AuthGuard, RolesGuard)
 @ApiBearerAuth()
 export class TenantController {
-  constructor(private readonly tenantService: TenantService) {}
+  constructor(
+    private readonly tenantService: TenantService,
+    private readonly tenantSwitchingService: TenantSwitchingService
+  ) {}
 
   @Post()
   @UseInterceptors(AuditInterceptor)
@@ -124,6 +125,41 @@ export class TenantController {
   })
   async getTenantStatistics() {
     return await this.tenantService.getTenantStatistics();
+  }
+
+  // IMPORTANT: 'current' route must come BEFORE ':id' route
+  // Otherwise '/tenants/current' will be matched by ':id' with id='current'
+  @Get('current')
+  @Roles(UserRole.ADMIN, UserRole.OWNER, UserRole.MANAGER, UserRole.MEMBER)
+  @ApiOperation({ summary: 'Get current tenant context' })
+  @ApiResponse({
+    status: 200,
+    description: 'Current tenant context retrieved successfully',
+  })
+  async getCurrentTenant(@Request() req: any) {
+    // Delegate to tenant switching service for consistency
+    const { tenant, membership } =
+      await this.tenantSwitchingService.getCurrentTenantContext(req.user.id);
+    return {
+      success: true,
+      tenantContext: {
+        id: tenant.id,
+        name: tenant.name,
+        domain: tenant.domain,
+        plan: tenant.plan,
+        features: tenant.features || [],
+        settings: tenant.settings || {},
+      },
+      membership: {
+        id: membership.id,
+        role: membership.role,
+        status: membership.status,
+        joinedAt: membership.joinedAt,
+        lastAccessedAt: membership.lastAccessedAt,
+        permissions:
+          membership.permissions?.map((p: any) => p.getFullName()) || [],
+      },
+    };
   }
 
   @Get(':id')

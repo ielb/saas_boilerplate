@@ -92,11 +92,6 @@ export class Role {
   childRoles!: Role[];
 
   @ManyToMany(() => User, (user: User) => user.roles)
-  @JoinTable({
-    name: 'user_roles',
-    joinColumn: { name: 'roleId', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'userId', referencedColumnName: 'id' },
-  })
   users!: User[];
 
   isOwner(): boolean {
